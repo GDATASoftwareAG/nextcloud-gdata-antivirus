@@ -1,0 +1,29 @@
+services:
+  db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: nextcloud
+      POSTGRES_PASSWORD: nextcloud
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  app:
+    image: nextcloud:production
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    links:
+      - db
+    volumes:
+      - nextcloud:/var/www/html
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_PASSWORD=nextcloud
+      - POSTGRES_HOST=db
+
+volumes:
+  db:
+  nextcloud:

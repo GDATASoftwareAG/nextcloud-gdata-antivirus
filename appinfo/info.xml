@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<info>
+    <!--
+    SPDX-FileCopyrightText: Lennart Dohmann <lennart.dohmann@gdata.de>
+    SPDX-License-Identifier: CC0-1.0
+    -->
+    <id>gdatavaas</id>
+    <name>G DATA Antivirus</name>
+    <summary>This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.</summary>
+    <version>0.1.0</version>
+    <licence>agpl</licence>
+    <author mail="lennart.dohmann@gdata.de" homepage="https://www.gdata.de/oem/verdict-as-a-service">Lennart Dohmann</author>
+    <namespace>GDataVaas</namespace>
+    <category>security</category>
+    <bugs>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues</bugs>
+    <settings>
+        <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
+        <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
+    </settings>
+    <dependencies>
+        <nextcloud min-version="27" max-version="27"/>
+    </dependencies>
+	<background-jobs>
+		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
+		<job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
+	</background-jobs>
+	<database>pgsql</database>
+	<database>mysql</database>
+	<database>sqlite</database>
+</info>

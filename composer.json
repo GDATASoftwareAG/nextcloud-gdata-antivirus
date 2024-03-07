@@ -1,0 +1,34 @@
+{
+	"name": "nextcloud/gdatavaas",
+	"description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
+	"type": "project",
+	"license": "AGPL-3.0-or-later",
+	"authors": [
+		{
+			"name": "Lennart Dohmann"
+		}
+	],
+	"require-dev": {
+		"nextcloud/coding-standard": "^1.0",
+		"nextcloud/ocp": "dev-master"
+	},
+	"require": {
+		"gdata/vaas": "^7.2.0",
+		"psr/log": "^1.1"
+	},
+	"scripts": {
+		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+		"cs:check": "php-cs-fixer fix --dry-run --diff",
+		"cs:fix": "php-cs-fixer fix",
+		"psalm": "psalm.phar --threads=1",
+		"psalm:update-baseline": "psalm.phar --threads=1 --update-baseline",
+		"psalm:update-baseline:force": "psalm.phar --threads=1 --update-baseline --set-baseline=tests/psalm-baseline.xml",
+		"psalm:clear": "psalm.phar --clear-cache && psalm --clear-global-cache",
+		"psalm:fix": "psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/package-versions-deprecated": true
+		}
+	}
+}
