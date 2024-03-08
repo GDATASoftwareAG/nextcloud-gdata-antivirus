@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: Lennart Dohmann <lennart.dohmann@gdata.de>
 SPDX-License-Identifier: CC0-1.0
 -->
 
-# G DATA Anti-Malware for Nextcloud
+# G DATA Antivirus for Nextcloud
 
 ![Image](img/example.png)
 
@@ -27,10 +27,9 @@ Before you start, make sure you have the following tools installed:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [Node.js](https://nodejs.org/en/)
 - [Composer](https://getcomposer.org/)
 
-Also you need to make an ```npm install``` and a ```composer install``` before you can start the development environment.
+Also you need to make a ```composer install``` before you can start the development environment.
 
 ### Windows
 For Windows you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
