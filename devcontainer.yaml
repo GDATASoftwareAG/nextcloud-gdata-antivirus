@@ -1,0 +1,21 @@
+services:
+  dev:
+    image: mcr.microsoft.com/devcontainers/php:8.3
+    working_dir: /workspaces/nextcloud-gdata-antivirus
+    volumes:
+      - .:/workspaces/nextcloud-gdata-antivirus:cached
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  nextcloud:
+    image: ghcr.io/juliushaertl/nextcloud-dev-php82:latest
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html/apps-extra/gdatavaas:ro,cached
+      - .:/workspaces/nextcloud-gdata-antivirus:cached
+    environment:
+      SERVER_BRANCH: v27.1.6
+
+volumes:
+  nextcloud:
