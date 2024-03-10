@@ -14,7 +14,8 @@
 	// connected. This is typically a file mount in .devcontainer/docker-compose.yml
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"features": {
-		"ghcr.io/devcontainers/features/php:1": {}
+		"ghcr.io/devcontainers/features/php:1": {},
+		"ghcr.io/devcontainers-contrib/features/node-asdf:0": {}
 	},
 	"remoteUser": "www-data",
 	"remoteEnv": {
