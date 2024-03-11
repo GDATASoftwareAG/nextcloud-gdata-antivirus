@@ -25,16 +25,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const authSubmit = document.querySelector('#auth_submit');
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
-	const modifyValues = document.querySelector('#modify_values');
-	const modifyValuesAdvanced = document.querySelector('#modify_values_advanced');
 	const autoScanFiles = document.querySelector('#auto_scan_files');
 	const scanOnlyNew = document.querySelector('#scan_only_new');
 	const prefixMalicious = document.querySelector('#prefixMalicious');
 	const authMethod = document.querySelector('#authMethod');
-
-	const toggleReadOnly = (ids, readOnly) => {
-		ids.forEach(id => document.querySelector(`#${id}`).toggleAttribute('readonly', readOnly));
-	}
+	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
 
 	authSubmit.addEventListener('click', async (e) => {
 		e.preventDefault();
@@ -55,7 +50,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const msgElement = document.querySelector('#auth_save_msg');
 
 		if (response.status === "success") {
-			toggleReadOnly(['username', 'password', 'clientId', 'clientSecret', 'authMethod', 'quarantine_folder'], true);
 			msgElement.textContent = 'Data saved successfully.';
 		} else {
 			msgElement.textContent = 'An error occurred when saving the data.';
@@ -71,21 +65,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const msgElement = document.querySelector('#auth_save_msg_advanced');
 
 		if (response.status === "success") {
-			toggleReadOnly(['token_endpoint', 'vaas_url'], true);
 			msgElement.textContent = 'Data saved successfully.';
 		} else {
 			msgElement.textContent = 'An error occurred when saving the data.';
 		}
-	});
-
-	modifyValues.addEventListener('click', (e) => {
-		e.preventDefault();
-		toggleReadOnly(['username', 'password', 'clientId', 'clientSecret', 'authMethod', 'quarantine_folder'], false);
-	});
-
-	modifyValuesAdvanced.addEventListener('click', (e) => {
-		e.preventDefault();
-		toggleReadOnly(['token_endpoint', 'vaas_url'], false);
 	});
 
 	autoScanFiles.addEventListener('click', async () => {
@@ -98,6 +81,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	prefixMalicious.addEventListener('click', async () => {
 		await postData(OC.generateUrl('apps/gdatavaas/setPrefixMalicious'), {prefixMalicious: prefixMalicious.checked});
+	});
+	
+	disableUnscannedTag.addEventListener('click', async () => {
+		await postData(OC.generateUrl('apps/gdatavaas/setDisableUnscannedTag'), {disableUnscannedTag: disableUnscannedTag.checked});
 	});
 
 	// Activate or deactivate scanning only for new files
@@ -132,4 +119,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await toggleScanOnlyNew(false);
 	}
 	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
+	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;
 });

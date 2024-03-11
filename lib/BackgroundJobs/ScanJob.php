@@ -24,7 +24,7 @@ class ScanJob extends TimedJob {
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
 
-		$this->setInterval(5 * 60);
+		$this->setInterval(5);
 		$this->setAllowParallelRuns(false);
 		$this->setTimeSensitivity(self::TIME_INSENSITIVE);
 	}
@@ -32,9 +32,11 @@ class ScanJob extends TimedJob {
     /**
      * @param $argument
      * @return void
+     * @throws \OCP\DB\Exception if the database platform is not supported
      */
     protected function run($argument): void
 	{
+        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
 		$autoScan = $this->appConfig->getAppValue(self::APP_ID, 'autoScanFiles');
 		if (!$autoScan) {
 			return;
@@ -47,11 +49,21 @@ class ScanJob extends TimedJob {
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
 
-		if ($autoScanOnlyNewFiles) {
-            $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
-		} else {
-            $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId()], $quantity, $unscannedTag);
-		}
+        if ($unscannedTagIsDisabled) {
+            if ($autoScanOnlyNewFiles) {
+                $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId()];
+            } else {
+                $excludedTagIds = [$unscannedTag->getId()];
+            }
+            $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, $quantity);
+        }
+        else {
+            if ($autoScanOnlyNewFiles) {
+                $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
+            } else {
+                $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId()], $quantity, $unscannedTag);
+            }
+        }
 
 		foreach ($fileIds as $fileId) {
             try {

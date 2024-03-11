@@ -111,11 +111,12 @@ class TagService
 
     /**
      * @param array $excludedTagIds
+     * @param int $limit
      * @return array
      * @throws Exception if the database platform is not supported
      */
-    public function getFileIdsWithoutTags(array $excludedTagIds): array {
-        return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds);
+    public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array {
+        return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit);
     }
 
     /**
@@ -139,5 +140,20 @@ class TagService
         $objectIds = $this->tagMapper->getObjectIdsForTags($tagIds, 'files');
         shuffle($objectIds);
         return array_merge($objectIdsPrior, array_slice($objectIds, 0, $limit - count($objectIdsPrior)));
+    }
+
+    /**
+     * Delete a tag by name if it exists
+     * @param string $tagName
+     * @return void
+     */
+    public function removeTag(string $tagName): void
+    {
+        try{
+            $tag = $this->getTag($tagName, false);
+        } catch (TagNotFoundException) {
+            return;
+        }
+        $this->tagService->deleteTags([$tag->getId()]);
     }
 }
