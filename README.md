@@ -5,7 +5,7 @@ SPDX-License-Identifier: CC0-1.0
 
 # G DATA Antivirus for Nextcloud
 
-![Image](img/example.png)
+![Image](img/example.gif)
 
 ## Introduction
 
