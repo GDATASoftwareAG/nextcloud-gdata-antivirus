@@ -3,6 +3,7 @@
 namespace OCA\GDataVaas\Service;
 
 use Exception;
+use OC\User\NoUserException;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
@@ -80,7 +81,8 @@ class VerdictService
      * @throws NotPermittedException
      * @throws FileDoesNotExistException if the VaaS SDK could not find the file
      * @throws EntityTooLargeException if the file that should be scanned is too large
-    */
+     * @throws NoUserException
+     */
     public function scanFileById(int $fileId): Verdict
     {
         $node = $this->fileService->getNodeFromFileId($fileId);

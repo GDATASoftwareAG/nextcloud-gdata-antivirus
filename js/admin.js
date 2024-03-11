@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const authSubmit = document.querySelector('#auth_submit');
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
+	const resetAllTags = document.querySelector('#reset');
 	const autoScanFiles = document.querySelector('#auto_scan_files');
 	const scanOnlyNew = document.querySelector('#scan_only_new');
 	const prefixMalicious = document.querySelector('#prefixMalicious');
@@ -38,6 +39,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const clientId = document.querySelector('#clientId').value;
 		const clientSecret = document.querySelector('#clientSecret').value;
 		const quarantineFolder = document.querySelector('#quarantine_folder').value;
+		const allowlist = document.querySelector('#allowlist').value;
+		const blocklist = document.querySelector('#blocklist').value;
+		const scanQueueLength = document.querySelector('#scan_queue_length').value;
 
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
 			username: username,
@@ -45,7 +49,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 			clientId: clientId,
 			clientSecret: clientSecret,
 			authMethod: authMethod.value,
-			quarantineFolder
+			quarantineFolder,
+			allowlist,
+			blocklist,
+			scanQueueLength
 		});
 		const msgElement = document.querySelector('#auth_save_msg');
 
@@ -68,6 +75,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 			msgElement.textContent = 'Data saved successfully.';
 		} else {
 			msgElement.textContent = 'An error occurred when saving the data.';
+		}
+	});
+
+	resetAllTags.addEventListener('click', async (e) => {
+		e.preventDefault();
+		const response = await postData(OC.generateUrl('apps/gdatavaas/resetalltags'), {});
+		const msgElement = document.querySelector('#auth_save_msg_advanced');
+
+		if (response.status === "success") {
+			msgElement.textContent = 'All tags have been reset successfully.';
+		} else {
+			msgElement.textContent = 'An error occurred when resetting the tags.';
 		}
 	});
 
