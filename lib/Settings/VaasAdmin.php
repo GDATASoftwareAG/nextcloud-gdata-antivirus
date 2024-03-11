@@ -29,6 +29,7 @@ class VaasAdmin implements ISettings {
 			'autoScanFiles' => $this->config->getAppValue(self::APP_ID, 'autoScanFiles', false),
 			'scanOnlyNewFiles' => $this->config->getAppValue(self::APP_ID, 'scanOnlyNewFiles', false),
 			'prefixMalicious' => $this->config->getAppValue(self::APP_ID, 'prefixMalicious', true),
+            'disableUnscannedTag' => $this->config->getAppValue(self::APP_ID, 'disableUnscannedTag', false),
 			// TODO: Make settible for user in settingspage
 			'scanQueueLength' => $this->config->getAppValue(self::APP_ID, 'scanQueueLength', 5),
 		];

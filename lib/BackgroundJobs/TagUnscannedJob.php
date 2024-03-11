@@ -6,13 +6,19 @@ use OCA\GDataVaas\Service\TagService;
 use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\Exception;
+use OCP\IConfig;
 
 class TagUnscannedJob extends TimedJob {
-    private TagService $tagService;
 
-    public function __construct(ITimeFactory $time, TagService $tagService) {
+    private const APP_ID = "gdatavaas";
+    
+    private TagService $tagService;
+    private IConfig $appConfig;
+
+    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService) {
         parent::__construct($time);
         
+        $this->appConfig = $appConfig;
         $this->tagService = $tagService;
 
         $this->setInterval(5 * 60);
@@ -27,13 +33,19 @@ class TagUnscannedJob extends TimedJob {
      */
     protected function run($argument): void
     {
+        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
+        if ($unscannedTagIsDisabled) {
+            $this->tagService->removeTag(TagService::UNSCANNED);
+            return;
+        }
+        
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
         
         $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId()];
         
-        $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds);
+        $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 1000);
         
         if (count($fileIds) == 0) {
             return;

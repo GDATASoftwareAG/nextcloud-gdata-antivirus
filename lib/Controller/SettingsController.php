@@ -74,4 +74,15 @@ class SettingsController extends Controller {
 	{
 		return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'authMethod')]);
 	}
+
+    public function setDisableUnscannedTag(bool $disableUnscannedTag): JSONResponse
+    {
+        $this->config->setAppValue($this->appName, 'disableUnscannedTag', $disableUnscannedTag);
+        return new JSONResponse(['status' => 'success']);
+    }
+
+    public function getDisableUnscannedTag(): JSONResponse
+    {
+        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'disableUnscannedTag')]);
+    }
 }

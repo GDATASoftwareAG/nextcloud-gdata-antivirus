@@ -23,28 +23,27 @@
             </tr>
             <tr class="basic_settings">
                 <td><label for="username">Username</label></td>
-                <td class="input_field"><input id="username" type="text" name="username" value="<?php p($_['username']); ?>" <?php if ($_['username'] !== '') { echo 'readonly'; } ?> /></td>
+                <td class="input_field"><input id="username" type="text" name="username" value="<?php p($_['username']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
                 <td><label for="password">Password</label></td>
-                <td class="input_field"><input id="password" type="password" name="password" value="<?php p($_['password']); ?>" <?php if ($_['password'] !== '') { echo 'readonly'; } ?> /></td>
+                <td class="input_field"><input id="password" type="password" name="password" value="<?php p($_['password']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
                 <td><label for="clientId">Client ID</label></td>
-                <td class="input_field"><input id="clientId" type="text" name="clientId" value="<?php p($_['clientId']); ?>" <?php if ($_['clientId'] !== '') { echo 'readonly'; } ?> /></td>
+                <td class="input_field"><input id="clientId" type="text" name="clientId" value="<?php p($_['clientId']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
                 <td><label for="clientSecret">Client Secret</label></td>
-                <td class="input_field"><input id="clientSecret" type="password" name="clientSecret" value="<?php p($_['clientSecret']); ?>" <?php if ($_['clientSecret'] !== '') { echo 'readonly'; } ?> /></td>
+                <td class="input_field"><input id="clientSecret" type="password" name="clientSecret" value="<?php p($_['clientSecret']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
                 <td><label for="quarantine_folder"><?php p($l->t('Quarantine folder'));?></label></td>
-                <td class="input_field"><input id="quarantine_folder" type="text" name="quarantineFolder" value="<?php p($_['quarantineFolder']); ?>" <?php if ($_['quarantineFolder'] !== '') { echo 'readonly'; } ?> /></td>
+                <td class="input_field"><input id="quarantine_folder" type="text" name="quarantineFolder" value="<?php p($_['quarantineFolder']); ?>"/></td>
             </tr>
         </table>
         <h4><?php p($l->t('If you do not want to use a quarantine folder, just save it empty (malicious files will stay where they are).'));?></h4>
         <input id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
-        <button id="modify_values"><?php p($l->t('Modify'));?></button>
         <span id="auth_save_msg"></span>
         <div id="advanced_settings">
             <h3><?php p($l->t('Advanced Settings'));?></h3>
@@ -52,15 +51,14 @@
             <table>
                 <tr class="token_endpoint">
                     <td><label for="token_endpoint">Token Endpoint</label></td>
-                    <td class="input_field"><input type="text" id="token_endpoint" name="tokenEndpoint" value="<?php p($_['tokenEndpoint']); ?>" <?php if ($_['tokenEndpoint'] !== '') { echo 'readonly'; } ?> /></td>
+                    <td class="input_field"><input type="text" id="token_endpoint" name="tokenEndpoint" value="<?php p($_['tokenEndpoint']); ?>"/></td>
                 </tr>
                 <tr class="vaas_url">
                     <td><label for="vaas_url">Vaas URL</label></td>
-                    <td class="input_field"><input type="text" id="vaas_url" name="vaasUrl" value="<?php p($_['vaasUrl']); ?>" <?php if ($_['vaasUrl'] !== '') { echo 'readonly'; } ?> /></td>
+                    <td class="input_field"><input type="text" id="vaas_url" name="vaasUrl" value="<?php p($_['vaasUrl']); ?>"/></td>
                 </tr>
             </table>
             <input id="auth_submit_advanced" type="submit" value="<?php p($l->t('Save'));?>" />
-            <button id="modify_values_advanced"><?php p($l->t('Modify'));?></button>
             <span id="auth_save_msg_advanced"></span>
         </div>
     </fieldset>
@@ -87,6 +85,13 @@
                 <label for="prefixMalicious"></label>
             </td>
             <td><label><?php p($l->t('Set prefix for malicious files'));?></label></td>
+        </tr>
+        <tr>
+            <td>
+                <input id="disable_tag_unscanned" class="toggle-round" type="checkbox">
+                <label for="disable_tag_unscanned"></label>
+            </td>
+            <td><label><?php p($l->t('Disable Unscanned tag'));?></label></td>
         </tr>
     </table>
 </div>

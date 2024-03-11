@@ -16,10 +16,11 @@ class DbFileMapper extends QBMapper {
     /**
      * Get file ids that do not have any of the given tags
      * @param array $excludedTagIds
+     * @param int $limit
      * @return array of file ids
      * @throws Exception if the database platform is not supported
      */
-    public function getFileIdsWithoutTags(array $excludedTagIds): array {
+    public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array {
         $qb = $this->db->getQueryBuilder();
         $qb->automaticTablePrefix(true);
         
@@ -31,7 +32,8 @@ class DbFileMapper extends QBMapper {
             ->orWhere($qb->expr()->isNull('o.systemtagid'))
             ->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
             ->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
-            ->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')));
+            ->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+            ->setMaxResults($limit);
         
         $fileIds = [];
         $result = $qb->executeQuery();
