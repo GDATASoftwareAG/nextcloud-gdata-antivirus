@@ -156,4 +156,15 @@ class TagService
         }
         $this->tagService->deleteTags([$tag->getId()]);
     }
+
+    /**
+     * Removes all tags
+     * @return void
+     */
+    public function resetAllTags(): void
+    {
+        $this->removeTag(self::CLEAN);
+        $this->removeTag(self::MALICIOUS);
+        $this->removeTag(self::UNSCANNED);
+    }
 }

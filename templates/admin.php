@@ -14,19 +14,19 @@
         <h3>You may use self registration and create a new username and password by yourself <a href="https://vaas.gdata.de/login" target="_blank">here</a> for free.</h3>
         <table class="basic_settings_table">
             <tr class="basic_settings">
-                <td><label for="auth_method">Authentication Method</label></td>
+                <td><label for="auth_method"><?php p($l->t('Authentication Method'));?></label></td>
                 <td class="input_field">
                     <select id="authMethod" name="authMethod">
-                        <option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') { echo 'selected'; } ?>>ClientCredentials</option>
-                        <option value="ResourceOwnerPassword" <?php if ($_['authMethod'] === 'ResourceOwnerPassword') { echo 'selected'; } ?>>ResourceOwnerPassword</option>
+                        <option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') { echo 'selected'; } ?>>Client Credentials Flow</option>
+                        <option value="ResourceOwnerPassword" <?php if ($_['authMethod'] === 'ResourceOwnerPassword') { echo 'selected'; } ?>>Resource Owner Password Flow</option>
                     </select>
             </tr>
             <tr class="basic_settings">
-                <td><label for="username">Username</label></td>
+                <td><label for="username"><?php p($l->t('Username'));?></label></td>
                 <td class="input_field"><input id="username" type="text" name="username" value="<?php p($_['username']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
-                <td><label for="password">Password</label></td>
+                <td><label for="password"><?php p($l->t('Password'));?></label></td>
                 <td class="input_field"><input id="password" type="password" name="password" value="<?php p($_['password']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
@@ -41,9 +41,20 @@
                 <td><label for="quarantine_folder"><?php p($l->t('Quarantine folder'));?></label></td>
                 <td class="input_field"><input id="quarantine_folder" type="text" name="quarantineFolder" value="<?php p($_['quarantineFolder']); ?>"/></td>
             </tr>
+            <tr class="basic_settings">
+                <td><label for="allowlist">Allowlist</label></td>
+                <td class="input_field"><input id="allowlist" type="text" name="allowlist" value="<?php p($_['allowlist']); ?>"/></td>
+            </tr>
+            <tr class="basic_settings">
+                <td><label for="blocklist">Blocklist</label></td>
+                <td class="input_field"><input id="blocklist" type="text" name="blocklist" value="<?php p($_['blocklist']); ?>"/></td>
+            </tr>
+            <tr class="basic_settings">
+                <td><label for="scan_queue_length"><?php p($l->t('Scan queue length'));?></label></td>
+                <td class="input_field"><input id="scan_queue_length" type="text" name="scan_queue_length" value="<?php p($_['scanQueueLength']); ?>"/></td>
+            </tr>
         </table>
-        <h4><?php p($l->t('If you do not want to use a quarantine folder, just save it empty (malicious files will stay where they are).'));?></h4>
-        <input id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
+        <input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
         <span id="auth_save_msg"></span>
         <div id="advanced_settings">
             <h3><?php p($l->t('Advanced Settings'));?></h3>
@@ -58,6 +69,7 @@
                     <td class="input_field"><input type="text" id="vaas_url" name="vaasUrl" value="<?php p($_['vaasUrl']); ?>"/></td>
                 </tr>
             </table>
+            <input class="submit-button" id="reset" type="submit" value="<?php p($l->t('Reset all tags'));?>" />
             <input id="auth_submit_advanced" type="submit" value="<?php p($l->t('Save'));?>" />
             <span id="auth_save_msg_advanced"></span>
         </div>

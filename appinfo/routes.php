@@ -17,6 +17,7 @@ return [
 		['name' => 'settings#getPrefixMalicious', 'url' => '/getPrefixMalicious', 'verb' => 'GET'],
 		['name' => 'settings#getAuthMethod', 'url' => '/getAuthMethod', 'verb' => 'GET'],
 		['name' => 'settings#setDisableUnscannedTag', 'url' => '/setDisableUnscannedTag', 'verb' => 'POST'],
-		['name' => 'settings#getDisableUnscannedTag', 'url' => '/getDisableUnscannedTag', 'verb' => 'GET']
+		['name' => 'settings#getDisableUnscannedTag', 'url' => '/getDisableUnscannedTag', 'verb' => 'GET'],
+		['name' => 'settings#resetAllTags', 'url' => '/resetalltags', 'verb' => 'POST']
 	]
 ];

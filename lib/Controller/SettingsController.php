@@ -2,6 +2,7 @@
 
 namespace OCA\GDataVaas\Controller;
 
+use OCA\GDataVaas\Service\TagService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
@@ -9,13 +10,15 @@ use OCP\IRequest;
 
 class SettingsController extends Controller {
 	private IConfig $config;
+    private TagService $tagService;
 
-	public function __construct($appName, IRequest $request, IConfig $config) {
+	public function __construct($appName, IRequest $request, IConfig $config, TagService $tagService) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
+        $this->tagService = $tagService;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder): JSONResponse
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength): JSONResponse
 	{
 		$this->config->setAppValue($this->appName, 'username', $username);
 		if (!empty($password)) {
@@ -27,6 +30,9 @@ class SettingsController extends Controller {
 		}
 		$this->config->setAppValue($this->appName, 'authMethod', $authMethod);
 		$this->config->setAppValue($this->appName, 'quarantineFolder', $quarantineFolder);
+        $this->config->setAppValue($this->appName, 'allowlist', $allowlist);
+        $this->config->setAppValue($this->appName, 'blocklist', $blocklist);
+        $this->config->setAppValue($this->appName, 'scanQueueLength', $scanQueueLength);
 		return new JSONResponse(['status' => 'success']);
 	}
 
@@ -84,5 +90,11 @@ class SettingsController extends Controller {
     public function getDisableUnscannedTag(): JSONResponse
     {
         return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'disableUnscannedTag')]);
+    }
+    
+    public function resetAllTags(): JSONResponse
+    {
+        $this->tagService->resetAllTags();
+        return new JSONResponse(['status' => 'success']);
     }
 }
