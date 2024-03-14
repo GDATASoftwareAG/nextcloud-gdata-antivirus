@@ -9,12 +9,14 @@ use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
+use Psr\Log\LoggerInterface;
 use VaasSdk\ClientCredentialsGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
 use VaasSdk\Exceptions\InvalidSha256Exception;
 use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Message\VaasVerdict;
 use VaasSdk\Message\Verdict;
 use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
@@ -36,9 +38,11 @@ class VerdictService
 	private FileService $fileService;
     private TagService $tagService;
     private Vaas $vaas;
+    private LoggerInterface $logger;
 
-    public function __construct(IConfig $appConfig, FileService $fileService, TagService $tagService)
+    public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService)
     {
+        $this->logger = $logger;
         $this->appConfig = $appConfig;
         $this->fileService = $fileService;
         $this->tagService = $tagService;
@@ -71,7 +75,7 @@ class VerdictService
     /**
      * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
      * @param int $fileId
-     * @return Verdict
+     * @return VaasVerdict
      * @throws InvalidPathException
      * @throws InvalidSha256Exception
      * @throws NotFoundException
@@ -83,7 +87,7 @@ class VerdictService
      * @throws EntityTooLargeException if the file that should be scanned is too large
      * @throws NoUserException
      */
-    public function scanFileById(int $fileId): Verdict
+    public function scanFileById(int $fileId): VaasVerdict
     {
         $node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
@@ -91,13 +95,39 @@ class VerdictService
 			throw new EntityTooLargeException("File is too large");
 		}
         $this->vaas->Connect($this->authenticator->getToken());
-		$verdict = $this->vaas->ForFile($filePath)->Verdict;
+		$verdict = $this->vaas->ForFile($filePath);
+        
+        $detections = $verdict->Detections;
+        $sha256 = $verdict->Sha256;
+        if (!empty($verdict->LibMagic)) {
+            $mimeType = $verdict->LibMagic->mime_type;
+            $fileType = $verdict->LibMagic->file_type;
+        } else {
+            $mimeType = "None";
+            $fileType = "None";
+        }        
+        if (empty($detections)) {
+            $detections = "None";
+        } else {
+            $detections = implode(", ", $detections);
+        }
+        if (empty($mimeType)) {
+            $mimeType = "None";
+        }
+        if (empty($fileType)) {
+            $fileType = "None";
+        }
+        if (empty($sha256)) {
+            $sha256 = "None";
+        }
+        
+        $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Detections: " . $detections . ", Mime type: " . $mimeType . ", File type: " . $fileType . ", SHA256: " . $sha256);
 
         $this->tagService->removeTagFromFile(TagService::CLEAN, $fileId);
         $this->tagService->removeTagFromFile(TagService::MALICIOUS, $fileId);
         $this->tagService->removeTagFromFile(TagService::UNSCANNED, $fileId);
 
-        switch ($verdict->value) {
+        switch ($verdict->Verdict->value) {
             case TagService::CLEAN:
                 $this->tagService->setTag($fileId, TagService::CLEAN);
                 break;
