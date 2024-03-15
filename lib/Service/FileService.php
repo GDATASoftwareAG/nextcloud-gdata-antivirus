@@ -11,6 +11,7 @@ use OCP\Files\Node;
 use OCP\Files\NotFoundException;
 use OCP\Files\IRootFolder;
 use OCP\Lock\LockedException;
+use Psr\Log\LoggerInterface;
 
 class FileService
 {
@@ -19,11 +20,13 @@ class FileService
 	private IUserMountCache $userMountCache;
 	private IRootFolder $rootFolder;
 	private IConfig $appConfig;
+    private LoggerInterface $logger;
 
-	public function __construct(IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig) {
+    public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig) {
         $this->userMountCache = $userMountCache;
         $this->rootFolder = $rootFolder;
         $this->appConfig = $appConfig;
+        $this->logger = $logger;
     }
 
     /**
@@ -43,6 +46,7 @@ class FileService
             if (!str_starts_with($file->getName(), '[MALICIOUS] ')) {
                 $newFileName = "[MALICIOUS] " . $file->getName();
                 $file->move($file->getParent()->getPath() . '/' . $newFileName);
+                $this->logger->error("Malicious prefix added to file " . $file->getName() . " (" . $fileId . ")");
             }
         }
     }
@@ -99,8 +103,10 @@ class FileService
 			$quarantine = $mountUserFolder->get($quarantineFolderPath);
 		} catch (NotFoundException) {
 			$quarantine = $mountUserFolder->newFolder($quarantineFolderPath);
+            $this->logger->error("Quarantine folder created at " . $quarantine->getPath());
 		}
 		$file = $this->getNodeFromFileId($fileId);
         $file->move($quarantine->getPath() . '/' . $file->getName());
+        $this->logger->error("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
 	}
 }

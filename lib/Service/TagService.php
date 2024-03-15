@@ -9,6 +9,7 @@ use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\SystemTag\TagAlreadyExistsException;
 use OCP\SystemTag\TagNotFoundException;
 use OCP\SystemTag\ISystemTagManager;
+use Psr\Log\LoggerInterface;
 
 class TagService
 {
@@ -19,12 +20,14 @@ class TagService
 	private ISystemTagManager $tagService;
 	private ISystemTagObjectMapper $tagMapper;
     private DbFileMapper $dbFileMapper;
+    private LoggerInterface $logger;
 
 
-    public function __construct(ISystemTagManager $systemTagManager, ISystemTagObjectMapper $objectMapper, DbFileMapper $dbFileMapper) {
+    public function __construct(LoggerInterface $logger, ISystemTagManager $systemTagManager, ISystemTagObjectMapper $objectMapper, DbFileMapper $dbFileMapper) {
         $this->tagService = $systemTagManager;
         $this->tagMapper = $objectMapper;
         $this->dbFileMapper = $dbFileMapper;
+        $this->logger = $logger;
 	}
 
     /**
@@ -42,6 +45,7 @@ class TagService
 				throw new TagNotFoundException();
 			}
 			$tag = $this->tagService->createTag($name, true, true);
+            $this->logger->debug("Tag created: " . $name);
 		}
 		return $tag;
 	}
@@ -54,6 +58,7 @@ class TagService
     public function setTag(int $fileId, string $tagName): void {
 		$tag = $this->getTag($tagName);
 		$this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
+        $this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
 	}
 
     /**
@@ -65,6 +70,7 @@ class TagService
 		try {
 			$tag = $this->tagService->getTag($tagName, true, true);
 			$this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
+            $this->logger->debug("Tag removed: " . $tagName . " for file " . $fileId);
 			return true;
 		} catch (TagNotFoundException) {
 			return false;
@@ -155,6 +161,7 @@ class TagService
             return;
         }
         $this->tagService->deleteTags([$tag->getId()]);
+        $this->logger->debug("Tag removed: " . $tagName);
     }
 
     /**
@@ -166,5 +173,6 @@ class TagService
         $this->removeTag(self::CLEAN);
         $this->removeTag(self::MALICIOUS);
         $this->removeTag(self::UNSCANNED);
+        $this->logger->info("All tags removed");
     }
 }

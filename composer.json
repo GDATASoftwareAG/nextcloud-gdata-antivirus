@@ -13,7 +13,7 @@
 		"nextcloud/ocp": "dev-master"
 	},
 	"require": {
-		"gdata/vaas": "^7.2.0",
+		"gdata/vaas": "^7.2.3",
 		"psr/log": "^1.1"
 	},
 	"scripts": {
