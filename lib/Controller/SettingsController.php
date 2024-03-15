@@ -21,13 +21,9 @@ class SettingsController extends Controller {
 	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength): JSONResponse
 	{
 		$this->config->setAppValue($this->appName, 'username', $username);
-		if (!empty($password)) {
-			$this->config->setAppValue($this->appName, 'password', $password);
-		}
+        $this->config->setAppValue($this->appName, 'password', $password);
 		$this->config->setAppValue($this->appName, 'clientId', $clientId);
-		if (!empty($clientSecret)) {
-			$this->config->setAppValue($this->appName, 'clientSecret', $clientSecret);
-		}
+        $this->config->setAppValue($this->appName, 'clientSecret', $clientSecret);
 		$this->config->setAppValue($this->appName, 'authMethod', $authMethod);
 		$this->config->setAppValue($this->appName, 'quarantineFolder', $quarantineFolder);
         $this->config->setAppValue($this->appName, 'allowlist', $allowlist);
