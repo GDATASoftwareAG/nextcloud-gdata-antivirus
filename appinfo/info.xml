@@ -7,7 +7,7 @@
     <id>gdatavaas</id>
     <name>G DATA Antivirus</name>
     <summary>This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.</summary>
-    <version>1.1.0</version>
+    <version>1.0.0</version>
     <licence>agpl</licence>
     <author mail="lennart.dohmann@gdata.de" homepage="https://www.gdata.de/oem/verdict-as-a-service">Lennart Dohmann</author>
     <namespace>GDataVaas</namespace>

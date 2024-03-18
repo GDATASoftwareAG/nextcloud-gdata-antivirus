@@ -17,7 +17,6 @@ use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\VaasVerdict;
-use VaasSdk\Message\Verdict;
 use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
 
@@ -94,6 +93,25 @@ class VerdictService
 		if ($node->getSize() > self::MAX_FILE_SIZE) {
 			throw new EntityTooLargeException("File is too large");
 		}
+
+        $blocklist = $this->getBlocklist();
+        $this->logger->error("Blocklist: " . implode(", ", $blocklist));
+        foreach ($blocklist as $blocklistItem) {
+            if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
+                $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
+                throw new NotPermittedException("File is in the blocklist");
+            }
+        }
+        
+        $allowlist = $this->getAllowlist();
+        $this->logger->error("Allowlist: " . implode(", ", $allowlist));
+        foreach ($allowlist as $allowlistItem) {
+            if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
+                $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");
+                throw new NotPermittedException("File is not in the allowlist");
+            }
+        }
+        
         $this->vaas->Connect($this->authenticator->getToken());
 		$verdict = $this->vaas->ForFile($filePath);
         
@@ -145,4 +163,30 @@ class VerdictService
 
 		return $verdict;
 	}
+
+    /**
+     * Parses the allowlist from the app settings and returns it as an array.
+     * @return array
+     */
+    private function getAllowlist(): array {
+        $allowlist = $this->appConfig->getAppValue(self::APP_ID, 'allowlist');
+        $allowlist = preg_replace('/\s+/', '', $allowlist);
+        if (empty($allowlist)) {
+            return [];
+        }
+        return explode(",", $allowlist);
+    }
+
+    /**
+     * Parses the blocklist from the app settings and returns it as an array.
+     * @return array
+     */
+    private function getBlocklist(): array {
+        $blocklist = $this->appConfig->getAppValue(self::APP_ID, 'blocklist');
+        $blocklist = preg_replace('/\s+/', '', $blocklist);
+        if (empty($blocklist)) {
+            return [];
+        }
+        return explode(",", $blocklist);
+    }
 }

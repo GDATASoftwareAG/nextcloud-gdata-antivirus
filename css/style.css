@@ -1,14 +1,9 @@
-body {
-	font-family: Arial, sans-serif;
-}
-
 .input_field {
 	width: 100%;
 }
 
 a {
 	color: blue;
-	text-decoration: underline;
 }
 
 input[type=text], input[type=password], input[type=email], input[type=number], select {
