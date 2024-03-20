@@ -60,3 +60,4 @@ js/*hot-update.*
 package-lock.json
 move_app.sh
 dev-environment/
+js/

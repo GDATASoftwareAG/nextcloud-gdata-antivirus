@@ -1,8 +1,8 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-    echo "No server branch supplied. Using 27.1.6"
-    version="27.1.6"
+    echo "No server branch supplied. Using 28.0.3"
+    version="28.0.3"
 else
     version=$1
 fi

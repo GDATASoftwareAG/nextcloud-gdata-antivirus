@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="<?php script('gdatavaas', 'admin');?>"></script>
+    <script src="<?php script('gdatavaas', 'gdatavaas-admin-settings');?>"></script>
     <script src="<?php style('gdatavaas', 'style');?>"></script>
     <title>G DATA Verdict-as-a-Service</title>
 </head>
