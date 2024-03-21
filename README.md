@@ -28,8 +28,12 @@ Before you start, make sure you have the following tools installed:
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - [Composer](https://getcomposer.org/)
+- [Node.js](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/)
 
-Also you need to make a ```composer install``` before you can start the development environment.
+Also, you need to make an ```npm install```, ```npm run build``` and ```composer install``` to install dependencies and build the node modules.
+You always need to do this before you start the development environment or copy the app to your Nextcloud instance manually.
+If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
 
 ### Windows
 For Windows you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```

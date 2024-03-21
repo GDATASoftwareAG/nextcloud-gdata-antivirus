@@ -4,27 +4,29 @@ declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
 
+use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCP\AppFramework\App;
-use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Util;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class Application extends App {
+class Application extends App
+{
     public const APP_ID = 'gdatavaas';
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(self::APP_ID);
 
         $container = $this->getContainer();
         $eventDispatcher = $container->get(IEventDispatcher::class);
         $eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
-            Util::addscript(self::APP_ID, 'scan');
+            Util::addScript(self::APP_ID, 'gdatavaas-files-action');
         });
 
         $this->register();
