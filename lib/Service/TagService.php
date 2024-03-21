@@ -13,22 +13,23 @@ use Psr\Log\LoggerInterface;
 
 class TagService
 {
-	public const CLEAN = 'Clean';
-	public const MALICIOUS = 'Malicious';
+    public const CLEAN = 'Clean';
+    public const MALICIOUS = 'Malicious';
     public const UNSCANNED = 'Unscanned';
-    
-	private ISystemTagManager $tagService;
-	private ISystemTagObjectMapper $tagMapper;
+
+    private ISystemTagManager $tagService;
+    private ISystemTagObjectMapper $tagMapper;
     private DbFileMapper $dbFileMapper;
     private LoggerInterface $logger;
 
 
-    public function __construct(LoggerInterface $logger, ISystemTagManager $systemTagManager, ISystemTagObjectMapper $objectMapper, DbFileMapper $dbFileMapper) {
+    public function __construct(LoggerInterface $logger, ISystemTagManager $systemTagManager, ISystemTagObjectMapper $objectMapper, DbFileMapper $dbFileMapper)
+    {
         $this->tagService = $systemTagManager;
         $this->tagMapper = $objectMapper;
         $this->dbFileMapper = $dbFileMapper;
         $this->logger = $logger;
-	}
+    }
 
     /**
      * @param string $name
@@ -37,45 +38,48 @@ class TagService
      * @throws TagAlreadyExistsException if tag already exists
      * @throws TagNotFoundException if tag does not exist and $create=false
      */
-    public function getTag(string $name, bool $create=true) : ISystemTag {
-		try {
-			$tag = $this->tagService->getTag($name, true, true);
-		} catch (TagNotFoundException) {
-			if (!$create) {
-				throw new TagNotFoundException();
-			}
-			$tag = $this->tagService->createTag($name, true, true);
+    public function getTag(string $name, bool $create = true): ISystemTag
+    {
+        try {
+            $tag = $this->tagService->getTag($name, true, true);
+        } catch (TagNotFoundException) {
+            if (!$create) {
+                throw new TagNotFoundException();
+            }
+            $tag = $this->tagService->createTag($name, true, true);
             $this->logger->debug("Tag created: " . $name);
-		}
-		return $tag;
-	}
+        }
+        return $tag;
+    }
 
     /**
      * @param int $fileId
      * @param string $tagName
      * @return void
      */
-    public function setTag(int $fileId, string $tagName): void {
-		$tag = $this->getTag($tagName);
-		$this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
+    public function setTag(int $fileId, string $tagName): void
+    {
+        $tag = $this->getTag($tagName);
+        $this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
         $this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
-	}
+    }
 
     /**
      * @param string $tagName
      * @param int $fileId
      * @return bool
      */
-    public function removeTagFromFile(string $tagName, int $fileId) :bool {
-		try {
-			$tag = $this->tagService->getTag($tagName, true, true);
-			$this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
+    public function removeTagFromFile(string $tagName, int $fileId): bool
+    {
+        try {
+            $tag = $this->tagService->getTag($tagName, true, true);
+            $this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
             $this->logger->debug("Tag removed: " . $tagName . " for file " . $fileId);
-			return true;
-		} catch (TagNotFoundException) {
-			return false;
-		}
-	}
+            return true;
+        } catch (TagNotFoundException) {
+            return false;
+        }
+    }
 
     /**
      * Checks if a file has either CLEAN or MALICIOUS tag and creates these.
@@ -83,20 +87,21 @@ class TagService
      * @return bool
      */
     public function hasCleanOrMaliciousTag(int $fileId): bool
-	{
+    {
         if ($this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
             $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId())) {
             return true;
         }
-		return false;
-	}
+        return false;
+    }
 
     /**
      * Checks if a file has UNSCANNED tag and creates it.
      * @param int $fileId
      * @return bool
      */
-    public function hasUnscannedTag(int $fileId): bool {
+    public function hasUnscannedTag(int $fileId): bool
+    {
         return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED)->getId());
     }
 
@@ -106,12 +111,13 @@ class TagService
      * @param string $offset The last object id you already received
      * @return array
      */
-    public function getFileIdsWithTag(string $tagName, int $limit, string $offset): array {
+    public function getFileIdsWithTag(string $tagName, int $limit, string $offset): array
+    {
         try {
             $tag = $this->getTag($tagName, false);
         } catch (TagNotFoundException) {
             return [];
-        }        
+        }
         return $this->tagMapper->getObjectIdsForTags([$tag->getId()], 'files', $limit, $offset);
     }
 
@@ -121,7 +127,8 @@ class TagService
      * @return array
      * @throws Exception if the database platform is not supported
      */
-    public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array {
+    public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array
+    {
         return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit);
     }
 
@@ -133,7 +140,8 @@ class TagService
      * @return array
      * @throws TagNotFoundException if a tag does not exist
      */
-    public function getRandomTaggedFileIds(array $tagIds, int $limit, ?ISystemTag $priorTagId=null): array {
+    public function getRandomTaggedFileIds(array $tagIds, int $limit, ?ISystemTag $priorTagId = null): array
+    {
         if ($priorTagId === null) {
             $objectIds = $this->tagMapper->getObjectIdsForTags($tagIds, 'files');
             shuffle($objectIds);
@@ -155,7 +163,7 @@ class TagService
      */
     public function removeTag(string $tagName): void
     {
-        try{
+        try {
             $tag = $this->getTag($tagName, false);
         } catch (TagNotFoundException) {
             return;

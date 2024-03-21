@@ -11,14 +11,16 @@ use OCP\Util;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class Application extends App {
+class Application extends App
+{
     public const APP_ID = 'gdatavaas';
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct(self::APP_ID);
 
         $container = $this->getContainer();
