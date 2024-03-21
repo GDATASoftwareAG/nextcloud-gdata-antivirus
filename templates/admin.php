@@ -17,8 +17,12 @@
                 <td><label for="auth_method"><?php p($l->t('Authentication Method'));?></label></td>
                 <td class="input_field">
                     <select id="authMethod" name="authMethod">
-                        <option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') { echo 'selected'; } ?>>Client Credentials Flow</option>
-                        <option value="ResourceOwnerPassword" <?php if ($_['authMethod'] === 'ResourceOwnerPassword') { echo 'selected'; } ?>>Resource Owner Password Flow</option>
+                        <option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') {
+                            echo 'selected';
+                        } ?>>Client Credentials Flow</option>
+                        <option value="ResourceOwnerPassword" <?php if ($_['authMethod'] === 'ResourceOwnerPassword') {
+                            echo 'selected';
+                        } ?>>Resource Owner Password Flow</option>
                     </select>
             </tr>
             <tr class="basic_settings">
@@ -42,11 +46,11 @@
                 <td class="input_field"><input id="quarantine_folder" type="text" name="quarantineFolder" value="<?php p($_['quarantineFolder']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
-                <td><label for="allowlist">Allowlist</label></td>
+                <td><label for="allowlist"><?php p($l->t('Scan only this'));?></label></td>
                 <td class="input_field"><input id="allowlist" type="text" name="allowlist" value="<?php p($_['allowlist']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
-                <td><label for="blocklist">Blocklist</label></td>
+                <td><label for="blocklist"><?php p($l->t('Do not scan this'));?></label></td>
                 <td class="input_field"><input id="blocklist" type="text" name="blocklist" value="<?php p($_['blocklist']); ?>"/></td>
             </tr>
             <tr class="basic_settings">

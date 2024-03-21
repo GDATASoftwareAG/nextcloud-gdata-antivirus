@@ -8,16 +8,17 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\Exception;
 use OCP\IConfig;
 
-class TagUnscannedJob extends TimedJob {
-
+class TagUnscannedJob extends TimedJob
+{
     private const APP_ID = "gdatavaas";
-    
+
     private TagService $tagService;
     private IConfig $appConfig;
 
-    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService) {
+    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService)
+    {
         parent::__construct($time);
-        
+
         $this->appConfig = $appConfig;
         $this->tagService = $tagService;
 
@@ -38,19 +39,19 @@ class TagUnscannedJob extends TimedJob {
             $this->tagService->removeTag(TagService::UNSCANNED);
             return;
         }
-        
+
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
-        
+
         $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId()];
-        
+
         $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 1000);
-        
+
         if (count($fileIds) == 0) {
             return;
         }
-        
+
         foreach ($fileIds as $fileId) {
             if ($this->tagService->hasCleanOrMaliciousTag($fileId)) {
                 continue;

@@ -1,4 +1,5 @@
 <?php
+
 namespace OCA\GDataVaas\Controller;
 
 use OCA\GDataVaas\Service\VerdictService;
@@ -15,21 +16,24 @@ use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 
-class ScanController extends Controller {
-	private VerdictService $verdictService;
+class ScanController extends Controller
+{
+    private VerdictService $verdictService;
 
-	public function __construct($appName, IRequest $request, VerdictService $verdictService) {
-		parent::__construct($appName, $request);
-        
-        $this->verdictService = $verdictService; 
-	}
+    public function __construct($appName, IRequest $request, VerdictService $verdictService)
+    {
+        parent::__construct($appName, $request);
+
+        $this->verdictService = $verdictService;
+    }
 
     /**
      * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
      * @param int $fileId
      * @return JSONResponse
      */
-    public function scan(int $fileId): JSONResponse {
+    public function scan(int $fileId): JSONResponse
+    {
         try {
             $verdict = $this->verdictService->scanFileById($fileId);
             return new JSONResponse($verdict->Verdict->value);

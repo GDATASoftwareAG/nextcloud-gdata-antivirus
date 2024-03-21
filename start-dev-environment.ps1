@@ -5,4 +5,4 @@ if (-not $args[0]) {
     $version = $args[0]
 }
 
-docker run -p 8080:80 -e SERVER_BRANCH=v$version -v "${PWD}:/var/www/html/apps-extra/gdatavaas" -v ./dev-environment:/var/www/html ghcr.io/juliushaertl/nextcloud-dev-php82:latest
+docker run -p 8080:80 -e SERVER_BRANCH=v$version -v "${PWD}:/var/www/html/apps-extra/gdatavaas" ghcr.io/juliushaertl/nextcloud-dev-php82:latest

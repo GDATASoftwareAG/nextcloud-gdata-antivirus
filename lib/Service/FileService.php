@@ -16,13 +16,14 @@ use Psr\Log\LoggerInterface;
 class FileService
 {
     private const APP_ID = "gdatavaas";
-    
-	private IUserMountCache $userMountCache;
-	private IRootFolder $rootFolder;
-	private IConfig $appConfig;
+
+    private IUserMountCache $userMountCache;
+    private IRootFolder $rootFolder;
+    private IConfig $appConfig;
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig) {
+    public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig)
+    {
         $this->userMountCache = $userMountCache;
         $this->rootFolder = $rootFolder;
         $this->appConfig = $appConfig;
@@ -58,15 +59,16 @@ class FileService
      * @throws NotPermittedException
      * @throws NoUserException
      */
-    public function getNodeFromFileId(int $fileId): Node {
-		$mounts = $this->userMountCache->getMountsForFileId($fileId);
-		foreach ($mounts as $mount) {
-			if ($node = $this->findNodeInMount($mount, $fileId)) {
-				return $node;
-			}
-		}
-		throw new NotFoundException();
-	}
+    public function getNodeFromFileId(int $fileId): Node
+    {
+        $mounts = $this->userMountCache->getMountsForFileId($fileId);
+        foreach ($mounts as $mount) {
+            if ($node = $this->findNodeInMount($mount, $fileId)) {
+                return $node;
+            }
+        }
+        throw new NotFoundException();
+    }
 
     /**
      * @param $mount
@@ -75,7 +77,8 @@ class FileService
      * @throws NotPermittedException
      * @throws NoUserException
      */
-    private function findNodeInMount($mount, int $fileId): ?Node {
+    private function findNodeInMount($mount, int $fileId): ?Node
+    {
         $mountUserFolder = $this->rootFolder->getUserFolder($mount->getUser()->getUID());
         $nodes = $mountUserFolder->getById($fileId);
         return $nodes[0] ?? null;
@@ -92,21 +95,21 @@ class FileService
      * @throws NoUserException
      */
     public function moveFileToQuarantineFolderIfDefined(int $fileId): void
-	{
-		$quarantineFolderPath = $this->appConfig->getAppValue(self::APP_ID, 'quarantineFolder');
-		if (empty($quarantineFolderPath)) {
-			throw new InvalidPathException('Quarantine folder path is not defined');
-		}
-		$mounts = $this->userMountCache->getMountsForFileId($fileId);
-		$mountUserFolder = $this->rootFolder->getUserFolder($mounts[0]->getUser()->getUID());
-		try {
-			$quarantine = $mountUserFolder->get($quarantineFolderPath);
-		} catch (NotFoundException) {
-			$quarantine = $mountUserFolder->newFolder($quarantineFolderPath);
+    {
+        $quarantineFolderPath = $this->appConfig->getAppValue(self::APP_ID, 'quarantineFolder');
+        if (empty($quarantineFolderPath)) {
+            throw new InvalidPathException('Quarantine folder path is not defined');
+        }
+        $mounts = $this->userMountCache->getMountsForFileId($fileId);
+        $mountUserFolder = $this->rootFolder->getUserFolder($mounts[0]->getUser()->getUID());
+        try {
+            $quarantine = $mountUserFolder->get($quarantineFolderPath);
+        } catch (NotFoundException) {
+            $quarantine = $mountUserFolder->newFolder($quarantineFolderPath);
             $this->logger->error("Quarantine folder created at " . $quarantine->getPath());
-		}
-		$file = $this->getNodeFromFileId($fileId);
+        }
+        $file = $this->getNodeFromFileId($fileId);
         $file->move($quarantine->getPath() . '/' . $file->getName());
         $this->logger->error("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
-	}
+    }
 }

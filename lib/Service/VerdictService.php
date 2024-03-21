@@ -22,19 +22,19 @@ use VaasSdk\Vaas;
 
 class VerdictService
 {
-	public const MAX_FILE_SIZE = 2147483646;
+    public const MAX_FILE_SIZE = 2147483646;
     private const APP_ID = "gdatavaas";
-    
-	private string $username;
-	private string $password;
-	private string $clientId;
-	private string $clientSecret;
-	private string $authMethod;
-	private string $tokenEndpoint;
-	private string $vaasUrl;
-	private ResourceOwnerPasswordGrantAuthenticator|ClientCredentialsGrantAuthenticator $authenticator;
+
+    private string $username;
+    private string $password;
+    private string $clientId;
+    private string $clientSecret;
+    private string $authMethod;
+    private string $tokenEndpoint;
+    private string $vaasUrl;
+    private ResourceOwnerPasswordGrantAuthenticator|ClientCredentialsGrantAuthenticator $authenticator;
     private IConfig $appConfig;
-	private FileService $fileService;
+    private FileService $fileService;
     private TagService $tagService;
     private Vaas $vaas;
     private LoggerInterface $logger;
@@ -45,7 +45,7 @@ class VerdictService
         $this->appConfig = $appConfig;
         $this->fileService = $fileService;
         $this->tagService = $tagService;
-        
+
         $this->authMethod = $this->appConfig->getAppValue(self::APP_ID, 'authMethod', 'ResourceOwnerPassword');
         $this->tokenEndpoint = $this->appConfig->getAppValue(self::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
         $this->vaasUrl = $this->appConfig->getAppValue(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
@@ -53,13 +53,14 @@ class VerdictService
         $this->clientSecret = $this->appConfig->getAppValue(self::APP_ID, 'clientSecret');
         $this->username = $this->appConfig->getAppValue(self::APP_ID, 'username');
         $this->password = $this->appConfig->getAppValue(self::APP_ID, 'password');
-        
+
         if ($this->authMethod === 'ResourceOwnerPassword') {
             $this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
                 "nextcloud-customer",
                 $this->username,
                 $this->password,
-                $this->tokenEndpoint);
+                $this->tokenEndpoint
+            );
         } elseif ($this->authMethod === 'ClientCredentials') {
             $this->authenticator = new ClientCredentialsGrantAuthenticator(
                 $this->clientId,
@@ -67,7 +68,7 @@ class VerdictService
                 $this->tokenEndpoint
             );
         }
-        
+
         $this->vaas = new Vaas($this->vaasUrl);
     }
 
@@ -89,10 +90,10 @@ class VerdictService
     public function scanFileById(int $fileId): VaasVerdict
     {
         $node = $this->fileService->getNodeFromFileId($fileId);
-		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-		if ($node->getSize() > self::MAX_FILE_SIZE) {
-			throw new EntityTooLargeException("File is too large");
-		}
+        $filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
+        if ($node->getSize() > self::MAX_FILE_SIZE) {
+            throw new EntityTooLargeException("File is too large");
+        }
 
         $blocklist = $this->getBlocklist();
         $this->logger->error("Blocklist: " . implode(", ", $blocklist));
@@ -102,7 +103,7 @@ class VerdictService
                 throw new NotPermittedException("File is in the blocklist");
             }
         }
-        
+
         $allowlist = $this->getAllowlist();
         $this->logger->error("Allowlist: " . implode(", ", $allowlist));
         foreach ($allowlist as $allowlistItem) {
@@ -111,10 +112,10 @@ class VerdictService
                 throw new NotPermittedException("File is not in the allowlist");
             }
         }
-        
+
         $this->vaas->Connect($this->authenticator->getToken());
-		$verdict = $this->vaas->ForFile($filePath);
-        
+        $verdict = $this->vaas->ForFile($filePath);
+
         $detections = $verdict->Detections;
         $sha256 = $verdict->Sha256;
         if (!empty($verdict->LibMagic)) {
@@ -123,7 +124,7 @@ class VerdictService
         } else {
             $mimeType = "None";
             $fileType = "None";
-        }        
+        }
         if (empty($detections)) {
             $detections = "None";
         } else {
@@ -138,7 +139,7 @@ class VerdictService
         if (empty($sha256)) {
             $sha256 = "None";
         }
-        
+
         $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Detections: " . $detections . ", Mime type: " . $mimeType . ", File type: " . $fileType . ", SHA256: " . $sha256);
 
         $this->tagService->removeTagFromFile(TagService::CLEAN, $fileId);
@@ -154,21 +155,23 @@ class VerdictService
                 try {
                     $this->fileService->setMaliciousPrefixIfActivated($fileId);
                     $this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
-                } catch (Exception) {}
+                } catch (Exception) {
+                }
                 break;
             default:
                 $this->tagService->setTag($fileId, TagService::UNSCANNED);
                 break;
         }
 
-		return $verdict;
-	}
+        return $verdict;
+    }
 
     /**
      * Parses the allowlist from the app settings and returns it as an array.
      * @return array
      */
-    private function getAllowlist(): array {
+    private function getAllowlist(): array
+    {
         $allowlist = $this->appConfig->getAppValue(self::APP_ID, 'allowlist');
         $allowlist = preg_replace('/\s+/', '', $allowlist);
         if (empty($allowlist)) {
@@ -181,7 +184,8 @@ class VerdictService
      * Parses the blocklist from the app settings and returns it as an array.
      * @return array
      */
-    private function getBlocklist(): array {
+    private function getBlocklist(): array
+    {
         $blocklist = $this->appConfig->getAppValue(self::APP_ID, 'blocklist');
         $blocklist = preg_replace('/\s+/', '', $blocklist);
         if (empty($blocklist)) {

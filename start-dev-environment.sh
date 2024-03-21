@@ -7,4 +7,11 @@ else
     version=$1
 fi
 
-docker run -p 8080:80 -e SERVER_BRANCH=v"$version" -v "$(pwd)":/var/www/html/apps-extra/gdatavaas -v ./dev-environment:/var/www/html ghcr.io/juliushaertl/nextcloud-dev-php82:latest
+if [ -z "$2" ]; then
+    echo "No port supplied. Using 8080"
+    serverPort="8080"
+else
+    serverPort=$2
+fi
+
+make build && docker run -p "$serverPort":80 -e SERVER_BRANCH=v"$version" -v "$(pwd)":/var/www/html/apps-extra/gdatavaas ghcr.io/juliushaertl/nextcloud-dev-php82:latest
