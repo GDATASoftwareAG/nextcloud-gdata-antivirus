@@ -103,26 +103,6 @@ distclean: clean
 	rm -rf js/vendor
 	rm -rf js/node_modules
 
-# Builds the source and appstore package
-.PHONY: dist
-dist:
-	make source
-	make appstore
-
-# Builds the source package
-.PHONY: source
-source:
-	rm -rf $(source_build_directory)
-	mkdir -p $(source_build_directory)
-	tar cvzf $(source_package_name).tar.gz \
-	--exclude-vcs \
-	--exclude="../$(app_directory_name)/build" \
-	--exclude="../$(app_directory_name)/js/node_modules" \
-	--exclude="../$(app_directory_name)/node_modules" \
-	--exclude="../$(app_directory_name)/*.log" \
-	--exclude="../$(app_directory_name)/js/*.log" \
-	../$(app_directory_name) \
-
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release
 .PHONY: appstore
@@ -167,8 +147,3 @@ appstore:
 	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
 	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
 	../$(app_directory_name) \
-
-.PHONY: test
-test: composer
-	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.xml
-	$(CURDIR)/vendor/phpunit/phpunit/phpunit -c phpunit.integration.xml

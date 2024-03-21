@@ -1,12 +1,11 @@
 import { showError, showSuccess } from '@nextcloud/dialogs'
-import {DefaultType, FileAction, Permission, registerFileAction} from '@nextcloud/files'
+import {FileAction, Permission, registerFileAction} from '@nextcloud/files'
 import Magnifier from '@mdi/svg/svg/magnify.svg?raw'
 
 if (parseInt(OC.config.version.split('.')[0]) >= 28) {
 	registerFileAction(new FileAction({
 		id: "gdatavaas-filescan",
 		displayName: () => t('gdatavaas', 'Antivirus scan'),
-		default: DefaultType.DEFAULT,
 		enabled: (nodes) => {
 			const node = nodes[0];
 			return node.mime !== 'httpd/unix-directory' && (node.permissions & Permission.READ);
