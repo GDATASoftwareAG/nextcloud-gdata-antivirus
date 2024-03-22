@@ -61,3 +61,4 @@ package-lock.json
 move_app.sh
 dev-environment/
 js/
+*.cache
