@@ -59,3 +59,7 @@ input.toggle-round:checked + label:after {
 #advanced_settings {
 	margin-top: 50px;
 }
+
+#advanced_buttons:hover {
+	background-color: inherit;
+}
