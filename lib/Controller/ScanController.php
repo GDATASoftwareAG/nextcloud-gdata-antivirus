@@ -48,13 +48,13 @@ class ScanController extends Controller
         } catch (NotFoundException) {
             return new JSONResponse(['error' => 'Not found'], 404);
         } catch (NotPermittedException) {
-            return new JSONResponse(['error' => 'Not permitted'], 403);
+            return new JSONResponse(['error' => 'Current settings do not permit scanning this.'], 403);
         } catch (TimeoutException) {
-            return new JSONResponse(['error' => 'Timeout'], 408);
+            return new JSONResponse(['error' => 'Scanning timed out'], 408);
         } catch (UploadFailedException) {
-            return new JSONResponse(['error' => 'Upload failed'], 500);
+            return new JSONResponse(['error' => 'File upload failed'], 500);
         } catch (VaasAuthenticationException) {
-            return new JSONResponse(['error' => 'VaaS authentication failed'], 401);
+            return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
         }
     }
 }

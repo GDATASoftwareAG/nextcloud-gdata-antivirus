@@ -96,7 +96,7 @@ class VerdictService
         }
 
         $blocklist = $this->getBlocklist();
-        $this->logger->error("Blocklist: " . implode(", ", $blocklist));
+        $this->logger->info("Blocklist: " . implode(", ", $blocklist));
         foreach ($blocklist as $blocklistItem) {
             if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
                 $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
@@ -105,7 +105,7 @@ class VerdictService
         }
 
         $allowlist = $this->getAllowlist();
-        $this->logger->error("Allowlist: " . implode(", ", $allowlist));
+        $this->logger->info("Allowlist: " . implode(", ", $allowlist));
         foreach ($allowlist as $allowlistItem) {
             if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
                 $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");

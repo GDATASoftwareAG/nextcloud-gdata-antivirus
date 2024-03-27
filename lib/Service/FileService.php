@@ -47,7 +47,7 @@ class FileService
             if (!str_starts_with($file->getName(), '[MALICIOUS] ')) {
                 $newFileName = "[MALICIOUS] " . $file->getName();
                 $file->move($file->getParent()->getPath() . '/' . $newFileName);
-                $this->logger->error("Malicious prefix added to file " . $file->getName() . " (" . $fileId . ")");
+                $this->logger->info("Malicious prefix added to file " . $file->getName() . " (" . $fileId . ")");
             }
         }
     }
@@ -106,10 +106,10 @@ class FileService
             $quarantine = $mountUserFolder->get($quarantineFolderPath);
         } catch (NotFoundException) {
             $quarantine = $mountUserFolder->newFolder($quarantineFolderPath);
-            $this->logger->error("Quarantine folder created at " . $quarantine->getPath());
+            $this->logger->info("Quarantine folder created at " . $quarantine->getPath());
         }
         $file = $this->getNodeFromFileId($fileId);
         $file->move($quarantine->getPath() . '/' . $file->getName());
-        $this->logger->error("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
+        $this->logger->info("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
     }
 }
