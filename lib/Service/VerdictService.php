@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use Exception;
-use OC\User\NoUserException;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
@@ -85,7 +84,6 @@ class VerdictService
      * @throws NotPermittedException
      * @throws FileDoesNotExistException if the VaaS SDK could not find the file
      * @throws EntityTooLargeException if the file that should be scanned is too large
-     * @throws NoUserException
      */
     public function scanFileById(int $fileId): VaasVerdict
     {
@@ -96,7 +94,7 @@ class VerdictService
         }
 
         $blocklist = $this->getBlocklist();
-        $this->logger->error("Blocklist: " . implode(", ", $blocklist));
+        $this->logger->info("Blocklist: " . implode(", ", $blocklist));
         foreach ($blocklist as $blocklistItem) {
             if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
                 $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
@@ -105,7 +103,7 @@ class VerdictService
         }
 
         $allowlist = $this->getAllowlist();
-        $this->logger->error("Allowlist: " . implode(", ", $allowlist));
+        $this->logger->info("Allowlist: " . implode(", ", $allowlist));
         foreach ($allowlist as $allowlistItem) {
             if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
                 $this->logger->info("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");

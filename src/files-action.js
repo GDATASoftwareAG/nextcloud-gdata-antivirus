@@ -24,13 +24,13 @@ if (parseInt(OC.config.version.split('.')[0]) >= 28) {
 				})
 			});
 			let vaasVerdict = await response.json();
-			if (vaasVerdict === 'Malicious' || vaasVerdict === 'Clean') {
-				switch (vaasVerdict) {
+			if (response.status === 200) {
+				switch (vaasVerdict['verdict']) {
 					case 'Malicious':
-						showError(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict ' + vaasVerdict));
+						showError(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Malicious'));
 						break;
 					case 'Clean':
-						showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict ' + vaasVerdict));
+						showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
 						break;
 				}
 			} else {
@@ -64,13 +64,13 @@ if (parseInt(OC.config.version.split('.')[0]) >= 28) {
 						})
 					});
 					let vaasVerdict = await response.json();
-					if (vaasVerdict === 'Malicious' || vaasVerdict === 'Clean') {
-						switch (vaasVerdict) {
+					if (response.status === 200) {
+						switch (vaasVerdict['verdict']) {
 							case 'Malicious':
-								showError(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict ' + vaasVerdict));
+								showError(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict Malicious'));
 								break;
 							case 'Clean':
-								showSuccess(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict ' + vaasVerdict));
+								showSuccess(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict Clean'));
 								break;
 						}
 					} else {

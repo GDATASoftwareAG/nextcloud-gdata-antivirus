@@ -2,7 +2,6 @@
 
 namespace OCA\GDataVaas\Service;
 
-use OC\User\NoUserException;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotPermittedException;
@@ -38,7 +37,6 @@ class FileService
      * @throws InvalidPathException
      * @throws NotPermittedException
      * @throws LockedException
-     * @throws NoUserException
      */
     public function setMaliciousPrefixIfActivated(int $fileId): void
     {
@@ -47,7 +45,7 @@ class FileService
             if (!str_starts_with($file->getName(), '[MALICIOUS] ')) {
                 $newFileName = "[MALICIOUS] " . $file->getName();
                 $file->move($file->getParent()->getPath() . '/' . $newFileName);
-                $this->logger->error("Malicious prefix added to file " . $file->getName() . " (" . $fileId . ")");
+                $this->logger->info("Malicious prefix added to file " . $file->getName() . " (" . $fileId . ")");
             }
         }
     }
@@ -57,7 +55,6 @@ class FileService
      * @return Node
      * @throws NotFoundException
      * @throws NotPermittedException
-     * @throws NoUserException
      */
     public function getNodeFromFileId(int $fileId): Node
     {
@@ -75,9 +72,8 @@ class FileService
      * @param int $fileId
      * @return Node|null
      * @throws NotPermittedException
-     * @throws NoUserException
      */
-    private function findNodeInMount($mount, int $fileId): ?Node
+    private function findNodeInMount(\OCP\Files\Config\ICachedMountFileInfo $mount, int $fileId): ?Node
     {
         $mountUserFolder = $this->rootFolder->getUserFolder($mount->getUser()->getUID());
         $nodes = $mountUserFolder->getById($fileId);
@@ -92,7 +88,6 @@ class FileService
      * @throws LockedException
      * @throws NotFoundException
      * @throws NotPermittedException
-     * @throws NoUserException
      */
     public function moveFileToQuarantineFolderIfDefined(int $fileId): void
     {
@@ -106,10 +101,10 @@ class FileService
             $quarantine = $mountUserFolder->get($quarantineFolderPath);
         } catch (NotFoundException) {
             $quarantine = $mountUserFolder->newFolder($quarantineFolderPath);
-            $this->logger->error("Quarantine folder created at " . $quarantine->getPath());
+            $this->logger->info("Quarantine folder created at " . $quarantine->getPath());
         }
         $file = $this->getNodeFromFileId($fileId);
         $file->move($quarantine->getPath() . '/' . $file->getName());
-        $this->logger->error("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
+        $this->logger->info("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
     }
 }
