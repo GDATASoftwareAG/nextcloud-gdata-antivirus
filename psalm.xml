@@ -2,24 +2,18 @@
 <psalm
         totallyTyped="true"
         errorLevel="5"
-        resolveFromConfigFile="true"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xmlns="https://getpsalm.org/schema/config"
         xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-        errorBaseline="tests/psalm-baseline.xml"
 >
     <projectFiles>
         <directory name="lib" />
         <ignoreFiles>
             <directory name="vendor" />
-            <directory name="lib/Vendor" />
         </ignoreFiles>
     </projectFiles>
     <extraFiles>
         <directory name="vendor" />
-        <ignoreFiles>
-            <directory name="vendor/phpunit/php-code-coverage" />
-        </ignoreFiles>
     </extraFiles>
     <issueHandlers>
         <UndefinedClass>

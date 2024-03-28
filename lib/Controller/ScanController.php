@@ -36,7 +36,7 @@ class ScanController extends Controller
     {
         try {
             $verdict = $this->verdictService->scanFileById($fileId);
-            return new JSONResponse($verdict->Verdict->value);
+            return new JSONResponse(['verdict' => $verdict->Verdict->value], 200);
         } catch (EntityTooLargeException) {
             return new JSONResponse(['error' => 'File is too large'], 413);
         } catch (FileDoesNotExistException) {

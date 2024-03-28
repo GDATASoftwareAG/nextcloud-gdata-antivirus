@@ -2,7 +2,6 @@
 
 namespace OCA\GDataVaas\Service;
 
-use OC\User\NoUserException;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotPermittedException;
@@ -38,7 +37,6 @@ class FileService
      * @throws InvalidPathException
      * @throws NotPermittedException
      * @throws LockedException
-     * @throws NoUserException
      */
     public function setMaliciousPrefixIfActivated(int $fileId): void
     {
@@ -57,7 +55,6 @@ class FileService
      * @return Node
      * @throws NotFoundException
      * @throws NotPermittedException
-     * @throws NoUserException
      */
     public function getNodeFromFileId(int $fileId): Node
     {
@@ -75,9 +72,8 @@ class FileService
      * @param int $fileId
      * @return Node|null
      * @throws NotPermittedException
-     * @throws NoUserException
      */
-    private function findNodeInMount($mount, int $fileId): ?Node
+    private function findNodeInMount(\OCP\Files\Config\ICachedMountFileInfo $mount, int $fileId): ?Node
     {
         $mountUserFolder = $this->rootFolder->getUserFolder($mount->getUser()->getUID());
         $nodes = $mountUserFolder->getById($fileId);
@@ -92,7 +88,6 @@ class FileService
      * @throws LockedException
      * @throws NotFoundException
      * @throws NotPermittedException
-     * @throws NoUserException
      */
     public function moveFileToQuarantineFolderIfDefined(int $fileId): void
     {
