@@ -142,8 +142,10 @@ appstore:
 	--exclude="../$(app_directory_name)/src" \
 	--exclude="../$(app_directory_name)/babel.config.js" \
 	--exclude="../$(app_directory_name)/compose.yaml" \
+	--exclude="../$(app_directory_name)/nginx.conf" \
 	--exclude="../$(app_directory_name)/devcontainer.yaml" \
 	--exclude="../$(app_directory_name)/psalm.xml" \
 	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
 	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
+	--exclude="../$(app_directory_name)/dev-environment*" \
 	../$(app_directory_name) \
