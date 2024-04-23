@@ -1,29 +1,52 @@
+version: '3'
 services:
-  db:
-    image: postgres
-    restart: unless-stopped
+  
+  nextcloud-server:
+    image: nextcloud:28.0.4-fpm
+    container_name: nextcloud-server
+    hostname: nextcloud-server
     environment:
-      POSTGRES_DB: nextcloud
-      POSTGRES_USER: nextcloud
-      POSTGRES_PASSWORD: nextcloud
+      - MYSQL_DATABASE=ncdb
+      - MYSQL_USER=nextcloud
+      - MYSQL_PASSWORD=nextcloud
+      - MYSQL_HOST=nextcloud-db
     volumes:
-      - db:/var/lib/postgresql/data
+      - ./dev-environment-data/server:/var/www/html
+    depends_on:
+      - nextcloud-db
+    restart: unless-stopped
+    networks:
+      - nextcloud-network
 
-  app:
-    image: nextcloud:production
+  nextcloud-nginx:
+    image: nginx
+    container_name: nextcloud-nginx
+    hostname: nextcloud-nginx
+    restart: unless-stopped
     ports:
-      - "8080:80"
-    restart: unless-stopped
-    links:
-      - db
+      - "8080:8080"
     volumes:
-      - nextcloud:/var/www/html
-    environment:
-      - POSTGRES_DB=nextcloud
-      - POSTGRES_USER=nextcloud
-      - POSTGRES_PASSWORD=nextcloud
-      - POSTGRES_HOST=db
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./dev-environment-data/server:/var/www/html:ro
+    depends_on:
+      - nextcloud-server
+    networks:
+      - nextcloud-network
 
-volumes:
-  db:
-  nextcloud:
+  nextcloud-db:
+    container_name: nextcloud-db
+    hostname: nextcloud-db
+    restart: unless-stopped
+    image: mariadb:10.8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ncdb
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: nextcloud
+    volumes:
+      - ./dev-environment-data/db:/var/lib/mysql
+    networks:
+      - nextcloud-network
+
+networks:
+  nextcloud-network:

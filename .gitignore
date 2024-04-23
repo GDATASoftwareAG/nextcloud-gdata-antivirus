@@ -59,6 +59,6 @@ js/*hot-update.*
 .env
 package-lock.json
 move_app.sh
-dev-environment/
+dev-environment*/
 js/
 *.cache
