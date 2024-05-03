@@ -27,7 +27,7 @@ class ScanJob extends TimedJob
 
         $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
-        $this->setTimeSensitivity(self::TIME_INSENSITIVE);
+        $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
 
     /**
