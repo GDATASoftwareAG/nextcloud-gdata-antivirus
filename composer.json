@@ -9,7 +9,7 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "^7.2.3"
+		"gdata/vaas": "^8.0.0"
 	},
 	"require-dev": {
 		"nextcloud/ocp": "dev-stable28",

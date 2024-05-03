@@ -114,34 +114,13 @@ class VerdictService
         $this->vaas->Connect($this->authenticator->getToken());
         $verdict = $this->vaas->ForFile($filePath);
 
-        $detections = $verdict->Detections;
-        $sha256 = $verdict->Sha256;
-        if (!empty($verdict->LibMagic)) {
-            $mimeType = $verdict->LibMagic->mime_type;
-            $fileType = $verdict->LibMagic->file_type;
-        } else {
-            $mimeType = "None";
-            $fileType = "None";
-        }
-        if (empty($detections)) {
-            $detections = "None";
-        } else {
-            $detections = implode(", ", $detections);
-        }
-        if (empty($mimeType)) {
-            $mimeType = "None";
-        }
-        if (empty($fileType)) {
-            $fileType = "None";
-        }
-        if (empty($sha256)) {
-            $sha256 = "None";
-        }
-
-        $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Detections: " . $detections . ", Mime type: " . $mimeType . ", File type: " . $fileType . ", SHA256: " . $sha256);
+        $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: " 
+            . $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 . 
+            ", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
         $this->tagService->removeTagFromFile(TagService::CLEAN, $fileId);
         $this->tagService->removeTagFromFile(TagService::MALICIOUS, $fileId);
+        $this->tagService->removeTagFromFile(TagService::PUP, $fileId);
         $this->tagService->removeTagFromFile(TagService::UNSCANNED, $fileId);
 
         switch ($verdict->Verdict->value) {
@@ -155,6 +134,9 @@ class VerdictService
                     $this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
                 } catch (Exception) {
                 }
+                break;
+            case TagService::PUP:
+                $this->tagService->setTag($fileId, TagService::PUP);
                 break;
             default:
                 $this->tagService->setTag($fileId, TagService::UNSCANNED);
