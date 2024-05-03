@@ -35,7 +35,7 @@ class VerdictService
     private IConfig $appConfig;
     private FileService $fileService;
     private TagService $tagService;
-    private Vaas $vaas;
+    private ?Vaas $vaas;
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService)
@@ -53,22 +53,7 @@ class VerdictService
         $this->username = $this->appConfig->getAppValue(self::APP_ID, 'username');
         $this->password = $this->appConfig->getAppValue(self::APP_ID, 'password');
 
-        if ($this->authMethod === 'ResourceOwnerPassword') {
-            $this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
-                "nextcloud-customer",
-                $this->username,
-                $this->password,
-                $this->tokenEndpoint
-            );
-        } elseif ($this->authMethod === 'ClientCredentials') {
-            $this->authenticator = new ClientCredentialsGrantAuthenticator(
-                $this->clientId,
-                $this->clientSecret,
-                $this->tokenEndpoint
-            );
-        }
 
-        $this->vaas = new Vaas($this->vaasUrl);
     }
 
     /**
@@ -110,9 +95,19 @@ class VerdictService
                 throw new NotPermittedException("File is not in the allowlist");
             }
         }
+        
+        if ($this->vaas == null) {
+            $this->vaas = $this->createAndConnectVaas();
+        }
 
-        $this->vaas->Connect($this->authenticator->getToken());
-        $verdict = $this->vaas->ForFile($filePath);
+        try {
+            $verdict = $this->vaas->ForFile($filePath);
+        }
+        catch (Exception $e) {
+            $this->logger->error("Vaas for file: " . $e->getMessage());
+            $this->vaas = null;
+            throw;
+        }
 
         $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: " 
             . $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 . 
@@ -172,5 +167,27 @@ class VerdictService
             return [];
         }
         return explode(",", $blocklist);
+    }
+    
+    private function createAndConnectVaas(): Vaas
+    {
+        if ($this->authMethod === 'ResourceOwnerPassword') {
+            $this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
+                "nextcloud-customer",
+                $this->username,
+                $this->password,
+                $this->tokenEndpoint
+            );
+        } elseif ($this->authMethod === 'ClientCredentials') {
+            $this->authenticator = new ClientCredentialsGrantAuthenticator(
+                $this->clientId,
+                $this->clientSecret,
+                $this->tokenEndpoint
+            );
+        }
+
+        $vaas = new Vaas($this->vaasUrl);
+        $vaas->Connect($this->authenticator->getToken());
+        return $vaas;
     }
 }
