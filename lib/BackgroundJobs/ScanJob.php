@@ -27,7 +27,7 @@ class ScanJob extends TimedJob
 
         $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
-        $this->setTimeSensitivity(self::TIME_INSENSITIVE);
+        $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
 
     /**
@@ -49,12 +49,13 @@ class ScanJob extends TimedJob
         }
 
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
+        $pupTag = $this->tagService->getTag(TagService::PUP);
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
 
         if ($unscannedTagIsDisabled) {
             if ($autoScanOnlyNewFiles) {
-                $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId()];
+                $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId()];
             } else {
                 $excludedTagIds = [$unscannedTag->getId()];
             }
@@ -63,7 +64,7 @@ class ScanJob extends TimedJob
             if ($autoScanOnlyNewFiles) {
                 $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
             } else {
-                $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId()], $quantity, $unscannedTag);
+                $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId(), $pupTag->getId()], $quantity, $unscannedTag);
             }
         }
 

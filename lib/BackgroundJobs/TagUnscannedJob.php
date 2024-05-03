@@ -24,7 +24,7 @@ class TagUnscannedJob extends TimedJob
 
         $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
-        $this->setTimeSensitivity(self::TIME_INSENSITIVE);
+        $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
 
     /**
@@ -42,9 +42,10 @@ class TagUnscannedJob extends TimedJob
 
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
+        $pupTag = $this->tagService->getTag(TagService::PUP);
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
 
-        $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId()];
+        $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId()];
 
         $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 1000);
 
@@ -53,7 +54,7 @@ class TagUnscannedJob extends TimedJob
         }
 
         foreach ($fileIds as $fileId) {
-            if ($this->tagService->hasCleanOrMaliciousTag($fileId)) {
+            if ($this->tagService->hasCleanMaliciousOrPupTag($fileId)) {
                 continue;
             }
             $this->tagService->setTag($fileId, TagService::UNSCANNED);

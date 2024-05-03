@@ -15,6 +15,7 @@ class TagService
 {
     public const CLEAN = 'Clean';
     public const MALICIOUS = 'Malicious';
+    public const PUP = 'Pup';
     public const UNSCANNED = 'Unscanned';
 
     private ISystemTagManager $tagService;
@@ -86,10 +87,11 @@ class TagService
      * @param int $fileId
      * @return bool
      */
-    public function hasCleanOrMaliciousTag(int $fileId): bool
+    public function hasCleanMaliciousOrPupTag(int $fileId): bool
     {
         if ($this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
-            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId())) {
+            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) || 
+            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId())) {
             return true;
         }
         return false;
@@ -181,6 +183,7 @@ class TagService
         $this->removeTag(self::CLEAN);
         $this->removeTag(self::MALICIOUS);
         $this->removeTag(self::UNSCANNED);
+        $this->removeTag(self::PUP);
         $this->logger->info("All tags removed");
     }
 }
