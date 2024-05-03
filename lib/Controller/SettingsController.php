@@ -95,4 +95,15 @@ class SettingsController extends Controller
         $this->tagService->resetAllTags();
         return new JSONResponse(['status' => 'success']);
     }
+
+    public function setAllowParallelRuns(bool $allowParallelRuns): JSONResponse
+    {
+        $this->config->setAppValue($this->appName, 'allowParallelRuns', $allowParallelRuns);
+        return new JSONResponse(['status' => 'success']);
+    }
+
+    public function getAllowParallelRuns(): JSONResponse
+    {
+        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'allowParallelRuns')]);
+    }
 }

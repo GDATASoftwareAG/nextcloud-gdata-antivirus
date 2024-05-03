@@ -35,6 +35,7 @@ class VaasAdmin implements ISettings
             'allowlist' => $this->config->getAppValue(self::APP_ID, 'allowlist'),
             'blocklist' => $this->config->getAppValue(self::APP_ID, 'blocklist'),
             'scanQueueLength' => $this->config->getAppValue(self::APP_ID, 'scanQueueLength', 5),
+            'allowParallelRuns' => $this->config->getAppValue(self::APP_ID, 'allowParallelRuns', false),
         ];
 
         return new TemplateResponse(self::APP_ID, 'admin', $params);

@@ -1,6 +1,6 @@
 if (-not $args[0]) {
-    Write-Host "No server branch supplied. Using 28.0.4"
-    $version = "28.0.4"
+    Write-Host "No server branch supplied. Using 28.0.5"
+    $version = "28.0.5"
 } else {
     $version = $args[0]
 }

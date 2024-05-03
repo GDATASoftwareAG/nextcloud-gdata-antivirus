@@ -19,6 +19,8 @@ return [
         ['name' => 'settings#getAuthMethod', 'url' => '/getAuthMethod', 'verb' => 'GET'],
         ['name' => 'settings#setDisableUnscannedTag', 'url' => '/setDisableUnscannedTag', 'verb' => 'POST'],
         ['name' => 'settings#getDisableUnscannedTag', 'url' => '/getDisableUnscannedTag', 'verb' => 'GET'],
-        ['name' => 'settings#resetAllTags', 'url' => '/resetalltags', 'verb' => 'POST']
+        ['name' => 'settings#resetAllTags', 'url' => '/resetalltags', 'verb' => 'POST'],
+        ['name' => 'settings#setAllowParallelRuns', 'url' => '/setAllowParallelRuns', 'verb' => 'POST'],
+        ['name' => 'settings#getAllowParallelRuns', 'url' => '/getAllowParallelRuns', 'verb' => 'GET']
     ]
 ];

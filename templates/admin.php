@@ -101,6 +101,13 @@
         </tr>
         <tr>
             <td>
+                <input id="disable_tag_unscanned" class="toggle-round" type="checkbox">
+                <label for="disable_tag_unscanned"></label>
+            </td>
+            <td><div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", but they will still be scanned if "Automatic file scanning" is switched on.'));?>" class="visible"><label><?php p($l->t('Disable Unscanned tag'));?></label></div></td>
+        </tr>
+        <tr>
+            <td>
                 <input id="prefixMalicious" class="toggle-round" type="checkbox">
                 <label for="prefixMalicious"></label>
             </td>
@@ -108,10 +115,10 @@
         </tr>
         <tr>
             <td>
-                <input id="disable_tag_unscanned" class="toggle-round" type="checkbox">
-                <label for="disable_tag_unscanned"></label>
+                <input id="allow_parallel_runs" class="toggle-round" type="checkbox" name="allowParallelRuns"/>
+                <label for="allow_parallel_runs"></label>
             </td>
-            <td><div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", but they will still be scanned if "Automatic file scanning" is switched on.'));?>" class="visible"><label><?php p($l->t('Disable Unscanned tag'));?></label></div></td>
+            <td><div title="<?php p($l->t('Set this to false to prevent two Jobs from this class from running in parallel.'));?>" class="visible"><label><?php p($l->t('Allow parallel runs of background jobs'));?></label></div></td>
         </tr>
     </table>
 </div>

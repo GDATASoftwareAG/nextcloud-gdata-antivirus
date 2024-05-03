@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'requesttoken': oc_requesttoken
+				'requesttoken': OC.requestToken
 			},
 			body: JSON.stringify(data)
 		});
@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'requesttoken': oc_requesttoken
+				'requesttoken': OC.requestToken
 			}
 		});
 		return response.json();
@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const prefixMalicious = document.querySelector('#prefixMalicious');
 	const authMethod = document.querySelector('#authMethod');
 	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
+	const allowParallelRuns = document.querySelector('#allow_parallel_runs');
 
 	authSubmit.addEventListener('click', async (e) => {
 		e.preventDefault();
@@ -106,6 +107,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await postData(OC.generateUrl('apps/gdatavaas/setDisableUnscannedTag'), {disableUnscannedTag: disableUnscannedTag.checked});
 	});
 
+	allowParallelRuns.addEventListener('click', async () => {
+		await postData(OC.generateUrl('apps/gdatavaas/setAllowParallelRuns'), {allowParallelRuns: allowParallelRuns.checked});
+	});
+
 	// Activate or deactivate scanning only for new files
 	const toggleScanOnlyNew = async (enable) => {
 		scanOnlyNew.checked = enable;
@@ -139,4 +144,5 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
 	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;
+	allowParallelRuns.checked = (await getData(OC.generateUrl('apps/gdatavaas/getAllowParallelRuns'))).status;
 });

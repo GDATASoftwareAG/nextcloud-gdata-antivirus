@@ -26,7 +26,7 @@ class ScanJob extends TimedJob
         $this->appConfig = $appConfig;
 
         $this->setInterval(5 * 60);
-        $this->setAllowParallelRuns(false);
+        $this->setAllowParallelRuns($this->appConfig->getAppValue(self::APP_ID, 'allowParallelRuns'));
         $this->setTimeSensitivity(self::TIME_INSENSITIVE);
     }
 
