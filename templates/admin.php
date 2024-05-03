@@ -118,7 +118,7 @@
                 <input id="allow_parallel_runs" class="toggle-round" type="checkbox" name="allowParallelRuns"/>
                 <label for="allow_parallel_runs"></label>
             </td>
-            <td><div title="<?php p($l->t('Set this to false to prevent two Jobs from this class from running in parallel.'));?>" class="visible"><label><?php p($l->t('Allow parallel runs of background jobs'));?></label></div></td>
+            <td><div title="<?php p($l->t('Set this to false to prevent two background scan jobs from running in parallel.'));?>" class="visible"><label><?php p($l->t('Allow parallel runs of background jobs'));?></label></div></td>
         </tr>
     </table>
 </div>
