@@ -16,16 +16,17 @@ class ScanJob extends TimedJob
     private TagService $tagService;
     private VerdictService $scanService;
     private IConfig $appConfig;
+    private IJobList $jobList;
 
-    public function __construct(ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig)
+    public function __construct(ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig, IJobList $jobList)
     {
         parent::__construct($time);
 
         $this->tagService = $tagService;
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
+        $this->jobList = $jobList;
 
-        $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
         $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
@@ -47,6 +48,7 @@ class ScanJob extends TimedJob
         if ($quantity == "") {
             $quantity = 5;
         }
+        $quantity++;
 
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
         $pupTag = $this->tagService->getTag(TagService::PUP);
@@ -67,6 +69,11 @@ class ScanJob extends TimedJob
                 $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId(), $pupTag->getId()], $quantity, $unscannedTag);
             }
         }
+        
+        $moreFilesToScan = $quantity == count($fileIds);
+        if ($moreFilesToScan) {
+            $fileIds = array_slice($fileIds, 0, -1);
+        }
 
         foreach ($fileIds as $fileId) {
             try {
@@ -74,6 +81,12 @@ class ScanJob extends TimedJob
             } catch (Exception) {
                 // Do nothing
             }
+        }
+        
+        $newInterval = $moreFilesToScan ? 0 : 60;
+        if ($newInterval != $this->interval) {
+            $this->setInterval($newInterval);
+            $this->jobList->add($this);
         }
     }
 }
