@@ -5,6 +5,7 @@ namespace OCA\GDataVaas\BackgroundJobs;
 use Exception;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
+use OCP\BackgroundJob\IJobList;
 use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IConfig;
@@ -26,7 +27,7 @@ class ScanJob extends TimedJob
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
         $this->jobList = $jobList;
-
+        
         $this->setAllowParallelRuns(false);
         $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }

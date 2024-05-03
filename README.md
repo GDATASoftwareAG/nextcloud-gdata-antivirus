@@ -53,3 +53,10 @@ The command may take a while and starts Nextcloud directly. Nextcloud can then b
 
 In the future, Nextcloud can then be started again by changing to the
 folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy```. For more information see the [Nextcloud app development tutorials](https://cloud.nextcloud.com/s/iyNGp8ryWxc7Efa). These steps set up the official Nextcloud Dev Environment. It uses an SQLite databse. If you want to test on a production like instance you can set up a real Nextcloud Server using this [compose file](compose.yaml).
+
+### Useful commands
+
+To trigger cronjobs manually you can use the following command:
+```bash
+docker exec --user www-data {nextcloud_container} php /var/www/html/cron.php
+```

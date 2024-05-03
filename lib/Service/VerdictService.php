@@ -35,7 +35,7 @@ class VerdictService
     private IConfig $appConfig;
     private FileService $fileService;
     private TagService $tagService;
-    private ?Vaas $vaas;
+    private ?Vaas $vaas = null;
     private LoggerInterface $logger;
 
     public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService)
@@ -52,8 +52,6 @@ class VerdictService
         $this->clientSecret = $this->appConfig->getAppValue(self::APP_ID, 'clientSecret');
         $this->username = $this->appConfig->getAppValue(self::APP_ID, 'username');
         $this->password = $this->appConfig->getAppValue(self::APP_ID, 'password');
-
-
     }
 
     /**
@@ -106,7 +104,7 @@ class VerdictService
         catch (Exception $e) {
             $this->logger->error("Vaas for file: " . $e->getMessage());
             $this->vaas = null;
-            throw;
+            throw $e;
         }
 
         $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: " 
