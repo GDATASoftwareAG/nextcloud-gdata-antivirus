@@ -9,6 +9,7 @@ use OCP\BackgroundJob\IJobList;
 use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IConfig;
+use Psr\Log\LoggerInterface;
 
 class ScanJob extends TimedJob
 {
@@ -18,11 +19,13 @@ class ScanJob extends TimedJob
     private VerdictService $scanService;
     private IConfig $appConfig;
     private IJobList $jobList;
+    private LoggerInterface $logger;
 
-    public function __construct(ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig, IJobList $jobList)
+    public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig, IJobList $jobList)
     {
         parent::__construct($time);
 
+        $this->logger = $logger;
         $this->tagService = $tagService;
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
@@ -85,7 +88,7 @@ class ScanJob extends TimedJob
         }
         
         $newInterval = $moreFilesToScan ? 0 : 60;
-        if ($newInterval != $this->interval) {
+        if ($this->interval == 0 || $newInterval != $this->interval) {
             $this->setInterval($newInterval);
             $this->jobList->add($this);
         }
