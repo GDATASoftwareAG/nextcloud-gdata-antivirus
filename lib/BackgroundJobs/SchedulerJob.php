@@ -20,7 +20,7 @@ class SchedulerJob extends TimedJob
         $this->appConfig = $appConfig;
         $this->jobList = $jobList;
         
-        $this->setInterval(5);
+        $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
         $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
