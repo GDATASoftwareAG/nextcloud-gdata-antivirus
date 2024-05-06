@@ -6,12 +6,12 @@ use Exception;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\BackgroundJob\IJobList;
-use OCP\BackgroundJob\TimedJob;
+use OCP\BackgroundJob\QueuedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
-class ScanJob extends TimedJob
+class ScanJob extends QueuedJob
 {
     private const APP_ID = "gdatavaas";
 
@@ -32,7 +32,6 @@ class ScanJob extends TimedJob
         $this->jobList = $jobList;
         
         $this->setAllowParallelRuns(false);
-        $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
 
     /**
@@ -49,7 +48,10 @@ class ScanJob extends TimedJob
         }
         $autoScanOnlyNewFiles = $this->appConfig->getAppValue(self::APP_ID, 'scanOnlyNewFiles');
         $quantity = $this->appConfig->getAppValue(self::APP_ID, 'scanQueueLength');
-        if ($quantity == "") {
+        try {
+            $quantity = intval($quantity);
+        }
+        catch (Exception) {
             $quantity = 5;
         }
         $quantity++;
@@ -76,7 +78,7 @@ class ScanJob extends TimedJob
         
         $moreFilesToScan = $quantity == count($fileIds);
         if ($moreFilesToScan) {
-            $fileIds = array_slice($fileIds, 0, -1);
+            array_pop($fileIds);
         }
 
         foreach ($fileIds as $fileId) {
@@ -87,10 +89,9 @@ class ScanJob extends TimedJob
             }
         }
         
-        $newInterval = $moreFilesToScan ? 0 : 60;
-        if ($this->interval == 0 || $newInterval != $this->interval) {
-            $this->setInterval($newInterval);
-            $this->jobList->add($this);
+        if ($moreFilesToScan){
+            $scanJob = new ScanJob($this);
+            $this->jobList->add(ScanJob::class);
         }
     }
 }
