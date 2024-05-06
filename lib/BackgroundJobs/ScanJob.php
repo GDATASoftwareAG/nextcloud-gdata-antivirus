@@ -5,12 +5,12 @@ namespace OCA\GDataVaas\BackgroundJobs;
 use Exception;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCP\BackgroundJob\QueuedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\BackgroundJob\TimedJob;
 use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
-class ScanJob extends QueuedJob
+class ScanJob extends TimedJob
 {
     private const APP_ID = "gdatavaas";
 
@@ -27,8 +27,10 @@ class ScanJob extends QueuedJob
         $this->tagService = $tagService;
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
-        
+
+        $this->setInterval(5 * 60);
         $this->setAllowParallelRuns(false);
+        $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
 
     /**
@@ -38,6 +40,10 @@ class ScanJob extends QueuedJob
      */
     protected function run($argument): void
     {
+        $autoScan = $this->appConfig->getAppValue(self::APP_ID, 'autoScanFiles');
+        if (!$autoScan) {
+            return;
+        }
         $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
         $autoScanOnlyNewFiles = $this->appConfig->getAppValue(self::APP_ID, 'scanOnlyNewFiles');
         $quantity = $this->appConfig->getAppValue(self::APP_ID, 'scanQueueLength');
