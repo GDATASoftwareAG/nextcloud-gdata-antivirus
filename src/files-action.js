@@ -1,4 +1,4 @@
-import { showError, showSuccess } from '@nextcloud/dialogs'
+import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
 import {FileAction, Permission, registerFileAction} from '@nextcloud/files'
 import Magnifier from '@mdi/svg/svg/magnify.svg?raw'
 
@@ -31,6 +31,9 @@ if (parseInt(OC.config.version.split('.')[0]) >= 28) {
 						break;
 					case 'Clean':
 						showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
+						break;
+					case 'Pup':
+						showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict PUP (Potentially unwanted program)'));
 						break;
 				}
 			} else {

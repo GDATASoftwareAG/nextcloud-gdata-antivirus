@@ -91,7 +91,7 @@ class ScanJob extends QueuedJob
         
         if ($moreFilesToScan){
             $scanJob = new ScanJob($this);
-            $this->jobList->add(ScanJob::class);
+            $this->jobList->add($scanJob);
         }
     }
 }
