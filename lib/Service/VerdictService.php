@@ -63,10 +63,10 @@ class VerdictService
      * @throws NotFoundException
      * @throws UploadFailedException
      * @throws TimeoutException
-     * @throws VaasAuthenticationException
      * @throws NotPermittedException
      * @throws FileDoesNotExistException if the VaaS SDK could not find the file
      * @throws EntityTooLargeException if the file that should be scanned is too large
+     * @throws VaasAuthenticationException if the authentication with the VaaS service fails
      */
     public function scanFileById(int $fileId): VaasVerdict
     {
@@ -166,7 +166,10 @@ class VerdictService
         }
         return explode(",", $blocklist);
     }
-    
+
+    /**
+     * @throws VaasAuthenticationException
+     */
     private function createAndConnectVaas(): Vaas
     {
         if ($this->authMethod === 'ResourceOwnerPassword') {

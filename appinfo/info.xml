@@ -22,6 +22,7 @@
     </dependencies>
 	<background-jobs>
 		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
+		<job>OCA\GDataVaas\BackgroundJobs\SchedulerJob</job>
 		<job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
 	</background-jobs>
 	<database>pgsql</database>
