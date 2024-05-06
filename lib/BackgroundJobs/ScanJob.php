@@ -5,9 +5,10 @@ namespace OCA\GDataVaas\BackgroundJobs;
 use Exception;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
+use OCP\BackgroundJob\TimedJob;
 use OCP\IConfig;
+use Psr\Log\LoggerInterface;
 
 class ScanJob extends TimedJob
 {
@@ -16,11 +17,13 @@ class ScanJob extends TimedJob
     private TagService $tagService;
     private VerdictService $scanService;
     private IConfig $appConfig;
+    private LoggerInterface $logger;
 
-    public function __construct(ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig)
+    public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig)
     {
         parent::__construct($time);
 
+        $this->logger = $logger;
         $this->tagService = $tagService;
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
@@ -37,14 +40,17 @@ class ScanJob extends TimedJob
      */
     protected function run($argument): void
     {
-        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
         $autoScan = $this->appConfig->getAppValue(self::APP_ID, 'autoScanFiles');
         if (!$autoScan) {
             return;
         }
+        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
         $autoScanOnlyNewFiles = $this->appConfig->getAppValue(self::APP_ID, 'scanOnlyNewFiles');
         $quantity = $this->appConfig->getAppValue(self::APP_ID, 'scanQueueLength');
-        if ($quantity == "") {
+        try {
+            $quantity = intval($quantity);
+        }
+        catch (Exception) {
             $quantity = 5;
         }
 
@@ -67,12 +73,14 @@ class ScanJob extends TimedJob
                 $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId(), $pupTag->getId()], $quantity, $unscannedTag);
             }
         }
+        
+        $this->logger->debug("Scanning " . count($fileIds) . " files: " . implode(", ", $fileIds));
 
         foreach ($fileIds as $fileId) {
             try {
                 $this->scanService->scanFileById($fileId);
-            } catch (Exception) {
-                // Do nothing
+            } catch (Exception $e) {
+                $this->logger->error("Failed to scan file with id " . $fileId . ": " . $e->getMessage());
             }
         }
     }
