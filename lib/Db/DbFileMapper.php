@@ -36,6 +36,7 @@ class DbFileMapper extends QBMapper
             ->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
             ->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
             ->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+            ->orderBy('f.fileid', 'DESC')
             ->setMaxResults($limit);
 
         $fileIds = [];
