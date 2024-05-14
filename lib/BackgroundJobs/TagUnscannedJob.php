@@ -22,7 +22,7 @@ class TagUnscannedJob extends TimedJob
         $this->appConfig = $appConfig;
         $this->tagService = $tagService;
 
-        $this->setInterval(5 * 60);
+        $this->setInterval(60);
         $this->setAllowParallelRuns(false);
         $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
