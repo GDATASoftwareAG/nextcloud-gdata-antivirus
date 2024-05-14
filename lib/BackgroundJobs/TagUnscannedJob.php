@@ -47,7 +47,7 @@ class TagUnscannedJob extends TimedJob
 
         $excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId()];
 
-        $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 1000);
+        $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 10000);
 
         if (count($fileIds) == 0) {
             return;
