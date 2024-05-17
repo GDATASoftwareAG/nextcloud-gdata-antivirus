@@ -15,6 +15,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - uses: actions/setup-node@v4
+      name: setup node
+      with:
+        node-version: 20
+
     - name: Build 
       run: make build
 
