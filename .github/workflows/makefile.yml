@@ -14,5 +14,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
-      run: make
+    - name: Build 
+      run: make build
+
+    - name: Create artifact 
+      run: make appstore
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: gdata-antivirus
+        path: build/artifact
