@@ -7,6 +7,7 @@ use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\Exception;
 use OCP\IConfig;
+use Psr\Log\LoggerInterface;
 
 class TagUnscannedJob extends TimedJob
 {
@@ -14,13 +15,15 @@ class TagUnscannedJob extends TimedJob
 
     private TagService $tagService;
     private IConfig $appConfig;
+    private LoggerInterface $logger;
 
-    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService)
+    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService, LoggerInterface $logger)
     {
         parent::__construct($time);
 
         $this->appConfig = $appConfig;
         $this->tagService = $tagService;
+        $this->logger = $logger;
 
         $this->setInterval(60);
         $this->setAllowParallelRuns(false);
@@ -40,6 +43,8 @@ class TagUnscannedJob extends TimedJob
             return;
         }
 
+        $this->logger->debug("Tagging unscanned files");
+
         $unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
         $pupTag = $this->tagService->getTag(TagService::PUP);
@@ -49,15 +54,13 @@ class TagUnscannedJob extends TimedJob
 
         $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 10000);
 
-        if (count($fileIds) == 0) {
-            return;
-        }
-
         foreach ($fileIds as $fileId) {
             if ($this->tagService->hasCleanMaliciousOrPupTag($fileId)) {
                 continue;
             }
             $this->tagService->setTag($fileId, TagService::UNSCANNED);
         }
+        
+        $this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
     }
 }
