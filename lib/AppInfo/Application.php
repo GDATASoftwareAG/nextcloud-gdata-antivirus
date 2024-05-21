@@ -29,6 +29,9 @@ class Application extends App
             Util::addScript(self::APP_ID, 'gdatavaas-files-action');
         });
 
+        // TODO
+        Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
+
         $this->register();
     }
 
@@ -42,5 +45,39 @@ class Application extends App
         if (file_exists($composerAutoloadFile)) {
             require_once $composerAutoloadFile;
         }
+    }
+
+    /**
+     * 	 * Add wrapper for local storages
+     */
+    public function setupWrapper(): void {
+        Filesystem::addStorageWrapper(
+            'oc_avir',
+            function (string $mountPoint, IStorage $storage) {
+                if ($storage->instanceOfStorage(Jail::class)) {
+                    // No reason to wrap jails again
+                    return $storage;
+                }
+
+                $container = $this->getContainer();
+                $scannerFactory = $container->query(ScannerFactory::class);
+                $l10n = $container->get(IL10N::class);
+                $logger = $container->get(LoggerInterface::class);
+                $activityManager = $container->get(IManager::class);
+                $eventDispatcher = $container->get(IEventDispatcher::class);
+                $appManager = $container->get(IAppManager::class);
+                return new AvirWrapper([
+                    'storage' => $storage,
+                    'scannerFactory' => $scannerFactory,
+                    'l10n' => $l10n,
+                    'logger' => $logger,
+                    'activityManager' => $activityManager,
+                    'isHomeStorage' => $storage->instanceOfStorage(IHomeStorage::class),
+                    'eventDispatcher' => $eventDispatcher,
+                    'trashEnabled' => $appManager->isEnabledForUser('files_trashbin'),
+                ]);
+            },
+            1
+        );
     }
 }
