@@ -4,14 +4,25 @@ declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
 
+use OC\Files\Filesystem;
 use OCA\Files\Event\LoadAdditionalScriptsEvent;
+use OCA\GDataVaas\AvirWrapper;
+use OCP\Activity\IManager;
+use OCP\App\IAppManager;
 use OCP\AppFramework\App;
+use OCP\AppFramework\Bootstrap\IBootContext;
+use OCP\AppFramework\Bootstrap\IBootstrap;
+use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\IHomeStorage;
+use OCP\Files\Storage;
+use OCP\Files\Storage\IStorage;
 use OCP\Util;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
 
-class Application extends App
+class Application extends App implements IBootstrap
 {
     public const APP_ID = 'gdatavaas';
 
@@ -28,23 +39,26 @@ class Application extends App
         $eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
             Util::addScript(self::APP_ID, 'gdatavaas-files-action');
         });
-
-        // TODO
-        Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
-
-        $this->register();
+        
+        // $this->register();
     }
 
     /**
      * Load the composer autoloader if it exists
      * @return void
      */
-    public function register(): void
+    public function register(IRegistrationContext $context): void
     {
         $composerAutoloadFile = __DIR__ . '/../../vendor/autoload.php';
         if (file_exists($composerAutoloadFile)) {
             require_once $composerAutoloadFile;
         }
+        
+        $logger = $this->getContainer()->get(LoggerInterface::class);
+        $logger->info("before connectHook");
+        // TODO
+        Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
+        $logger->info("after connectHook");
     }
 
     /**
@@ -52,24 +66,27 @@ class Application extends App
      */
     public function setupWrapper(): void {
         Filesystem::addStorageWrapper(
-            'oc_avir',
+            'oc_gdatavaas',
             function (string $mountPoint, IStorage $storage) {
+                /*
                 if ($storage->instanceOfStorage(Jail::class)) {
                     // No reason to wrap jails again
                     return $storage;
                 }
+                */
 
                 $container = $this->getContainer();
-                $scannerFactory = $container->query(ScannerFactory::class);
-                $l10n = $container->get(IL10N::class);
+                // $scannerFactory = $container->query(ScannerFactory::class);
+                // $l10n = $container->get(IL10N::class);
                 $logger = $container->get(LoggerInterface::class);
+                $logger->info("addStorageWrapper called");
                 $activityManager = $container->get(IManager::class);
                 $eventDispatcher = $container->get(IEventDispatcher::class);
                 $appManager = $container->get(IAppManager::class);
                 return new AvirWrapper([
                     'storage' => $storage,
-                    'scannerFactory' => $scannerFactory,
-                    'l10n' => $l10n,
+                    //'scannerFactory' => $scannerFactory,
+                    //'l10n' => $l10n,
                     'logger' => $logger,
                     'activityManager' => $activityManager,
                     'isHomeStorage' => $storage->instanceOfStorage(IHomeStorage::class),
@@ -79,5 +96,10 @@ class Application extends App
             },
             1
         );
+    }
+
+    public function boot(IBootContext $context): void
+    {
+        // TODO: Implement boot() method.
     }
 }

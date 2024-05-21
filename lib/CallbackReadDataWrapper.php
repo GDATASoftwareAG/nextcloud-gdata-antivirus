@@ -1,6 +1,6 @@
 <?php
 
-namespace OCA\Files_Antivirus;
+namespace OCA\GDataVaas;
 
 use Icewind\Streams\CallbackWrapper;
 use Icewind\Streams\Wrapper;
