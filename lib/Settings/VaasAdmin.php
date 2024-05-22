@@ -29,7 +29,7 @@ class VaasAdmin implements ISettings
             'vaasUrl' => $this->config->getAppValue(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de'),
             'quarantineFolder' => $this->config->getAppValue(self::APP_ID, 'quarantineFolder', 'Quarantine'),
             'autoScanFiles' => $this->config->getAppValue(self::APP_ID, 'autoScanFiles', false),
-            'scanOnlyNewFiles' => $this->config->getAppValue(self::APP_ID, 'scanOnlyNewFiles', false),
+            'scanOnlyNewFiles' => $this->config->getAppValue(self::APP_ID, 'scanOnlyNewFiles', true),
             'prefixMalicious' => $this->config->getAppValue(self::APP_ID, 'prefixMalicious', true),
             'disableUnscannedTag' => $this->config->getAppValue(self::APP_ID, 'disableUnscannedTag', false),
             'allowlist' => $this->config->getAppValue(self::APP_ID, 'allowlist'),
