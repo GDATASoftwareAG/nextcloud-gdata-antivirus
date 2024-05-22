@@ -149,4 +149,7 @@ appstore:
 	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
 	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
 	--exclude="../$(app_directory_name)/dev-environment*" \
+	--exclude="../$(app_directory_name)/docker-compose.yml" \
+	--exclude="../$(app_directory_name)/install.sh" \
+	--exclude="../$(app_directory_name)/renovate.json" \
 	../$(app_directory_name) \
