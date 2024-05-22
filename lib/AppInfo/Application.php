@@ -39,8 +39,6 @@ class Application extends App implements IBootstrap
         $eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
             Util::addScript(self::APP_ID, 'gdatavaas-files-action');
         });
-        
-        // $this->register();
     }
 
     /**
@@ -54,11 +52,8 @@ class Application extends App implements IBootstrap
             require_once $composerAutoloadFile;
         }
         
-        $logger = $this->getContainer()->get(LoggerInterface::class);
-        $logger->info("before connectHook");
-        // TODO
+        // Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
         Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
-        $logger->info("after connectHook");
     }
 
     /**
@@ -66,7 +61,7 @@ class Application extends App implements IBootstrap
      */
     public function setupWrapper(): void {
         Filesystem::addStorageWrapper(
-            'oc_gdatavaas',
+            'oc_gdata_vaas',
             function (string $mountPoint, IStorage $storage) {
                 /*
                 if ($storage->instanceOfStorage(Jail::class)) {
@@ -79,7 +74,6 @@ class Application extends App implements IBootstrap
                 // $scannerFactory = $container->query(ScannerFactory::class);
                 // $l10n = $container->get(IL10N::class);
                 $logger = $container->get(LoggerInterface::class);
-                $logger->info("addStorageWrapper called");
                 $activityManager = $container->get(IManager::class);
                 $eventDispatcher = $container->get(IEventDispatcher::class);
                 $appManager = $container->get(IAppManager::class);

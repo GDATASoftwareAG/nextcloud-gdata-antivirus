@@ -57,9 +57,6 @@ class AvirWrapper extends Wrapper {
 
 		/** @var IEventDispatcher $eventDispatcher */
 		$eventDispatcher = $parameters['eventDispatcher'];
-        $eventDispatcher->addListener(ScanStateEvent::class, function (ScanStateEvent $event) {
-			$this->shouldScan = $event->getState();
-		});
 	}
 
 	/**
@@ -69,7 +66,7 @@ class AvirWrapper extends Wrapper {
 	 * @return resource | false
 	 */
 	public function fopen($path, $mode) {
-        $this->logger->info("fopen " . $path);
+        $this->logger->debug("AvirWrapper::fopen " . $path);
 		$stream = $this->storage->fopen($path, $mode);
 
 		/*
@@ -110,7 +107,7 @@ class AvirWrapper extends Wrapper {
 				null,
 				null,
 				function () use ($path, $logger) {
-                    $logger->critical("Closing " . $path);
+                    $logger->debug("Closing " . $path);
                     sleep(20);
 //					$status = $scanner->completeAsyncScan();
 //					if ($status->getNumericStatus() === Status::SCANRESULT_INFECTED) {
