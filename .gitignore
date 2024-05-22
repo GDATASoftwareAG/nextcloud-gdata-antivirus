@@ -41,9 +41,6 @@ js/*hot-update.*
 # the fuelphp document
 /docs/
 
-# Github specific files
-.github/
-
 # you may install these packages with `oil package`.
 # http://fuelphp.com/docs/packages/oil/package.html
 # /fuel/packages/auth/
