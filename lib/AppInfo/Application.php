@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
 
-use OCA\Files\Event\LoadAdditionalScriptsEvent;
+use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\AppFramework\App;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Util;
