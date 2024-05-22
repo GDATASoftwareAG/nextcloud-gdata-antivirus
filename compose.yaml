@@ -2,7 +2,7 @@ version: '3'
 services:
   
   nextcloud-server:
-    image: nextcloud:28.0.4-fpm
+    image: nextcloud:28.0.5-fpm
     container_name: nextcloud-server
     hostname: nextcloud-server
     environment:
@@ -37,7 +37,7 @@ services:
     container_name: nextcloud-db
     hostname: nextcloud-db
     restart: unless-stopped
-    image: mariadb:10.8
+    image: mariadb:10.11
     ports:
       - "3306:3306"
     environment:
