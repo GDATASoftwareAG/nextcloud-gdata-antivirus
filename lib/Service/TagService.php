@@ -110,17 +110,17 @@ class TagService
     /**
      * @param string $tagName
      * @param int $limit Count of object ids you want to get
-     * @param string $offset The last object id you already received
      * @return array
+     * @throws Exception if the database platform is not supported
      */
-    public function getFileIdsWithTag(string $tagName, int $limit, string $offset): array
+    public function getFileIdsWithTag(string $tagName, int $limit): array
     {
         try {
             $tag = $this->getTag($tagName, false);
         } catch (TagNotFoundException) {
             return [];
         }
-        return $this->tagMapper->getObjectIdsForTags([$tag->getId()], 'files', $limit, $offset);
+        return $this->dbFileMapper->getFileIdsWithTags([$tag->getId()], $limit);
     }
 
     /**
@@ -138,24 +138,24 @@ class TagService
      * Get file ids that have any of the given tags
      * @param array $tagIds The tags to get the file ids for
      * @param int $limit The count of file ids you want to get
-     * @param ISystemTag|null $priorTagId Tag id to prioritize over the others
+     * @param ISystemTag|null $priorityTagId Tag id to prioritize over the others
      * @return array
      * @throws TagNotFoundException if a tag does not exist
+     * @throws Exception If the database platform is not supported
      */
-    public function getRandomTaggedFileIds(array $tagIds, int $limit, ?ISystemTag $priorTagId = null): array
+    public function getRandomTaggedFileIds(array $tagIds, int $limit, ?ISystemTag $priorityTagId = null): array
     {
-        if ($priorTagId === null) {
-            $objectIds = $this->tagMapper->getObjectIdsForTags($tagIds, 'files');
+        $objectIdsPriority = [];
+        if ($priorityTagId !== null) {
+            $objectIdsPriority = $this->dbFileMapper->getFileIdsWithTags([$priorityTagId->getId()], $limit);
+            shuffle($objectIdsPriority);
+        }
+        if (count($objectIdsPriority) < $limit) {
+            $objectIds = $this->dbFileMapper->getFileIdsWithTags($tagIds, $limit - count($objectIdsPriority));
             shuffle($objectIds);
-            return array_slice($objectIds, 0, $limit);
+            return array_merge($objectIdsPriority, $objectIds);
         }
-        $objectIdsPrior = $this->tagMapper->getObjectIdsForTags([$priorTagId->getId()], 'files', $limit, 0);
-        if (count($objectIdsPrior) >= $limit) {
-            return $objectIdsPrior;
-        }
-        $objectIds = $this->tagMapper->getObjectIdsForTags($tagIds, 'files');
-        shuffle($objectIds);
-        return array_merge($objectIdsPrior, array_slice($objectIds, 0, $limit - count($objectIdsPrior)));
+        return $objectIdsPriority;
     }
 
     /**

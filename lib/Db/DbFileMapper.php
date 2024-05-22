@@ -36,6 +36,38 @@ class DbFileMapper extends QBMapper
             ->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
             ->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
             ->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+            ->orderBy('f.fileid', 'DESC')
+            ->setMaxResults($limit);
+
+        $fileIds = [];
+        $result = $qb->executeQuery();
+        while ($row = $result->fetch()) {
+            $fileIds[] = $row['fileid'];
+        }
+        return $fileIds;
+    }
+
+    /**
+     * Get file ids that have at least one of the given tags
+     * @param array $includedTagIds
+     * @param int $limit
+     * @return array of file ids
+     * @throws Exception if the database platform is not supported
+     */
+    public function getFileIdsWithTags(array $includedTagIds, int $limit): array
+    {
+        $qb = $this->db->getQueryBuilder();
+        $qb->automaticTablePrefix(true);
+
+        $qb->select('f.fileid')
+            ->from($this->getTableName(), 'f')
+            ->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq('f.fileid', $qb->createFunction($this->getPlatformSpecificCast())))
+            ->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
+            ->where($qb->expr()->in('o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
+            ->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
+            ->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
+            ->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+            ->orderBy('f.fileid', 'DESC')
             ->setMaxResults($limit);
 
         $fileIds = [];

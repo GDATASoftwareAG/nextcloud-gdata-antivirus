@@ -28,7 +28,7 @@ class ScanJob extends TimedJob
         $this->scanService = $scanService;
         $this->appConfig = $appConfig;
 
-        $this->setInterval(5 * 60);
+        $this->setInterval(60);
         $this->setAllowParallelRuns(false);
         $this->setTimeSensitivity(self::TIME_SENSITIVE);
     }
@@ -74,7 +74,7 @@ class ScanJob extends TimedJob
             }
         }
         
-        $this->logger->debug("Scanning " . count($fileIds) . " files: " . implode(", ", $fileIds));
+        $this->logger->debug("Scanning files");
 
         foreach ($fileIds as $fileId) {
             try {
@@ -83,5 +83,7 @@ class ScanJob extends TimedJob
                 $this->logger->error("Failed to scan file with id " . $fileId . ": " . $e->getMessage());
             }
         }
+        
+        $this->logger->debug("Scanned " . count($fileIds) . " files");
     }
 }
