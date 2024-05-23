@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
 	const resetAllTags = document.querySelector('#reset');
 	const autoScanFiles = document.querySelector('#auto_scan_files');
-	const scanOnlyNew = document.querySelector('#scan_only_new');
 	const prefixMalicious = document.querySelector('#prefixMalicious');
 	const authMethod = document.querySelector('#authMethod');
 	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
@@ -94,10 +93,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await toggleAutoScan(autoScanFiles.checked);
 	});
 
-	scanOnlyNew.addEventListener('click', async () => {
-		await toggleScanOnlyNew(scanOnlyNew.checked);
-	});
-
 	prefixMalicious.addEventListener('click', async () => {
 		await postData(OC.generateUrl('apps/gdatavaas/setPrefixMalicious'), {prefixMalicious: prefixMalicious.checked});
 	});
@@ -106,21 +101,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await postData(OC.generateUrl('apps/gdatavaas/setDisableUnscannedTag'), {disableUnscannedTag: disableUnscannedTag.checked});
 	});
 
-	// Activate or deactivate scanning only for new files
-	const toggleScanOnlyNew = async (enable) => {
-		scanOnlyNew.checked = enable;
-		scanOnlyNew.disabled = !autoScanFiles.checked;
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setScanOnlyNewFiles'), {scanOnlyNewFiles: enable});
-		if (response.status !== "success") {
-			OC.Notification.showTemporary(`An Error occurred when ${enable ? 'activating' : 'deactivating'} scanning only for new files.`);
-		}
-	};
-
 	// Activate or deactivate automatic file scanning
 	const toggleAutoScan = async (enable) => {
 		autoScanFiles.checked = enable;
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setAutoScan'), {autoScanFiles: enable});
-		await toggleScanOnlyNew(enable);
 		if (response.status !== "success") {
 			OC.Notification.showTemporary(`An Error occurred when ${enable ? 'activating' : 'deactivating'} automatic file scanning.`);
 		}
@@ -130,12 +114,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const autoScanResponse = await getData(OC.generateUrl('apps/gdatavaas/getAutoScan'));
 	if (autoScanResponse.status) {
 		autoScanFiles.checked = true;
-		scanOnlyNew.disabled = false;
-		const scanOnlyNewResponse = await getData(OC.generateUrl('apps/gdatavaas/getScanOnlyNewFiles'));
-		scanOnlyNew.checked = scanOnlyNewResponse.status;
 	} else {
 		autoScanFiles.checked = false;
-		await toggleScanOnlyNew(false);
 	}
 	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
 	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;

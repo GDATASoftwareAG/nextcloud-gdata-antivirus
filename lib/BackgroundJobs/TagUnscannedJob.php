@@ -60,7 +60,7 @@ class TagUnscannedJob extends TimedJob
             }
             $this->tagService->setTag($fileId, TagService::UNSCANNED);
         }
-        
+
         $this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
     }
 }

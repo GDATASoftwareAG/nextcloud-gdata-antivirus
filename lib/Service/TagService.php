@@ -90,7 +90,7 @@ class TagService
     public function hasCleanMaliciousOrPupTag(int $fileId): bool
     {
         if ($this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
-            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) || 
+            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) ||
             $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId())) {
             return true;
         }

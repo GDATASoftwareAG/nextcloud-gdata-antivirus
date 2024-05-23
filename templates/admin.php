@@ -92,13 +92,6 @@
             </td>
             <td><label for="auto_scan"><?php p($l->t('Automatic file scanning'));?></label></td>
         </tr>
-        <tr id="scan_option_only_new">
-            <td>
-                <input id="scan_only_new" class="toggle-round" type="checkbox">
-                <label for="scan_only_new"></label>
-            </td>
-            <td><div title="<?php p($l->t('Automatically scans only files that have not yet been scanned. When switched off, files that have already been scanned are scanned again at random, but unscanned files are prioritized.'));?>" class="visible"><label for="scan_new"><?php p($l->t('Scan only new files'));?></label></div></td>
-        </tr>
         <tr>
             <td>
                 <input id="prefixMalicious" class="toggle-round" type="checkbox">

@@ -93,22 +93,21 @@ class VerdictService
                 throw new NotPermittedException("File is not in the allowlist");
             }
         }
-        
+
         if ($this->vaas == null) {
             $this->vaas = $this->createAndConnectVaas();
         }
 
         try {
             $verdict = $this->vaas->ForFile($filePath);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error("Vaas for file: " . $e->getMessage());
             $this->vaas = null;
             throw $e;
         }
 
-        $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: " 
-            . $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 . 
+        $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: "
+            . $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
             ", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
         $this->tagService->removeTagFromFile(TagService::CLEAN, $fileId);

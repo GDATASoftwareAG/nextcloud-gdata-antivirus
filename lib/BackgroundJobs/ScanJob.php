@@ -49,8 +49,7 @@ class ScanJob extends TimedJob
         $quantity = $this->appConfig->getAppValue(self::APP_ID, 'scanQueueLength');
         try {
             $quantity = intval($quantity);
-        }
-        catch (Exception) {
+        } catch (Exception) {
             $quantity = 5;
         }
 
@@ -73,7 +72,7 @@ class ScanJob extends TimedJob
                 $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId(), $pupTag->getId()], $quantity, $unscannedTag);
             }
         }
-        
+
         $this->logger->debug("Scanning files");
 
         foreach ($fileIds as $fileId) {
@@ -83,7 +82,7 @@ class ScanJob extends TimedJob
                 $this->logger->error("Failed to scan file with id " . $fileId . ": " . $e->getMessage());
             }
         }
-        
+
         $this->logger->debug("Scanned " . count($fileIds) . " files");
     }
 }

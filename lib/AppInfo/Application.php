@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace OCA\GDataVaas\AppInfo;
 
 use OC\Files\Filesystem;
-use OCA\Files\Event\LoadAdditionalScriptsEvent;
 use OCA\GDataVaas\AvirWrapper;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
+use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;

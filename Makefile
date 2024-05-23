@@ -73,9 +73,9 @@ ifeq (, $(composer))
 	mkdir -p $(build_tools_directory)
 	curl -sS https://getcomposer.org/installer | php
 	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist
+	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev 
 else
-	composer install --prefer-dist
+	composer install --prefer-dist --no-dev
 endif
 
 # Installs npm dependencies
@@ -149,4 +149,7 @@ appstore:
 	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
 	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
 	--exclude="../$(app_directory_name)/dev-environment*" \
+	--exclude="../$(app_directory_name)/docker-compose.yml" \
+	--exclude="../$(app_directory_name)/install.sh" \
+	--exclude="../$(app_directory_name)/renovate.json" \
 	../$(app_directory_name) \

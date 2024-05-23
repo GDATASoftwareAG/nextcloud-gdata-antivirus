@@ -1,0 +1,39 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: actions/setup-node@v4
+      name: setup node
+      with:
+        node-version: 20
+
+    - name: Build 
+      run: make build
+
+    - name: replace version
+      if: startsWith(github.ref, 'refs/tags/')
+      run: |
+        RELEASE_VERSION=${GITHUB_REF#refs/tags/}
+        sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
+
+    - name: Create artifact 
+      run: make appstore
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: build/artifacts/*
