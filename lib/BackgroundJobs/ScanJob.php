@@ -7,7 +7,7 @@ use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class ScanJob extends TimedJob
@@ -16,10 +16,10 @@ class ScanJob extends TimedJob
 
     private TagService $tagService;
     private VerdictService $scanService;
-    private IConfig $appConfig;
+    private IAppConfig $appConfig;
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig)
+    public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IAppConfig $appConfig)
     {
         parent::__construct($time);
 
@@ -40,18 +40,13 @@ class ScanJob extends TimedJob
      */
     protected function run($argument): void
     {
-        $autoScan = $this->appConfig->getAppValue(self::APP_ID, 'autoScanFiles');
+        $autoScan = $this->appConfig->getValueBool(self::APP_ID, 'autoScanFiles');
         if (!$autoScan) {
             return;
         }
-        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
-        $autoScanOnlyNewFiles = $this->appConfig->getAppValue(self::APP_ID, 'scanOnlyNewFiles');
-        $quantity = $this->appConfig->getAppValue(self::APP_ID, 'scanQueueLength');
-        try {
-            $quantity = intval($quantity);
-        } catch (Exception) {
-            $quantity = 5;
-        }
+        $unscannedTagIsDisabled = $this->appConfig->getValueBool(self::APP_ID, 'disableUnscannedTag');
+        $autoScanOnlyNewFiles = $this->appConfig->getValueBool(self::APP_ID, 'scanOnlyNewFiles');
+        $quantity = $this->appConfig->getValueInt(self::APP_ID, 'scanQueueLength');
 
         $maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
         $pupTag = $this->tagService->getTag(TagService::PUP);
@@ -67,7 +62,7 @@ class ScanJob extends TimedJob
             $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, $quantity);
         } else {
             if ($autoScanOnlyNewFiles) {
-                $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
+                $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity);
             } else {
                 $fileIds = $this->tagService->getRandomTaggedFileIds([$maliciousTag->getId(), $cleanTag->getId(), $unscannedTag->getId(), $pupTag->getId()], $quantity, $unscannedTag);
             }

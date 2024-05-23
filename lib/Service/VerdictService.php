@@ -7,7 +7,7 @@ use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 use VaasSdk\ClientCredentialsGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
@@ -32,26 +32,26 @@ class VerdictService
     private string $tokenEndpoint;
     private string $vaasUrl;
     private ResourceOwnerPasswordGrantAuthenticator|ClientCredentialsGrantAuthenticator $authenticator;
-    private IConfig $appConfig;
+    private IAppConfig $appConfig;
     private FileService $fileService;
     private TagService $tagService;
     private ?Vaas $vaas = null;
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService)
+    public function __construct(LoggerInterface $logger, IAppConfig $appConfig, FileService $fileService, TagService $tagService)
     {
         $this->logger = $logger;
         $this->appConfig = $appConfig;
         $this->fileService = $fileService;
         $this->tagService = $tagService;
 
-        $this->authMethod = $this->appConfig->getAppValue(self::APP_ID, 'authMethod', 'ResourceOwnerPassword');
-        $this->tokenEndpoint = $this->appConfig->getAppValue(self::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
-        $this->vaasUrl = $this->appConfig->getAppValue(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
-        $this->clientId = $this->appConfig->getAppValue(self::APP_ID, 'clientId');
-        $this->clientSecret = $this->appConfig->getAppValue(self::APP_ID, 'clientSecret');
-        $this->username = $this->appConfig->getAppValue(self::APP_ID, 'username');
-        $this->password = $this->appConfig->getAppValue(self::APP_ID, 'password');
+        $this->authMethod = $this->appConfig->getValueString(self::APP_ID, 'authMethod', 'ResourceOwnerPassword');
+        $this->tokenEndpoint = $this->appConfig->getValueString(self::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
+        $this->vaasUrl = $this->appConfig->getValueString(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
+        $this->clientId = $this->appConfig->getValueString(self::APP_ID, 'clientId');
+        $this->clientSecret = $this->appConfig->getValueString(self::APP_ID, 'clientSecret');
+        $this->username = $this->appConfig->getValueString(self::APP_ID, 'username');
+        $this->password = $this->appConfig->getValueString(self::APP_ID, 'password');
     }
 
     /**
@@ -144,7 +144,7 @@ class VerdictService
      */
     private function getAllowlist(): array
     {
-        $allowlist = $this->appConfig->getAppValue(self::APP_ID, 'allowlist');
+        $allowlist = $this->appConfig->getValueString(self::APP_ID, 'allowlist');
         $allowlist = preg_replace('/\s+/', '', $allowlist);
         if (empty($allowlist)) {
             return [];
@@ -158,7 +158,7 @@ class VerdictService
      */
     private function getBlocklist(): array
     {
-        $blocklist = $this->appConfig->getAppValue(self::APP_ID, 'blocklist');
+        $blocklist = $this->appConfig->getValueString(self::APP_ID, 'blocklist');
         $blocklist = preg_replace('/\s+/', '', $blocklist);
         if (empty($blocklist)) {
             return [];
