@@ -110,7 +110,7 @@ distclean: clean
 appstore:
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
-	tar cvzf $(appstore_package_name).tar.gz \
+	tar czf $(appstore_package_name).tar.gz \
 	--transform s/$(app_directory_name)/$(app_real_name)/ \
 	--exclude-vcs \
 	--exclude="../$(app_directory_name)/build" \
