@@ -45,7 +45,7 @@ class VerdictService
         $this->fileService = $fileService;
         $this->tagService = $tagService;
 
-        $this->authMethod = $this->appConfig->getAppValue(self::APP_ID, 'authMethod', 'ResourceOwnerPassword');
+        $this->authMethod = $this->appConfig->getAppValue(self::APP_ID, 'authMethod', 'ClientCredentials');
         $this->tokenEndpoint = $this->appConfig->getAppValue(self::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
         $this->vaasUrl = $this->appConfig->getAppValue(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
         $this->clientId = $this->appConfig->getAppValue(self::APP_ID, 'clientId');
@@ -94,17 +94,7 @@ class VerdictService
             }
         }
 
-        if ($this->vaas == null) {
-            $this->vaas = $this->createAndConnectVaas();
-        }
-
-        try {
-            $verdict = $this->vaas->ForFile($filePath);
-        } catch (Exception $e) {
-            $this->logger->error("Vaas for file: " . $e->getMessage());
-            $this->vaas = null;
-            throw $e;
-        }
+        $verdict = $this->scan($filePath);
 
         $this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: "
             . $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
@@ -136,6 +126,23 @@ class VerdictService
         }
 
         return $verdict;
+    }
+
+    public function scan(string $filePath): VaasVerdict
+    {
+        if ($this->vaas == null) {
+            $this->vaas = $this->createAndConnectVaas();
+        }
+
+        try {
+            $verdict = $this->vaas->ForFile($filePath);
+
+            return $verdict;
+        } catch (Exception $e) {
+            $this->logger->error("Vaas for file: " . $e->getMessage());
+            $this->vaas = null;
+            throw $e;
+        }        
     }
 
     /**

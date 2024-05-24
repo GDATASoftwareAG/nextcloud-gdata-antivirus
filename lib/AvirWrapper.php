@@ -10,10 +10,12 @@ namespace OCA\GDataVaas;
 
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
+use VaasSdk\Message\Verdict;
 
 class AvirWrapper extends Wrapper {
 	/**
@@ -22,8 +24,7 @@ class AvirWrapper extends Wrapper {
 	 */
 	private $writingModes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
-	/** @var ScannerFactory */
-	protected $scannerFactory;
+	protected VerdictService $verdictService;
 
 	/** @var IL10N */
 	protected $l10n;
@@ -48,7 +49,7 @@ class AvirWrapper extends Wrapper {
 	 */
 	public function __construct($parameters) {
 		parent::__construct($parameters);
-		//$this->scannerFactory = $parameters['scannerFactory'];
+		$this->verdictService = $parameters['verdictService'];
 		//$this->l10n = $parameters['l10n'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
@@ -66,7 +67,11 @@ class AvirWrapper extends Wrapper {
 	 * @return resource | false
 	 */
 	public function fopen($path, $mode) {
+		$e = new \Exception; $this->logger->debug(var_export($e->getTraceAsString(), true)); 
         $this->logger->debug("AvirWrapper::fopen " . $path);
+		$cache = $this->getCache($path);
+		$metadata = $cache->get($path);
+		$this->logger->debug(var_export($metadata, true));
 		$stream = $this->storage->fopen($path, $mode);
 
 		/*
@@ -84,6 +89,8 @@ class AvirWrapper extends Wrapper {
 
 	public function writeStream(string $path, $stream, int $size = null): int {
 		if ($this->shouldWrap($path)) {
+			$e = new \Exception; $this->logger->debug(var_export($e->getTraceAsString(), true)); 
+        	$this->logger->debug("AvirWrapper::writeStream " . $path);
 			$stream = $this->wrapSteam($path, $stream);
 		}
 		return parent::writeStream($path, $stream, $size);
@@ -99,40 +106,50 @@ class AvirWrapper extends Wrapper {
 
 	private function wrapSteam(string $path, $stream) {
 		try {
-			//$scanner = $this->scannerFactory->getScanner();
-			//$scanner->initScanner();
             $logger = $this->logger;
 			return CallbackReadDataWrapper::wrap(
 				$stream,
 				null,
 				null,
 				function () use ($path, $logger) {
-                    $logger->debug("Closing " . $path);
-                    sleep(20);
-//					$status = $scanner->completeAsyncScan();
-//					if ($status->getNumericStatus() === Status::SCANRESULT_INFECTED) {
-//						//prevent from going to trashbin
-//						if ($this->trashEnabled) {
-//							/** @var ITrashManager $trashManager */
-//							$trashManager = \OC::$server->query(ITrashManager::class);
-//							$trashManager->pauseTrash();
-//						}
-//
-//						$owner = $this->getOwner($path);
-//						$this->unlink($path);
-//
-//						if ($this->trashEnabled) {
-//							/** @var ITrashManager $trashManager */
-//							$trashManager = \OC::$server->query(ITrashManager::class);
-//							$trashManager->resumeTrash();
-//						}
-//
-//						$this->logger->warning(
-//							'Infected file deleted. ' . $status->getDetails()
-//							. ' Account: ' . $owner . ' Path: ' . $path,
-//							['app' => 'files_antivirus']
-//						);
-//
+                    $localPath = $this->getLocalFile($path);
+                    $filesize = $this->filesize($path);
+                    $logger->debug("Closing " . $localPath . " with size " . $filesize);
+					//$cache = $this->getCache($path);
+					//$logger->debug(print_r($cache, true));
+					//$metadata = $cache->get($path);
+					//$logger->debug(var_export($metadata, true));
+					//$metadata2 = $this->getMetaData($path);
+					//$logger->debug(var_export($metadata2, true));
+
+					$verdict = $this->verdictService->scan($localPath);
+                    $logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
+
+					if ($verdict->Verdict == Verdict::MALICIOUS) {
+                        $logger->debug("Removing malicious file  " . $localPath);
+                        
+						//prevent from going to trashbin
+						if ($this->trashEnabled) {
+							/** @var ITrashManager $trashManager */
+							$trashManager = \OC::$server->query(ITrashManager::class);
+							$trashManager->pauseTrash();
+						}
+
+						$owner = $this->getOwner($path);
+						$this->unlink($path);
+
+						if ($this->trashEnabled) {
+							/** @var ITrashManager $trashManager */
+							$trashManager = \OC::$server->query(ITrashManager::class);
+							$trashManager->resumeTrash();
+						}
+
+						$this->logger->warning(
+							'Infected file deleted. ' . $verdict->Detection
+							. ' Account: ' . $owner . ' Path: ' . $path,
+							['app' => 'gdatavaas']
+						);
+
 //						$activity = $this->activityManager->generateEvent();
 //						$activity->setApp(Application::APP_NAME)
 //							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$status->getDetails()])
@@ -151,7 +168,7 @@ class AvirWrapper extends Wrapper {
 //								$status->getDetails()
 //							)
 //						);
-//					}
+					}
 				}
 			);
 		} catch (\Exception $e) {

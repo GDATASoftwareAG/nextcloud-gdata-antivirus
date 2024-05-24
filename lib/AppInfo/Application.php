@@ -6,6 +6,7 @@ namespace OCA\GDataVaas\AppInfo;
 
 use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
@@ -71,7 +72,7 @@ class Application extends App implements IBootstrap
                 */
 
                 $container = $this->getContainer();
-                // $scannerFactory = $container->query(ScannerFactory::class);
+                $verdictService = $container->get(VerdictService::class);
                 // $l10n = $container->get(IL10N::class);
                 $logger = $container->get(LoggerInterface::class);
                 $activityManager = $container->get(IManager::class);
@@ -79,7 +80,7 @@ class Application extends App implements IBootstrap
                 $appManager = $container->get(IAppManager::class);
                 return new AvirWrapper([
                     'storage' => $storage,
-                    //'scannerFactory' => $scannerFactory,
+                    'verdictService' => $verdictService,
                     //'l10n' => $l10n,
                     'logger' => $logger,
                     'activityManager' => $activityManager,
