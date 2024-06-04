@@ -10,9 +10,12 @@ namespace OCA\GDataVaas;
 
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
+use OCA\GDataVaas\Activity\Provider;
+use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\InvalidContentException;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Message\Verdict;
@@ -50,7 +53,6 @@ class AvirWrapper extends Wrapper {
 	public function __construct($parameters) {
 		parent::__construct($parameters);
 		$this->verdictService = $parameters['verdictService'];
-		//$this->l10n = $parameters['l10n'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
@@ -67,8 +69,6 @@ class AvirWrapper extends Wrapper {
 	 * @return resource | false
 	 */
 	public function fopen($path, $mode) {
-		$e = new \Exception; $this->logger->debug(var_export($e->getTraceAsString(), true)); 
-        $this->logger->debug("AvirWrapper::fopen " . $path);
 		$cache = $this->getCache($path);
 		$metadata = $cache->get($path);
 		$this->logger->debug(var_export($metadata, true));
@@ -89,8 +89,6 @@ class AvirWrapper extends Wrapper {
 
 	public function writeStream(string $path, $stream, int $size = null): int {
 		if ($this->shouldWrap($path)) {
-			$e = new \Exception; $this->logger->debug(var_export($e->getTraceAsString(), true)); 
-        	$this->logger->debug("AvirWrapper::writeStream " . $path);
 			$stream = $this->wrapSteam($path, $stream);
 		}
 		return parent::writeStream($path, $stream, $size);
@@ -115,12 +113,6 @@ class AvirWrapper extends Wrapper {
                     $localPath = $this->getLocalFile($path);
                     $filesize = $this->filesize($path);
                     $logger->debug("Closing " . $localPath . " with size " . $filesize);
-					//$cache = $this->getCache($path);
-					//$logger->debug(print_r($cache, true));
-					//$metadata = $cache->get($path);
-					//$logger->debug(var_export($metadata, true));
-					//$metadata2 = $this->getMetaData($path);
-					//$logger->debug(var_export($metadata2, true));
 
 					$verdict = $this->verdictService->scan($localPath);
                     $logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
@@ -149,25 +141,22 @@ class AvirWrapper extends Wrapper {
 							. ' Account: ' . $owner . ' Path: ' . $path,
 							['app' => 'gdatavaas']
 						);
+                        
+						$activity = $this->activityManager->generateEvent();
+						$activity->setApp(Application::APP_ID)
+							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$verdict->Detection ?? "no_detection_name"])
+							->setMessage(Provider::MESSAGE_FILE_DELETED)
+							->setObject('', 0, $path)
+							->setAffectedUser($owner)
+							->setType(Provider::TYPE_VIRUS_DETECTED);
+						$this->activityManager->publish($activity);
 
-//						$activity = $this->activityManager->generateEvent();
-//						$activity->setApp(Application::APP_NAME)
-//							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$status->getDetails()])
-//							->setMessage(Provider::MESSAGE_FILE_DELETED)
-//							->setObject('', 0, $path)
-//							->setAffectedUser($owner)
-//							->setType(Provider::TYPE_VIRUS_DETECTED);
-//						$this->activityManager->publish($activity);
-//
-//						$this->logger->error('Infected file deleted. ' . $status->getDetails() .
-//							' File: ' . $path . ' Account: ' . $owner, ['app' => 'files_antivirus']);
-//
-//						throw new InvalidContentException(
-//							$this->l10n->t(
-//								'Virus %s is detected in the file. Upload cannot be completed.',
-//								$status->getDetails()
-//							)
-//						);
+						throw new InvalidContentException(
+                            sprintf(
+								'Virus %s is detected in the file. Upload cannot be completed.',
+                                $verdict->Detection
+							)
+						);
 					}
 				}
 			);

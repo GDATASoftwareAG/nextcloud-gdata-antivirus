@@ -18,6 +18,7 @@ use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\VaasVerdict;
 use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
+use VaasSdk\VaasOptions;
 
 class VerdictService
 {
@@ -193,7 +194,8 @@ class VerdictService
             );
         }
 
-        $vaas = new Vaas($this->vaasUrl);
+        $options = new VaasOptions(false, false);
+        $vaas = new Vaas($this->vaasUrl, $this->logger, $options);
         $vaas->Connect($this->authenticator->getToken());
         return $vaas;
     }

@@ -1,0 +1,63 @@
+"'#0 /var/www/html/lib/private/Files/Storage/Wrapper/Wrapper.php(307): OCA\\\\GDataVaas\\\\AvirWrapper->fopen(\\'files/Screensho...\\', \\'r\\')
+#1 /var/www/html/lib/private/Files/View.php(1159): OC\\\\Files\\\\Storage\\\\Wrapper\\\\Wrapper->fopen(\\'files/Screensho...\\', \\'r\\')
+#2 /var/www/html/lib/private/Files/View.php(987): OC\\\\Files\\\\View->basicOperation(\\'fopen\\', \\'/admin/files/Sc...\\', Array, \\'r\\')
+#3 /var/www/html/lib/private/Files/Node/File.php(116): OC\\\\Files\\\\View->fopen(\\'/admin/files/Sc...\\', \\'r\\')
+#4 /var/www/html/apps/photos/lib/Listener/ExifMetadataProvider.php(71): OC\\\\Files\\\
+ode\\\\File->fopen(\\'rb\\')
+#5 /var/www/html/lib/private/EventDispatcher/ServiceEventListener.php(86): OCA\\\\Photos\\\\Listener\\\\ExifMetadataProvider->handle(Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent))
+#6 /var/www/html/3rdparty/symfony/event-dispatcher/EventDispatcher.php(230): OC\\\\EventDispatcher\\\\ServiceEventListener->__invoke(Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent), \\'OCP\\\\\\\\FilesMetada...\\', Object(Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher))
+#7 /var/www/html/3rdparty/symfony/event-dispatcher/EventDispatcher.php(59): Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher->callListeners(Array, \\'OCP\\\\\\\\FilesMetada...\\', Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent))
+#8 /var/www/html/lib/private/EventDispatcher/EventDispatcher.php(94): Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher->dispatch(Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent), \\'OCP\\\\\\\\FilesMetada...\\')
+#9 /var/www/html/lib/private/EventDispatcher/EventDispatcher.php(106): OC\\\\EventDispatcher\\\\EventDispatcher->dispatch(\\'OCP\\\\\\\\FilesMetada...\\', Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent))
+#10 /var/www/html/lib/private/FilesMetadata/FilesMetadataManager.php(115): OC\\\\EventDispatcher\\\\EventDispatcher->dispatchTyped(Object(OCP\\\\FilesMetadata\\\\Event\\\\MetadataLiveEvent))
+#11 /var/www/html/lib/private/FilesMetadata/Listener/MetadataUpdate.php(59): OC\\\\FilesMetadata\\\\FilesMetadataManager->refreshMetadata(Object(OC\\\\Files\\\
+ode\\\\File))
+#12 /var/www/html/lib/private/EventDispatcher/ServiceEventListener.php(86): OC\\\\FilesMetadata\\\\Listener\\\\MetadataUpdate->handle(Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent))
+#13 /var/www/html/3rdparty/symfony/event-dispatcher/EventDispatcher.php(230): OC\\\\EventDispatcher\\\\ServiceEventListener->__invoke(Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent), \\'OCP\\\\\\\\Files\\\\\\\\Event...\\', Object(Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher))
+#14 /var/www/html/3rdparty/symfony/event-dispatcher/EventDispatcher.php(59): Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher->callListeners(Array, \\'OCP\\\\\\\\Files\\\\\\\\Event...\\', Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent))
+#15 /var/www/html/lib/private/EventDispatcher/EventDispatcher.php(94): Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcher->dispatch(Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent), \\'OCP\\\\\\\\Files\\\\\\\\Event...\\')
+#16 /var/www/html/lib/private/EventDispatcher/EventDispatcher.php(106): OC\\\\EventDispatcher\\\\EventDispatcher->dispatch(\\'OCP\\\\\\\\Files\\\\\\\\Event...\\', Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent))
+#17 /var/www/html/lib/private/Files/Node/HookConnector.php(109): OC\\\\EventDispatcher\\\\EventDispatcher->dispatchTyped(Object(OCP\\\\Files\\\\Events\\\
+ode\\\
+odeWrittenEvent))
+#18 /var/www/html/lib/private/legacy/OC_Hook.php(105): OC\\\\Files\\\
+ode\\\\HookConnector->postWrite(Array)
+#19 /var/www/html/apps/dav/lib/Connector/Sabre/File.php(479): OC_Hook::emit(\\'OC_Filesystem\\', \\'post_write\\', Array)
+#20 /var/www/html/apps/dav/lib/Connector/Sabre/File.php(404): OCA\\\\DAV\\\\Connector\\\\Sabre\\\\File->emitPostHooks(false)
+#21 /var/www/html/apps/dav/lib/Connector/Sabre/Directory.php(148): OCA\\\\DAV\\\\Connector\\\\Sabre\\\\File->put(Resource id #15)
+#22 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(1098): OCA\\\\DAV\\\\Connector\\\\Sabre\\\\Directory->createFile(\\'Screenshot from...\\', Resource id #15)
+#23 /var/www/html/3rdparty/sabre/dav/lib/DAV/CorePlugin.php(504): Sabre\\\\DAV\\\\Server->createFile(\\'files/admin/Scr...\\', Resource id #15, NULL)
+#24 /var/www/html/3rdparty/sabre/event/lib/WildcardEmitterTrait.php(89): Sabre\\\\DAV\\\\CorePlugin->httpPut(Object(Sabre\\\\HTTP\\\\Request), Object(Sabre\\\\HTTP\\\\Response))
+#25 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(472): Sabre\\\\DAV\\\\Server->emit(\\'method:PUT\\', Array)
+#26 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(253): Sabre\\\\DAV\\\\Server->invokeMethod(Object(Sabre\\\\HTTP\\\\Request), Object(Sabre\\\\HTTP\\\\Response))
+#27 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(321): Sabre\\\\DAV\\\\Server->start()
+#28 /var/www/html/apps/dav/lib/Server.php(373): Sabre\\\\DAV\\\\Server->exec()
+#29 /var/www/html/apps/dav/appinfo/v2/remote.php(35): OCA\\\\DAV\\\\Server->exec()
+#30 /var/www/html/remote.php(172): require_once(\\'/var/www/html/a...\\')
+#31 {main}'
+
+writeStream:
+
+"'#0 /var/www/html/lib/private/Files/Storage/Wrapper/Wrapper.php(653): OCA\\\\GDataVaas\\\\AvirWrapper->writeStream(\\'files/JSON_desc...\\', Resource id #18, NULL)
+#1 /var/www/html/apps/dav/lib/Connector/Sabre/File.php(250): OC\\\\Files\\\\Storage\\\\Wrapper\\\\Wrapper->writeStream(\\'files/JSON_desc...\\', Resource id #18)
+#2 /var/www/html/apps/dav/lib/Connector/Sabre/Directory.php(148): OCA\\\\DAV\\\\Connector\\\\Sabre\\\\File->put(Resource id #15)
+#3 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(1098): OCA\\\\DAV\\\\Connector\\\\Sabre\\\\Directory->createFile(\\'JSON_desc.txt\\', Resource id #15)
+#4 /var/www/html/3rdparty/sabre/dav/lib/DAV/CorePlugin.php(504): Sabre\\\\DAV\\\\Server->createFile(\\'files/admin/JSO...\\', Resource id #15, NULL)
+#5 /var/www/html/3rdparty/sabre/event/lib/WildcardEmitterTrait.php(89): Sabre\\\\DAV\\\\CorePlugin->httpPut(Object(Sabre\\\\HTTP\\\\Request), Object(Sabre\\\\HTTP\\\\Response))
+#6 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(472): Sabre\\\\DAV\\\\Server->emit(\\'method:PUT\\', Array)
+#7 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(253): Sabre\\\\DAV\\\\Server->invokeMethod(Object(Sabre\\\\HTTP\\\\Request), Object(Sabre\\\\HTTP\\\\Response))
+#8 /var/www/html/3rdparty/sabre/dav/lib/DAV/Server.php(321): Sabre\\\\DAV\\\\Server->start()
+#9 /var/www/html/apps/dav/lib/Server.php(373): Sabre\\\\DAV\\\\Server->exec()
+#10 /var/www/html/apps/dav/appinfo/v2/remote.php(35): OCA\\\\DAV\\\\Server->exec()
+#11 /var/www/html/remote.php(172): require_once(\\'/var/www/html/a...\\')
+#12 {main}'"

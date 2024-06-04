@@ -42,12 +42,12 @@ class TagService
     public function getTag(string $name, bool $create = true): ISystemTag
     {
         try {
-            $tag = $this->tagService->getTag($name, true, true);
+            $tag = $this->tagService->getTag($name, true, false);
         } catch (TagNotFoundException) {
             if (!$create) {
                 throw new TagNotFoundException();
             }
-            $tag = $this->tagService->createTag($name, true, true);
+            $tag = $this->tagService->createTag($name, true, false);
             $this->logger->debug("Tag created: " . $name);
         }
         return $tag;
@@ -73,7 +73,7 @@ class TagService
     public function removeTagFromFile(string $tagName, int $fileId): bool
     {
         try {
-            $tag = $this->tagService->getTag($tagName, true, true);
+            $tag = $this->tagService->getTag($tagName, true, false);
             $this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
             $this->logger->debug("Tag removed: " . $tagName . " for file " . $fileId);
             return true;
@@ -89,9 +89,11 @@ class TagService
      */
     public function hasCleanMaliciousOrPupTag(int $fileId): bool
     {
-        if ($this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
+        if (
+            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
             $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) ||
-            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId())) {
+            $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId())
+        ) {
             return true;
         }
         return false;
