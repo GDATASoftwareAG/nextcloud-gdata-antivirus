@@ -2,10 +2,16 @@
 
 docker stop nextcloud-container
 sleep 1
-docker run -d --name nextcloud-container --rm --publish 80:80 --publish 8080:8080 --publish 8443:8443 nextcloud:stable
+docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
 echo "Waiting for sunrise..."
-sleep 5
-docker exec --user www-data -it nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin
+
+until docker exec --user www-data -it nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin >/dev/null
+do
+  echo "Try again waiting 2 seconds"
+  sleep 2
+done
+
+make build
 make appstore
 tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/

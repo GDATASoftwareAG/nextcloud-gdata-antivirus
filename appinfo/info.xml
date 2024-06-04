@@ -27,4 +27,12 @@
 	<database>pgsql</database>
 	<database>mysql</database>
 	<database>sqlite</database>
+    <activity>
+        <settings>
+            <setting>OCA\GDataVaas\Activity\Setting</setting>
+        </settings>
+        <providers>
+            <provider>OCA\GDataVaas\Activity\Provider</provider>
+        </providers>
+    </activity>
 </info>

@@ -10,10 +10,15 @@ namespace OCA\GDataVaas;
 
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
+use OCA\GDataVaas\Activity\Provider;
+use OCA\GDataVaas\AppInfo\Application;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\InvalidContentException;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
+use VaasSdk\Message\Verdict;
 
 class AvirWrapper extends Wrapper {
 	/**
@@ -22,8 +27,7 @@ class AvirWrapper extends Wrapper {
 	 */
 	private $writingModes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
-	/** @var ScannerFactory */
-	protected $scannerFactory;
+	protected VerdictService $verdictService;
 
 	/** @var IL10N */
 	protected $l10n;
@@ -48,8 +52,7 @@ class AvirWrapper extends Wrapper {
 	 */
 	public function __construct($parameters) {
 		parent::__construct($parameters);
-		//$this->scannerFactory = $parameters['scannerFactory'];
-		//$this->l10n = $parameters['l10n'];
+		$this->verdictService = $parameters['verdictService'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
@@ -66,7 +69,9 @@ class AvirWrapper extends Wrapper {
 	 * @return resource | false
 	 */
 	public function fopen($path, $mode) {
-        $this->logger->debug("AvirWrapper::fopen " . $path);
+		$cache = $this->getCache($path);
+		$metadata = $cache->get($path);
+		$this->logger->debug(var_export($metadata, true));
 		$stream = $this->storage->fopen($path, $mode);
 
 		/*
@@ -99,59 +104,60 @@ class AvirWrapper extends Wrapper {
 
 	private function wrapSteam(string $path, $stream) {
 		try {
-			//$scanner = $this->scannerFactory->getScanner();
-			//$scanner->initScanner();
             $logger = $this->logger;
 			return CallbackReadDataWrapper::wrap(
 				$stream,
 				null,
 				null,
 				function () use ($path, $logger) {
-                    $logger->debug("Closing " . $path);
-                    sleep(20);
-//					$status = $scanner->completeAsyncScan();
-//					if ($status->getNumericStatus() === Status::SCANRESULT_INFECTED) {
-//						//prevent from going to trashbin
-//						if ($this->trashEnabled) {
-//							/** @var ITrashManager $trashManager */
-//							$trashManager = \OC::$server->query(ITrashManager::class);
-//							$trashManager->pauseTrash();
-//						}
-//
-//						$owner = $this->getOwner($path);
-//						$this->unlink($path);
-//
-//						if ($this->trashEnabled) {
-//							/** @var ITrashManager $trashManager */
-//							$trashManager = \OC::$server->query(ITrashManager::class);
-//							$trashManager->resumeTrash();
-//						}
-//
-//						$this->logger->warning(
-//							'Infected file deleted. ' . $status->getDetails()
-//							. ' Account: ' . $owner . ' Path: ' . $path,
-//							['app' => 'files_antivirus']
-//						);
-//
-//						$activity = $this->activityManager->generateEvent();
-//						$activity->setApp(Application::APP_NAME)
-//							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$status->getDetails()])
-//							->setMessage(Provider::MESSAGE_FILE_DELETED)
-//							->setObject('', 0, $path)
-//							->setAffectedUser($owner)
-//							->setType(Provider::TYPE_VIRUS_DETECTED);
-//						$this->activityManager->publish($activity);
-//
-//						$this->logger->error('Infected file deleted. ' . $status->getDetails() .
-//							' File: ' . $path . ' Account: ' . $owner, ['app' => 'files_antivirus']);
-//
-//						throw new InvalidContentException(
-//							$this->l10n->t(
-//								'Virus %s is detected in the file. Upload cannot be completed.',
-//								$status->getDetails()
-//							)
-//						);
-//					}
+                    $localPath = $this->getLocalFile($path);
+                    $filesize = $this->filesize($path);
+                    $logger->debug("Closing " . $localPath . " with size " . $filesize);
+
+					$verdict = $this->verdictService->scan($localPath);
+                    $logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
+
+					if ($verdict->Verdict == Verdict::MALICIOUS) {
+                        $logger->debug("Removing malicious file  " . $localPath);
+                        
+						//prevent from going to trashbin
+						if ($this->trashEnabled) {
+							/** @var ITrashManager $trashManager */
+							$trashManager = \OC::$server->query(ITrashManager::class);
+							$trashManager->pauseTrash();
+						}
+
+						$owner = $this->getOwner($path);
+						$this->unlink($path);
+
+						if ($this->trashEnabled) {
+							/** @var ITrashManager $trashManager */
+							$trashManager = \OC::$server->query(ITrashManager::class);
+							$trashManager->resumeTrash();
+						}
+
+						$this->logger->warning(
+							'Infected file deleted. ' . $verdict->Detection
+							. ' Account: ' . $owner . ' Path: ' . $path,
+							['app' => 'gdatavaas']
+						);
+                        
+						$activity = $this->activityManager->generateEvent();
+						$activity->setApp(Application::APP_ID)
+							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$verdict->Detection ?? "no_detection_name"])
+							->setMessage(Provider::MESSAGE_FILE_DELETED)
+							->setObject('', 0, $path)
+							->setAffectedUser($owner)
+							->setType(Provider::TYPE_VIRUS_DETECTED);
+						$this->activityManager->publish($activity);
+
+						throw new InvalidContentException(
+                            sprintf(
+								'Virus %s is detected in the file. Upload cannot be completed.',
+                                $verdict->Detection
+							)
+						);
+					}
 				}
 			);
 		} catch (\Exception $e) {
