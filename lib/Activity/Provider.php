@@ -74,7 +74,7 @@ class Provider implements IProvider {
                 'id' => $event->getObjectName(),
                 'name' => basename($event->getObjectName()),
             ];
-            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'gdatalogo.svg'));
+            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'favicon.svg'));
 
             if ($event->getMessage() === self::MESSAGE_FILE_DELETED) {
                 $event->setParsedMessage('The file has been removed');
@@ -91,7 +91,7 @@ class Provider implements IProvider {
 
             $event->setParsedSubject($subject);
             $event->setRichSubject($subject);
-            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'gdatalogo.svg'));
+            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'favicon.svg'));
 
             if ($event->getMessage() === self::MESSAGE_FILE_DELETED) {
                 $event->setParsedMessage('The file has been removed');
@@ -110,7 +110,7 @@ class Provider implements IProvider {
                 'id' => $event->getObjectName(),
                 'name' => $event->getObjectName(),
             ];
-            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'gdatalogo.svg'));
+            $event->setIcon($this->urlGenerator->imagePath('gdatavaas', 'favicon.svg'));
 
             if ($event->getMessage() === self::MESSAGE_FILE_DELETED) {
                 $event->setParsedMessage('The file has been removed');
