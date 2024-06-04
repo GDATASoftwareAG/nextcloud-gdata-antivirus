@@ -112,7 +112,12 @@ class AvirWrapper extends Wrapper {
 					$filesize = $this->filesize($path);
 					$logger->debug("Closing " . $localPath . " with size " . $filesize);
 
-					$verdict = $this->verdictService->scan($localPath);
+					try {
+						$verdict = $this->verdictService->scan($localPath);
+					} catch (\Exception $e) {
+						$this->logger->error($e->getMessage(), ['exception' => $e]);
+						return;
+					}
 					$logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
 
 					if ($verdict->Verdict == Verdict::MALICIOUS) {
