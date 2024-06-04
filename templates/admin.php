@@ -18,10 +18,10 @@
                 <td class="input_field">
                     <select id="authMethod" name="authMethod">
                         <option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') {
-                            echo 'selected';
+                        	echo 'selected';
                         } ?>>Client Credentials Flow</option>
                         <option value="ResourceOwnerPassword" <?php if ($_['authMethod'] === 'ResourceOwnerPassword') {
-                            echo 'selected';
+                        	echo 'selected';
                         } ?>>Resource Owner Password Flow</option>
                     </select></td>
             </tr>

@@ -1,5 +1,10 @@
 <?php
 
+require_once './vendor/autoload.php';
+
+use Nextcloud\CodingStandard\Config;
+
+
 $finder = (new PhpCsFixer\Finder())
     ->in(__DIR__)
     ->exclude([
@@ -9,6 +14,6 @@ $finder = (new PhpCsFixer\Finder())
     ])
 ;
 
-return (new PhpCsFixer\Config())
+return (new Config())
     ->setFinder($finder)
 ;

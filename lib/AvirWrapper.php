@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright (c) 2014 Victor Dubiniuk <victor.dubiniuk@gmail.com>
  * This file is licensed under the Affero General Public License version 3 or
@@ -69,9 +70,6 @@ class AvirWrapper extends Wrapper {
 	 * @return resource | false
 	 */
 	public function fopen($path, $mode) {
-		$cache = $this->getCache($path);
-		$metadata = $cache->get($path);
-		$this->logger->debug(var_export($metadata, true));
 		$stream = $this->storage->fopen($path, $mode);
 
 		/*
@@ -87,7 +85,7 @@ class AvirWrapper extends Wrapper {
 		return $stream;
 	}
 
-	public function writeStream(string $path, $stream, int $size = null): int {
+	public function writeStream(string $path, $stream, ?int $size = null): int {
 		if ($this->shouldWrap($path)) {
 			$stream = $this->wrapSteam($path, $stream);
 		}
@@ -104,22 +102,22 @@ class AvirWrapper extends Wrapper {
 
 	private function wrapSteam(string $path, $stream) {
 		try {
-            $logger = $this->logger;
+			$logger = $this->logger;
 			return CallbackReadDataWrapper::wrap(
 				$stream,
 				null,
 				null,
 				function () use ($path, $logger) {
-                    $localPath = $this->getLocalFile($path);
-                    $filesize = $this->filesize($path);
-                    $logger->debug("Closing " . $localPath . " with size " . $filesize);
+					$localPath = $this->getLocalFile($path);
+					$filesize = $this->filesize($path);
+					$logger->debug("Closing " . $localPath . " with size " . $filesize);
 
 					$verdict = $this->verdictService->scan($localPath);
-                    $logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
+					$logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
 
 					if ($verdict->Verdict == Verdict::MALICIOUS) {
-                        $logger->debug("Removing malicious file  " . $localPath);
-                        
+						$logger->debug("Removing malicious file  " . $localPath);
+
 						//prevent from going to trashbin
 						if ($this->trashEnabled) {
 							/** @var ITrashManager $trashManager */
@@ -138,10 +136,10 @@ class AvirWrapper extends Wrapper {
 
 						$this->logger->warning(
 							'Infected file deleted. ' . $verdict->Detection
-							. ' Account: ' . $owner . ' Path: ' . $path,
+								. ' Account: ' . $owner . ' Path: ' . $path,
 							['app' => 'gdatavaas']
 						);
-                        
+
 						$activity = $this->activityManager->generateEvent();
 						$activity->setApp(Application::APP_ID)
 							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$verdict->Detection ?? "no_detection_name"])
@@ -152,9 +150,9 @@ class AvirWrapper extends Wrapper {
 						$this->activityManager->publish($activity);
 
 						throw new InvalidContentException(
-                            sprintf(
+							sprintf(
 								'Virus %s is detected in the file. Upload cannot be completed.',
-                                $verdict->Detection
+								$verdict->Detection
 							)
 						);
 					}
