@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [  -z $CLIENT_ID ] || [ -z $CLIENT_SECRET ]; then
+  echo "Please set CLIENT_ID and CLIENT_SECRET"
+  exit 1
+fi
+
 docker stop nextcloud-container
 sleep 1
 docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
