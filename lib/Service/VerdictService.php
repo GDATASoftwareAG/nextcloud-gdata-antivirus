@@ -71,6 +71,8 @@ class VerdictService {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 		if ($node->getSize() > self::MAX_FILE_SIZE) {
+			$this->tagService->removeAllTagsFromFile($fileId);
+			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
 			throw new EntityTooLargeException("File is too large");
 		}
 
@@ -98,10 +100,7 @@ class VerdictService {
 			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
 			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
-		$this->tagService->removeTagFromFile(TagService::CLEAN, $fileId);
-		$this->tagService->removeTagFromFile(TagService::MALICIOUS, $fileId);
-		$this->tagService->removeTagFromFile(TagService::PUP, $fileId);
-		$this->tagService->removeTagFromFile(TagService::UNSCANNED, $fileId);
+		$this->tagService->removeAllTagsFromFile($fileId);
 
 		switch ($verdict->Verdict->value) {
 			case TagService::CLEAN:

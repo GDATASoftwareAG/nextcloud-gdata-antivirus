@@ -9,7 +9,8 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "^8.0.2"
+		"gdata/vaas": "^8.0.2",
+		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
 		"nextcloud/ocp": "dev-stable28",

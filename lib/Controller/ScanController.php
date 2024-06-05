@@ -2,6 +2,7 @@
 
 namespace OCA\GDataVaas\Controller;
 
+use Coduo\PHPHumanizer\NumberHumanizer;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
@@ -35,7 +36,7 @@ class ScanController extends Controller {
 			$verdict = $this->verdictService->scanFileById($fileId);
 			return new JSONResponse(['verdict' => $verdict->Verdict->value], 200);
 		} catch (EntityTooLargeException) {
-			return new JSONResponse(['error' => 'File is too large'], 413);
+			return new JSONResponse(['error' => 'File is larger than ' . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de')], 413);
 		} catch (FileDoesNotExistException) {
 			return new JSONResponse(['error' => 'File does not exist'], 404);
 		} catch (InvalidPathException) {
