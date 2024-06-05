@@ -21,7 +21,7 @@ use VaasSdk\Vaas;
 use VaasSdk\VaasOptions;
 
 class VerdictService {
-	public const MAX_FILE_SIZE = 2147483646;
+	public const MAX_FILE_SIZE = 268435456;
 	private const APP_ID = "gdatavaas";
 
 	private string $username;

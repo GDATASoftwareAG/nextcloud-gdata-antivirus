@@ -1,6 +1,8 @@
 #!/bin/bash
 
-if [  -z $CLIENT_ID ] || [ -z $CLIENT_SECRET ]; then
+source .env-local || echo "No .env-local file found."
+
+if [  -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
   echo "Please set CLIENT_ID and CLIENT_SECRET"
   exit 1
 fi
@@ -21,7 +23,7 @@ tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -it nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas
 
-until docker exec --user www-data -it nextcloud-container php occ app:update --all >/dev/null
+until docker exec --user www-data -it nextcloud-container php occ app:update --all
 do
   echo "Trying app update"
   sleep 2
@@ -29,8 +31,8 @@ done
 
 docker exec --user www-data -it nextcloud-container php occ app:enable gdatavaas
 
-docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas clientId --value=$CLIENT_ID
-docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas clientSecret --value=$CLIENT_SECRET
+docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas clientId --value="$CLIENT_ID"
+docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
@@ -38,5 +40,5 @@ docker exec --user www-data -it nextcloud-container php occ config:app:set gdata
 docker exec --user www-data -it nextcloud-container php occ log:manage --level DEBUG
 docker exec --user www-data -it nextcloud-container php occ app:disable firstrunwizard
 
-source *.local
+source install.local || echo "No additional install script found."
 # docker exec --user www-data -it nextcloud-container php cron.php
