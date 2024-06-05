@@ -5,7 +5,7 @@ if [  -z $CLIENT_ID ] || [ -z $CLIENT_SECRET ]; then
   exit 1
 fi
 
-docker stop nextcloud-container
+docker stop nextcloud-container || echo "No container to stop"
 sleep 1
 docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
 
@@ -20,7 +20,13 @@ make appstore
 tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -it nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas
-docker exec --user www-data -it nextcloud-container php occ app:update --all
+
+until docker exec --user www-data -it nextcloud-container php occ app:update --all >/dev/null
+do
+  echo "Trying app update"
+  sleep 2
+done
+
 docker exec --user www-data -it nextcloud-container php occ app:enable gdatavaas
 
 docker exec --user www-data -it nextcloud-container php occ config:app:set gdatavaas clientId --value=$CLIENT_ID
