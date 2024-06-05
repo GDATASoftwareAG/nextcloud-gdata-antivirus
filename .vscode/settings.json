@@ -1,0 +1,6 @@
+{
+    "php-cs-fixer.executablePath": "/workspaces/nextcloud-gdata-antivirus/vendor/bin/php-cs-fixer",
+    "php-cs-fixer.onsave": true,
+    "php-cs-fixer.autoFixByBracket": true,
+    "php-cs-fixer.autoFixBySemicolon": true
+}
