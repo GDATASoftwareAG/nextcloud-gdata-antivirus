@@ -8,7 +8,6 @@ fi
 docker stop nextcloud-container
 sleep 1
 docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
-echo "Waiting for sunrise..."
 
 until docker exec --user www-data -it nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin >/dev/null
 do
