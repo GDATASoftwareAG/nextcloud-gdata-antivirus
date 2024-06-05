@@ -16,6 +16,7 @@ class TagService {
 	public const MALICIOUS = 'Malicious';
 	public const PUP = 'Pup';
 	public const UNSCANNED = 'Unscanned';
+	public const WONT_SCAN = 'Won\'t scan';
 
 	private ISystemTagManager $tagService;
 	private ISystemTagObjectMapper $tagMapper;
@@ -77,16 +78,25 @@ class TagService {
 		}
 	}
 
+	public function removeAllTagsFromFile(int $fileId): void {
+		$this->removeTagFromFile(TagService::CLEAN, $fileId);
+		$this->removeTagFromFile(TagService::MALICIOUS, $fileId);
+		$this->removeTagFromFile(TagService::PUP, $fileId);
+		$this->removeTagFromFile(TagService::UNSCANNED, $fileId);
+		$this->removeTagFromFile(TagService::WONT_SCAN, $fileId);
+	}
+
 	/**
 	 * Checks if a file has either CLEAN or MALICIOUS tag and creates these.
 	 * @param int $fileId
 	 * @return bool
 	 */
-	public function hasCleanMaliciousOrPupTag(int $fileId): bool {
+	public function hasAnyButUnscannedTag(int $fileId): bool {
 		if (
 			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
 			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) ||
-			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId())
+			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId()) ||
+			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::WONT_SCAN)->getId())
 		) {
 			return true;
 		}
@@ -174,6 +184,7 @@ class TagService {
 		$this->removeTag(self::MALICIOUS);
 		$this->removeTag(self::UNSCANNED);
 		$this->removeTag(self::PUP);
+		$this->removeTag(self::WONT_SCAN);
 		$this->logger->info("All tags removed");
 	}
 }

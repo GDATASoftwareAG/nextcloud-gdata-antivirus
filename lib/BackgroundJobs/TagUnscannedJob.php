@@ -46,13 +46,14 @@ class TagUnscannedJob extends TimedJob {
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
 		$pupTag = $this->tagService->getTag(TagService::PUP);
 		$cleanTag = $this->tagService->getTag(TagService::CLEAN);
+		$wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
 
-		$excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId()];
+		$excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
 
 		$fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 10000);
 
 		foreach ($fileIds as $fileId) {
-			if ($this->tagService->hasCleanMaliciousOrPupTag($fileId)) {
+			if ($this->tagService->hasAnyButUnscannedTag($fileId)) {
 				continue;
 			}
 			$this->tagService->setTag($fileId, TagService::UNSCANNED);

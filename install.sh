@@ -38,5 +38,5 @@ docker exec --user www-data -it nextcloud-container php occ config:app:set gdata
 docker exec --user www-data -it nextcloud-container php occ log:manage --level DEBUG
 docker exec --user www-data -it nextcloud-container php occ app:disable firstrunwizard
 
-
+source *.local
 # docker exec --user www-data -it nextcloud-container php cron.php

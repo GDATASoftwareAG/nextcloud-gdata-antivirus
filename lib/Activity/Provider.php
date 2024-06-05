@@ -31,8 +31,7 @@ use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
 use Psr\Log\LoggerInterface;
 
-class Provider implements IProvider
-{
+class Provider implements IProvider {
 	public const TYPE_VIRUS_DETECTED = 'virus_detected';
 
 	public const SUBJECT_VIRUS_DETECTED = 'virus_detected';
@@ -48,15 +47,13 @@ class Provider implements IProvider
 	private $urlGenerator;
 	private LoggerInterface $logger;
 
-	public function __construct(IFactory $languageFactory, IURLGenerator $urlGenerator, LoggerInterface $logger)
-	{
+	public function __construct(IFactory $languageFactory, IURLGenerator $urlGenerator, LoggerInterface $logger) {
 		$this->languageFactory = $languageFactory;
 		$this->urlGenerator = $urlGenerator;
 		$this->logger = $logger;
 	}
 
-	public function parse($language, IEvent $event, ?IEvent $previousEvent = null)
-	{
+	public function parse($language, IEvent $event, ?IEvent $previousEvent = null) {
 		if ($event->getApp() !== Application::APP_ID || $event->getType() !== self::TYPE_VIRUS_DETECTED) {
 			throw new \InvalidArgumentException();
 		}
@@ -127,8 +124,7 @@ class Provider implements IProvider
 		return $event;
 	}
 
-	private function setSubjects(IEvent $event, string $subject, array $parameters): void
-	{
+	private function setSubjects(IEvent $event, string $subject, array $parameters): void {
 		$placeholders = $replacements = [];
 		foreach ($parameters as $placeholder => $parameter) {
 			$placeholders[] = '{' . $placeholder . '}';

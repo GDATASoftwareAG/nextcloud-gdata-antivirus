@@ -2,7 +2,6 @@
 
 namespace OCA\GDataVaas\Db;
 
-use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
@@ -31,7 +30,6 @@ class DbFileMapper extends QBMapper {
 			->where($qb->expr()->notIn('o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($qb->expr()->isNull('o.systemtagid'))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
 			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
 			->orderBy('f.fileid', 'DESC')
 			->setMaxResults($limit);
@@ -61,7 +59,6 @@ class DbFileMapper extends QBMapper {
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
 			->where($qb->expr()->in('o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->lte('f.size', $qb->createNamedParameter(VerdictService::MAX_FILE_SIZE)))
 			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
 			->orderBy('f.fileid', 'DESC')
 			->setMaxResults($limit);
