@@ -82,18 +82,18 @@ endif
 .PHONY: npm
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
-	ifeq (,$(wildcard $(CURDIR)/package-lock.json))
-		npm install
-	else
-		npm ci
-	endif
+ifeq (,$(wildcard $(CURDIR)/package-lock.json))
+	npm install
+else
+	npm ci
+endif
 	cd js && $(npm) run build
 else
-	ifeq (,$(wildcard $(CURDIR)/package-lock.json))
-		npm install
-	else
-		npm ci
-	endif
+ifeq (,$(wildcard $(CURDIR)/package-lock.json))
+	npm install
+else
+	npm ci
+endif
 	npm run build
 endif
 
