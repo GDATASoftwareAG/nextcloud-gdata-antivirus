@@ -9,7 +9,7 @@
     <summary>This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.</summary>
     <version>0.0.0</version>
     <licence>agpl</licence>
-    <author mail="lennart.dohmann@gdata.de" homepage="https://www.gdata.de/oem/verdict-as-a-service">Lennart Dohmann</author>
+    <author mail="vaas@gdata.de" homepage="https://www.gdata.de/oem/verdict-as-a-service">Lennart Dohmann</author>
     <namespace>GDataVaas</namespace>
     <category>security</category>
     <bugs>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues</bugs>
