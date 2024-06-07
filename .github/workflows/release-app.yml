@@ -33,6 +33,11 @@ jobs:
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: bats --no-parallelize-across-files --jobs 3 ./tests
 
+      - name: admin clean Upload
+        run: |
+          STATUS_CODE=$(curl --silent -u testuser:myfancysecurepassword234 -T /tmp/clean.txt http://127.0.0.1/remote.php/dav/files/testuser/clean.txt)
+          [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
+
       - uses: actions/upload-artifact@master
         with:
           name: build-dir
