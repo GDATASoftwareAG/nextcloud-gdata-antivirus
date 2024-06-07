@@ -33,12 +33,12 @@ jobs:
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: bats --no-parallelize-across-files --jobs 3 ./tests
 
-      - name: admin clean Upload
+      - name: test testuser clean Upload
         run: |
           STATUS_CODE=$(curl --silent -w "%{http_code}" -u testuser:myfancysecurepassword234 -T /tmp/clean.txt http://127.0.0.1/remote.php/dav/files/testuser/clean.txt)
           [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
 
-      - name: admin pup Upload
+      - name: test testuser pup Upload
         run: |
           STATUS_CODE=$(curl --silent -w "%{http_code}" -u testuser:myfancysecurepassword234 -T /tmp/pup.exe http://127.0.0.1/remote.php/dav/files/testuser/pup.exe)
           [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
