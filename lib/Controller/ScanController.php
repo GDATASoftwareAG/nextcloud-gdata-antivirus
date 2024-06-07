@@ -28,6 +28,7 @@ class ScanController extends Controller {
 
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
+	 * @NoAdminRequired
 	 * @param int $fileId
 	 * @return JSONResponse
 	 */
