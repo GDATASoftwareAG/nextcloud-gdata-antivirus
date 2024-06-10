@@ -11,7 +11,7 @@ docker stop nextcloud-container || echo "No container to stop"
 sleep 1
 docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
 
-until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin >/dev/null
+until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
 do
   echo "Trying installation"
   sleep 2
@@ -22,13 +22,11 @@ tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -i nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas
 
-until docker exec --user www-data -i nextcloud-container php occ app:update --all
+until docker exec --user www-data -i nextcloud-container php occ app:enable gdatavaas
 do
-  echo "Trying app update"
+  echo "Trying app enable"
   sleep 2
 done
-
-docker exec --user www-data -i nextcloud-container php occ app:enable gdatavaas
 
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientId --value="$CLIENT_ID"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
