@@ -1,6 +1,8 @@
 #!/usr/bin/env bats
 
 FOLDER_PREFIX=./tmp/functionality-sequential/
+TESTUSER=testuser
+TESTUSER_PASSWORD=myfancysecurepassword234
 
 setup_file() {
     mkdir -p $FOLDER_PREFIX/
@@ -38,16 +40,16 @@ setup_file() {
 
 @test "test croned scan for testuser files" {
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-    curl --silent -w "%{http_code}" -u testuser:myfancysecurepassword234 -T $FOLDER_PREFIX/eicar.com.txt http://127.0.0.1/remote.php/dav/files/testuser/testuser.functionality-sequential.eicar.com.txt
+    curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/eicar.com.txt http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
     docker exec --user www-data -i nextcloud-container php ./cron.php # tag unscanned
     docker exec --user www-data -i nextcloud-container php ./cron.php # actual scan
 
-    LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "testuser.functionality-sequential.eicar.com.txt")
+    LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "$TESTUSER.functionality-sequential.eicar.com.txt")
 
-    curl --silent -q -u testuser:myfancysecurepassword234 -X DELETE http://127.0.0.1/remote.php/dav/files/testuser/testuser.functionality-sequential.eicar.com.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
 
-    [[ $LOGS =~ ^.*testuser.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
+    [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
 }
 
 tearddown_file() {
