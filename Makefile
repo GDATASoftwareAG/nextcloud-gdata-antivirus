@@ -83,14 +83,14 @@ endif
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
 ifeq (,$(wildcard $(CURDIR)/package-lock.json))
-	npm install
+	npm install --no-audit --progress=false
 else
 	npm ci
 endif
 	cd js && $(npm) run build
 else
 ifeq (,$(wildcard $(CURDIR)/package-lock.json))
-	npm install
+	npm install --no-audit --progress=false
 else
 	npm ci
 endif
