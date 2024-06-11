@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-FOLDER_PREFIX=./tmp/functionality-parallel/
+FOLDER_PREFIX=./tmp/functionality-parallel
 TESTUSER=testuser
 TESTUSER_PASSWORD=myfancysecurepassword234
 
@@ -61,6 +61,6 @@ setup() {
 }
 
 @tearddown_file() {
-    rm -rf $FOLDER_PREFIX
+    rm -rf $FOLDER_PREFIX/
 }
  

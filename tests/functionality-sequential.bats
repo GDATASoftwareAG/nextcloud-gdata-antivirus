@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-FOLDER_PREFIX=./tmp/functionality-sequential/
+FOLDER_PREFIX=./tmp/functionality-sequential
 TESTUSER=testuser
 TESTUSER_PASSWORD=myfancysecurepassword234
 
@@ -54,5 +54,5 @@ setup_file() {
 
 tearddown_file() {
     sleep 2   
-    rm -rf $FOLDER_PREFIX
+    rm -rf $FOLDER_PREFIX/
 }
