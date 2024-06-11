@@ -17,7 +17,6 @@ do
   sleep 2
 done
 
-make build
 make appstore
 tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/

@@ -8,35 +8,35 @@ on:
     branches: ["main"]
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        name: setup node
-        with:
-          node-version: 20
-      - name: Setup BATS
-        uses: mig4/setup-bats@v1
-        with:
-          bats-version: 1.11.0
-      - uses: docker-practice/actions-setup-docker@master
-      - name: install nextcloud
-        env:
-          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: ./install.sh
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       name: setup node
+  #       with:
+  #         node-version: 20
+  #     - name: Setup BATS
+  #       uses: mig4/setup-bats@v1
+  #       with:
+  #         bats-version: 1.11.0
+  #     - uses: docker-practice/actions-setup-docker@master
+  #     - name: install nextcloud
+  #       env:
+  #         CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
+  #         CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
+  #       run: ./install.sh
 
-#      - name: run tests
-#        env:
-#          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
-#          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-#        run: bats --no-parallelize-across-files --jobs 3 ./tests
+  #     - name: run tests
+  #       env:
+  #         CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
+  #         CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
+  #       run: bats --no-parallelize-across-files --jobs 3 ./tests
 
-      - uses: actions/upload-artifact@master
-        with:
-          name: build-dir
-          path: build/
+  #     - uses: actions/upload-artifact@master
+  #       with:
+  #         name: build-dir
+  #         path: build/
 
   release:
     needs:
@@ -49,6 +49,9 @@ jobs:
         with:
           name: build-dir
           path: build/
+
+      - name: Build for appstore
+        run: make appstore
 
       - name: replace version
         id: replace-version
