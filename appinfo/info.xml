@@ -26,9 +26,10 @@ If you have any questions about scanning, usage or similar, please feel free to 
     <category>security</category>
     <bugs>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues</bugs>
     <repository type="git">https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus</repository>
+    <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/example.gif</screenshot>
+    <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/scanned.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/context.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/settings.png</screenshot>
-    <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/scanned.png</screenshot>
     <website>https://www.gdata.de/business/security-services/verdict-as-a-service</website>
     <settings>
         <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
