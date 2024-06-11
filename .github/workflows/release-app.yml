@@ -75,10 +75,10 @@ jobs:
           tag: ${{ github.ref }}
           overwrite: true
 
-       - name: Upload app to Nextcloud appstore
-         uses: nextcloud-releases/nextcloud-appstore-push-action@v1
-         with:
-           app_name: gdatavaas
-           appstore_token: ${{ secrets.VAAS_APPSTORE_TOKEN }}
-           download_url: ${{ steps.attach_to_release.outputs.browser_download_url }}
-           app_private_key: ${{ secrets.VAAS_NEXTCLOUD_KEY }}
+      - name: Upload app to Nextcloud appstore
+        uses: nextcloud-releases/nextcloud-appstore-push-action@v1
+        with:
+          app_name: gdatavaas
+          appstore_token: ${{ secrets.VAAS_APPSTORE_TOKEN }}
+          download_url: ${{ steps.attach_to_release.outputs.browser_download_url }}
+          app_private_key: ${{ secrets.VAAS_NEXTCLOUD_KEY }}
