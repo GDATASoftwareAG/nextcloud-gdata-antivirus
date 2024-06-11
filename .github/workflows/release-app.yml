@@ -16,10 +16,12 @@ jobs:
         name: setup node
         with:
           node-version: 20
+
       - name: Setup BATS
         uses: mig4/setup-bats@v1
         with:
           bats-version: 1.11.0
+
       - uses: docker-practice/actions-setup-docker@master
       - name: install nextcloud
         env:
@@ -32,26 +34,6 @@ jobs:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: bats --no-parallelize-across-files --jobs 3 ./tests
-
-      - name: test testuser clean Upload
-        run: |
-          STATUS_CODE=$(curl --silent -w "%{http_code}" -u testuser:myfancysecurepassword234 -T /tmp/clean.txt http://127.0.0.1/remote.php/dav/files/testuser/clean.txt)
-          [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
-
-      - name: test testuser pup Upload
-        run: |
-          STATUS_CODE=$(curl --silent -w "%{http_code}" -u testuser:myfancysecurepassword234 -T /tmp/pup.exe http://127.0.0.1/remote.php/dav/files/testuser/pup.exe)
-          [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
-
-      - name: test upload when vaas does not function
-        env:
-          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: |
-          docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-          STATUS_CODE=$(curl --silent -w "%{http_code}" -u admin:admin -T /tmp/eicar.com.txt http://127.0.0.1/remote.php/dav/files/admin/eicar.com.txt)
-          [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
-          docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
       - uses: actions/upload-artifact@master
         with:
