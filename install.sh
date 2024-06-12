@@ -49,6 +49,5 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 
 docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
 docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
-docker exec --user www-data -i nextcloud-container php occ user:info admin
 
 source install.local || echo "No additional install script found."
