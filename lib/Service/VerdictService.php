@@ -73,7 +73,7 @@ class VerdictService {
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-		if ($node->getSize() > self::MAX_FILE_SIZE) {
+		if (self::isFileTooLargeToScan($filePath)) {
 			$this->tagService->removeAllTagsFromFile($fileId);
 			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
 			throw new EntityTooLargeException("File is too large");
@@ -112,9 +112,6 @@ class VerdictService {
         $this->tagService->removeAllTagsFromFile($fileId);
 
         switch ($tagName) {
-            case TagService::CLEAN:
-                $this->tagService->setTag($fileId, TagService::CLEAN);
-                break;
             case TagService::MALICIOUS:
                 $this->tagService->setTag($fileId, TagService::MALICIOUS);
                 try {
@@ -123,13 +120,18 @@ class VerdictService {
                 } catch (Exception) {
                 }
                 break;
+            case TagService::CLEAN:
             case TagService::PUP:
-                $this->tagService->setTag($fileId, TagService::PUP);
-                break;
+            case TagService::WONT_SCAN:
             default:
-                $this->tagService->setTag($fileId, TagService::UNSCANNED);
+                $this->tagService->setTag($fileId, $tagName);
                 break;
         }
+    }
+
+    public static function isFileTooLargeToScan($path) {
+        $size = filesize($path);
+        return !$size || $size > self::MAX_FILE_SIZE;
     }
 
 	public function scan(string $filePath): VaasVerdict {
@@ -161,6 +163,10 @@ class VerdictService {
     }
 
     public function tagLastScannedFile(string $localPath, int $fileId) {
+        if (self::isFileTooLargeToScan($localPath)) {
+            $this->tagFile($fileId, TagService::WONT_SCAN);
+            return;
+        }
         if ($localPath === $this->lastLocalPath) {
             if ($this->lastVaasVerdict !== null) {
                 $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
