@@ -33,7 +33,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: bats --no-parallelize-across-files --jobs 3 ./tests
+        run: bats --no-parallelize-across-files --jobs 6 ./tests
 
       - uses: actions/upload-artifact@master
         with:
