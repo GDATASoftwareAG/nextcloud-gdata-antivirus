@@ -6,7 +6,7 @@ setup_nextcloud () {
   echo "setup nextcloud"
   docker stop nextcloud-container || echo "No container to stop"
   sleep 1
-  docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
+  docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28.0.5
 
   until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
   do
@@ -35,8 +35,6 @@ wait
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -i nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas
 
-docker exec --user www-data -i nextcloud-container php ./cron.php &
-
 until docker exec --user www-data -i nextcloud-container php occ app:enable gdatavaas
 do
   echo "Trying app enable"
@@ -51,5 +49,6 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 
 docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
 docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
+docker exec --user www-data -i nextcloud-container php occ user:info admin
 
 source install.local || echo "No additional install script found."
