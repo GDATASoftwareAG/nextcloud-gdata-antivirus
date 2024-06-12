@@ -3,6 +3,7 @@
 namespace OCA\GDataVaas;
 
 use OCA\GDataVaas\Service\TagService;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
@@ -17,10 +18,13 @@ class EventListener implements IEventListener
 
     private TagService $tagService;
 
-    public function __construct(LoggerInterface $logger, TagService $tagService)
+    private VerdictService $verdictService;
+
+    public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService)
     {
         $this->logger = $logger;
         $this->tagService = $tagService;
+        $this->verdictService = $verdictService;
     }
 
     public static function register(IRegistrationContext $context): void {
@@ -34,11 +38,14 @@ class EventListener implements IEventListener
             return;
         }
 
+        $storage = $event->getStorage();
         $path = $event->getPath();
         $fileId = $event->getFileId();
 
         if (self::shouldTag($path) && !$this->tagService->hasAnyVaasTag($fileId)) {
-            $this->tagService->setTag($event->getFileId(), TagService::UNSCANNED);
+            $this->logger->debug("Handling " . get_class($event) . " for " . $path);
+
+            $this->verdictService->tagLastScannedFile($storage->getLocalFile($path), $fileId);
         }
     }
 

@@ -38,6 +38,9 @@ class VerdictService {
 	private ?Vaas $vaas = null;
 	private LoggerInterface $logger;
 
+    private string $lastLocalPath = "";
+    private ?VaasVerdict $lastVaasVerdict = null;
+
 	public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService) {
 		$this->logger = $logger;
 		$this->appConfig = $appConfig;
@@ -100,38 +103,48 @@ class VerdictService {
 			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
 			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
-		$this->tagService->removeAllTagsFromFile($fileId);
-
-		switch ($verdict->Verdict->value) {
-			case TagService::CLEAN:
-				$this->tagService->setTag($fileId, TagService::CLEAN);
-				break;
-			case TagService::MALICIOUS:
-				$this->tagService->setTag($fileId, TagService::MALICIOUS);
-				try {
-					$this->fileService->setMaliciousPrefixIfActivated($fileId);
-					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
-				} catch (Exception) {
-				}
-				break;
-			case TagService::PUP:
-				$this->tagService->setTag($fileId, TagService::PUP);
-				break;
-			default:
-				$this->tagService->setTag($fileId, TagService::UNSCANNED);
-				break;
-		}
+        $this->tagFile($fileId, $verdict);
 
 		return $verdict;
 	}
 
+    private function tagFile(int $fileId, VaasVerdict $vaasVerdict) {
+        $this->tagService->removeAllTagsFromFile($fileId);
+
+        switch ($vaasVerdict->Verdict->value) {
+            case TagService::CLEAN:
+                $this->tagService->setTag($fileId, TagService::CLEAN);
+                break;
+            case TagService::MALICIOUS:
+                $this->tagService->setTag($fileId, TagService::MALICIOUS);
+                try {
+                    $this->fileService->setMaliciousPrefixIfActivated($fileId);
+                    $this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+                } catch (Exception) {
+                }
+                break;
+            case TagService::PUP:
+                $this->tagService->setTag($fileId, TagService::PUP);
+                break;
+            default:
+                $this->tagService->setTag($fileId, TagService::UNSCANNED);
+                break;
+        }
+    }
+
 	public function scan(string $filePath): VaasVerdict {
+        $this->lastLocalPath = "";
+        $this->lastVaasVerdict = null;
+
 		if ($this->vaas == null) {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
+
+            $this->lastLocalPath = $filePath;
+            $this->lastVaasVerdict = $verdict;
 
 			return $verdict;
 		} catch (Exception $e) {
@@ -140,6 +153,19 @@ class VerdictService {
 			throw $e;
 		}
 	}
+
+    public function onRename(string $localSource, string $localTarget)
+    {
+        if ($localSource === $this->lastLocalPath) {
+            $this->lastLocalPath = $localTarget;
+        }
+    }
+
+    public function tagLastScannedFile(string $localPath, int $fileId) {
+        if ($localPath === $this->lastLocalPath && $this->lastVaasVerdict !== null) {
+            $this->tagFile($fileId, $this->lastVaasVerdict);
+        }
+    }
 
 	/**
 	 * Parses the allowlist from the app settings and returns it as an array.
