@@ -103,15 +103,15 @@ class VerdictService {
 			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
 			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
-        $this->tagFile($fileId, $verdict);
+        $this->tagFile($fileId, $verdict->Verdict->value);
 
 		return $verdict;
 	}
 
-    private function tagFile(int $fileId, VaasVerdict $vaasVerdict) {
+    private function tagFile(int $fileId, string $tagName) {
         $this->tagService->removeAllTagsFromFile($fileId);
 
-        switch ($vaasVerdict->Verdict->value) {
+        switch ($tagName) {
             case TagService::CLEAN:
                 $this->tagService->setTag($fileId, TagService::CLEAN);
                 break;
@@ -133,7 +133,7 @@ class VerdictService {
     }
 
 	public function scan(string $filePath): VaasVerdict {
-        $this->lastLocalPath = "";
+        $this->lastLocalPath = $filePath;
         $this->lastVaasVerdict = null;
 
 		if ($this->vaas == null) {
@@ -143,7 +143,6 @@ class VerdictService {
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
 
-            $this->lastLocalPath = $filePath;
             $this->lastVaasVerdict = $verdict;
 
 			return $verdict;
@@ -162,8 +161,12 @@ class VerdictService {
     }
 
     public function tagLastScannedFile(string $localPath, int $fileId) {
-        if ($localPath === $this->lastLocalPath && $this->lastVaasVerdict !== null) {
-            $this->tagFile($fileId, $this->lastVaasVerdict);
+        if ($localPath === $this->lastLocalPath) {
+            if ($this->lastVaasVerdict !== null) {
+                $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
+            } else {
+                $this->tagFile($fileId, TagService::UNSCANNED);
+            }
         }
     }
 
