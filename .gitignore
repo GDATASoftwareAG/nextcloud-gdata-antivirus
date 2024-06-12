@@ -62,3 +62,5 @@ dev-environment*/
 js/
 *.cache
 .uuid
+eicar.com.txt
+tmp/

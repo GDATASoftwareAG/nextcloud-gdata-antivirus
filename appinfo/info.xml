@@ -35,6 +35,10 @@ If you have any questions about scanning, usage or similar, please feel free to 
         <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
         <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
     </settings>
+    <commands>
+        <command>OCA\GDataVaas\Command\ScanCommand</command>
+        <command>OCA\GDataVaas\Command\TagUnscannedCommand</command>
+	</commands>
     <dependencies>
         <nextcloud min-version="27" max-version="28"/>
     </dependencies>

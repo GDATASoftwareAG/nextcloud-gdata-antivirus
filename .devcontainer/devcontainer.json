@@ -23,11 +23,8 @@
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "make build && composer install",
 	"features": {
-		"ghcr.io/devcontainers/features/node:1": {
-			"nodeGypDependencies": true,
-			"version": "lts",
-			"nvmVersion": "latest"
-		}
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/edouard-lopez/devcontainer-features/bats:0": {}
 	}
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
