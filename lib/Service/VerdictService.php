@@ -3,6 +3,7 @@
 namespace OCA\GDataVaas\Service;
 
 use Exception;
+use OCA\GDataVaas\AppInfo\Application;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
@@ -22,7 +23,6 @@ use VaasSdk\VaasOptions;
 
 class VerdictService {
 	public const MAX_FILE_SIZE = 268435456;
-	private const APP_ID = "gdatavaas";
 
 	private string $username;
 	private string $password;
@@ -44,13 +44,13 @@ class VerdictService {
 		$this->fileService = $fileService;
 		$this->tagService = $tagService;
 
-		$this->authMethod = $this->appConfig->getAppValue(self::APP_ID, 'authMethod', 'ClientCredentials');
-		$this->tokenEndpoint = $this->appConfig->getAppValue(self::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
-		$this->vaasUrl = $this->appConfig->getAppValue(self::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
-		$this->clientId = $this->appConfig->getAppValue(self::APP_ID, 'clientId');
-		$this->clientSecret = $this->appConfig->getAppValue(self::APP_ID, 'clientSecret');
-		$this->username = $this->appConfig->getAppValue(self::APP_ID, 'username');
-		$this->password = $this->appConfig->getAppValue(self::APP_ID, 'password');
+		$this->authMethod = $this->appConfig->getAppValue(Application::APP_ID, 'authMethod', 'ClientCredentials');
+		$this->tokenEndpoint = $this->appConfig->getAppValue(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
+		$this->vaasUrl = $this->appConfig->getAppValue(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
+		$this->clientId = $this->appConfig->getAppValue(Application::APP_ID, 'clientId');
+		$this->clientSecret = $this->appConfig->getAppValue(Application::APP_ID, 'clientSecret');
+		$this->username = $this->appConfig->getAppValue(Application::APP_ID, 'username');
+		$this->password = $this->appConfig->getAppValue(Application::APP_ID, 'password');
 	}
 
 	/**
@@ -146,7 +146,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getAllowlist(): array {
-		$allowlist = $this->appConfig->getAppValue(self::APP_ID, 'allowlist');
+		$allowlist = $this->appConfig->getAppValue(Application::APP_ID, 'allowlist');
 		$allowlist = preg_replace('/\s+/', '', $allowlist);
 		if (empty($allowlist)) {
 			return [];
@@ -159,7 +159,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getBlocklist(): array {
-		$blocklist = $this->appConfig->getAppValue(self::APP_ID, 'blocklist');
+		$blocklist = $this->appConfig->getAppValue(Application::APP_ID, 'blocklist');
 		$blocklist = preg_replace('/\s+/', '', $blocklist);
 		if (empty($blocklist)) {
 			return [];
