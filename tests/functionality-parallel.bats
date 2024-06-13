@@ -58,6 +58,31 @@ setup_file() {
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]] || exit 1
 }
 
+@test "test unscanned job for admin" {
+    docker cp $FOLDER_PREFIX/pup.exe nextcloud-container:/var/www/html/data/admin/files/admin.unscanned.pup.exe
+    docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/admin/files/admin.unscanned.pup.exe
+    docker exec -i --user www-data nextcloud-container php occ files:scan --all
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
+
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.unscanned.pup.exe | grep "Unscanned") ]]
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.unscanned.pup.exe | wc -l ) -eq "1" ]]
+    
+    docker exec -i --user www-data nextcloud-container rm /var/www/html/data/admin/files/admin.unscanned.pup.exe
+}
+
+@test "test unscanned job for testuser" {
+    docker cp $FOLDER_PREFIX/pup.exe nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
+    docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
+    docker exec -i --user www-data nextcloud-container php occ files:scan --all
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
+
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.unscanned.pup.exe | grep "Unscanned") ]]
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.unscanned.pup.exe | wc -l ) -eq "1" ]]
+
+    docker exec -i --user www-data nextcloud-container rm /var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
+}
+
+
 @tearddown_file() {
     rm -rf $FOLDER_PREFIX/
 }
