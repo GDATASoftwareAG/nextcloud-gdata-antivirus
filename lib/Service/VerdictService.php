@@ -38,6 +38,9 @@ class VerdictService {
 	private ?Vaas $vaas = null;
 	private LoggerInterface $logger;
 
+    private string $lastLocalPath = "";
+    private ?VaasVerdict $lastVaasVerdict = null;
+
 	public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService) {
 		$this->logger = $logger;
 		$this->appConfig = $appConfig;
@@ -70,7 +73,7 @@ class VerdictService {
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-		if ($node->getSize() > self::MAX_FILE_SIZE) {
+		if (self::isFileTooLargeToScan($filePath)) {
 			$this->tagService->removeAllTagsFromFile($fileId);
 			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
 			throw new EntityTooLargeException("File is too large");
@@ -100,38 +103,60 @@ class VerdictService {
 			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
 			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
-		$this->tagService->removeAllTagsFromFile($fileId);
-
-		switch ($verdict->Verdict->value) {
-			case TagService::CLEAN:
-				$this->tagService->setTag($fileId, TagService::CLEAN);
-				break;
-			case TagService::MALICIOUS:
-				$this->tagService->setTag($fileId, TagService::MALICIOUS);
-				try {
-					$this->fileService->setMaliciousPrefixIfActivated($fileId);
-					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
-				} catch (Exception) {
-				}
-				break;
-			case TagService::PUP:
-				$this->tagService->setTag($fileId, TagService::PUP);
-				break;
-			default:
-				$this->tagService->setTag($fileId, TagService::UNSCANNED);
-				break;
-		}
+        $this->tagFile($fileId, $verdict->Verdict->value);
 
 		return $verdict;
 	}
 
-	public function scan(string $filePath): VaasVerdict {
+    private function tagFile(int $fileId, string $tagName) {
+        $this->tagService->removeAllTagsFromFile($fileId);
+
+        switch ($tagName) {
+            case TagService::MALICIOUS:
+                $this->tagService->setTag($fileId, TagService::MALICIOUS);
+                try {
+                    $this->fileService->setMaliciousPrefixIfActivated($fileId);
+                    $this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+                } catch (Exception) {
+                }
+                break;
+            case TagService::CLEAN:
+            case TagService::PUP:
+            case TagService::WONT_SCAN:
+            default:
+                $this->tagService->setTag($fileId, $tagName);
+                break;
+        }
+    }
+
+	/**
+	 * Checks if a file is too large to be scanned.
+	 * @param string $path
+	 * @return bool
+	 */
+    public static function isFileTooLargeToScan(string $path): bool {
+        $size = filesize($path);
+        return !$size || $size > self::MAX_FILE_SIZE;
+    }
+
+
+	/**
+	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
+	 * @param string $filePath The local path to the file to scan.
+	 * @return VaasVerdict The verdict.
+	 */
+	 public function scan(string $filePath): VaasVerdict {
+        $this->lastLocalPath = $filePath;
+        $this->lastVaasVerdict = null;
+
 		if ($this->vaas == null) {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
+
+            $this->lastVaasVerdict = $verdict;
 
 			return $verdict;
 		} catch (Exception $e) {
@@ -140,6 +165,40 @@ class VerdictService {
 			throw $e;
 		}
 	}
+
+	/**
+	 * Call this from a StorageWrapper, when a local file was renamed. This allows the scanner to track the name
+	 * of the file that was scanned last.
+	 * @param string $localSource The local source path.
+	 * @param string $localTarget The local destination path.
+	 */
+    public function onRename(string $localSource, string $localTarget): void
+    {
+        if ($localSource === $this->lastLocalPath) {
+            $this->lastLocalPath = $localTarget;
+        }
+    }
+
+
+	/**
+	 * Tag the file that was scanned last with it's verdict. Call this from an EventListener on CacheEntryInsertedEvent or
+	 * CacheEntryUpdatedEvent.
+	 * @param string $localPath The local path.
+	 * @param int $fileId The corresponding file id to tag.
+	 */
+    public function tagLastScannedFile(string $localPath, int $fileId): void {
+        if (self::isFileTooLargeToScan($localPath)) {
+            $this->tagFile($fileId, TagService::WONT_SCAN);
+            return;
+        }
+        if ($localPath === $this->lastLocalPath) {
+            if ($this->lastVaasVerdict !== null) {
+                $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
+            } else {
+                $this->tagFile($fileId, TagService::UNSCANNED);
+            }
+        }
+    }
 
 	/**
 	 * Parses the allowlist from the app settings and returns it as an array.

@@ -112,6 +112,15 @@ class TagService {
 		return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED)->getId());
 	}
 
+    /**
+     * Checks if a file has any Vaas tag.
+     * @param int $fileId
+     * @return bool
+     */
+    public function hasAnyVaasTag(int $fileId): bool {
+        return $this->hasAnyButUnscannedTag($fileId) || $this->hasUnscannedTag($fileId);
+    }
+
 	/**
 	 * @param string $tagName
 	 * @param int $limit Count of object ids you want to get

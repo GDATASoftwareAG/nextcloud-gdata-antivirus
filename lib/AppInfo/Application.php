@@ -7,6 +7,7 @@ namespace OCA\GDataVaas\AppInfo;
 use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
 use OCA\GDataVaas\Service\VerdictService;
+use OCA\GDataVaas\CacheEntryListener;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
@@ -48,8 +49,10 @@ class Application extends App implements IBootstrap {
 		if (file_exists($composerAutoloadFile)) {
 			require_once $composerAutoloadFile;
 		}
-		
-		// Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
+
+        CacheEntryListener::register($context);
+
+        // Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
 		Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
 	}
 
