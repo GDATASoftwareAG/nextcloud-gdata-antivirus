@@ -4,20 +4,19 @@ namespace OCA\GDataVaas\BackgroundJobs;
 
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\ScanService;
-use OCA\GDataVaas\Service\TagService;
-use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\IConfig;
-use Psr\Log\LoggerInterface;
 
 class ScanJob extends TimedJob {
 	private ScanService $scanService;
+	private IConfig $appConfig;
 
-	public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig) {
+	public function __construct(ITimeFactory $time, ScanService $scanService, IConfig $appConfig) {
 		parent::__construct($time);
 
-		$this->scanService = new ScanService($logger, $tagService, $scanService, $appConfig);
+		$this->scanService = $scanService;
+		$this->appConfig = $appConfig;
 
 		$this->setInterval(60);
 		$this->setAllowParallelRuns(false);

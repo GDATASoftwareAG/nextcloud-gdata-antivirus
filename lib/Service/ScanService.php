@@ -18,12 +18,21 @@ class ScanService {
 		$this->verdictService = $verdictService;
 		$this->appConfig = $appConfig;
 	}
-
-	public function setLogger(LoggerInterface $logger) {
+	
+	/**
+	 * @param LoggerInterface $logger
+	 * @return ScanService
+	 */
+	public function withLogger(LoggerInterface $logger): ScanService {
 		$this->logger = $logger;
+		return $this;
 	}
 
-	public function run() {
+	/**
+	 * @return int how many files where actually processed
+	 * @throws \OCP\DB\Exception if the database platform is not supported
+	 */
+	public function run(): int {
 		$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
 		$quantity = $this->appConfig->getAppValue(Application::APP_ID, 'scanQueueLength');
 		try {
@@ -56,5 +65,6 @@ class ScanService {
 		}
 
 		$this->logger->debug("Scanned " . count($fileIds) . " files");
+		return count($fileIds);
 	}
 }

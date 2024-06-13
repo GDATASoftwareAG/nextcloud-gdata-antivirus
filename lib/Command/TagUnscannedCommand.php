@@ -31,8 +31,14 @@ class TagUnscannedCommand extends Command {
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$this->tagUnscannedService->setLogger(new ConsoleCommandLogger($this->logger, $output));
-		$this->tagUnscannedService->run();
+		$logger = new ConsoleCommandLogger($this->logger, $output);
+		$logger->info("taggings files as unscanned");
+		$start = microtime(true);
+		$taggedFilesCount = $this->tagUnscannedService
+			->withLogger($logger)
+			->run();
+		$time_elapsed_secs = microtime(true) - $start;
+		$logger->info("Tagged $taggedFilesCount files in $time_elapsed_secs seconds");
 		return 0;
 	}
 }
