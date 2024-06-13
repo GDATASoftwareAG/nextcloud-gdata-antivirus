@@ -58,8 +58,8 @@ folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy``
 
 | Description               | Command                                                                                                  |
 |---------------------------|----------------------------------------------------------------------------------------------------------|
-| Trigger cronjobs manually | `docker exec --user www-data {nextcloud_container} php /var/www/html/cron.php`                           |
-| Upgrade Nextcloud via CLI | `docker exec --user www-data {nextcloud_container} php occ upgrade`                                      |
-| Watch logs                | `docker exec --user www-data {nextcloud_container} php occ log:watch`                                    |
-| Set log level to debug    | `docker exec --user www-data {nextcloud_container} php occ log:manage --level DEBUG`                     |
-| Watch logs                | `docker exec --user www-data nextcloud-container /bin/sh -c "tail -f data/nextcloud.log" \| jq .message` |
+| Trigger cronjobs manually | `docker exec --user www-data nextcloud-container php /var/www/html/cron.php`                             |
+| Upgrade Nextcloud via CLI | `docker exec --user www-data nextcloud-container php occ upgrade`                                        |
+| Watch logs                | `docker exec --user www-data nextcloud-container php occ log:watch`                                      |
+| Watch raw logs            | `docker exec --user www-data nextcloud-container php occ log:watch --raw \| jq .message`                 |
+| Set log level to debug    | `docker exec --user www-data nextcloud-container php occ log:manage --level DEBUG`                       |
