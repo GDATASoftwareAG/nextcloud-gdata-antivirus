@@ -29,7 +29,7 @@ setup_file() {
 
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
-    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned 
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:scan
 
     LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "admin.functionality-sequential.eicar.com.txt|Readme.md|admin.pup.exe" )
@@ -50,7 +50,7 @@ setup_file() {
 
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
-    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned 
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:scan
 
     LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "$TESTUSER.functionality-sequential.eicar.com.txt|$TESTUSER.pup.exe")
