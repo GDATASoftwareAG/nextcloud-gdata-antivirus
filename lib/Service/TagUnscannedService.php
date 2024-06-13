@@ -3,26 +3,31 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
-use OCP\IConfig;
+use OCP\DB\Exception;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class TagUnscannedService {
 	private TagService $tagService;
-	private IConfig $appConfig;
+	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, TagService $tagService, IConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, TagService $tagService, IAppConfig $appConfig) {
 		$this->logger = $logger;
 		$this->tagService = $tagService;
 		$this->appConfig = $appConfig;
 	}
 
-	public function setLogger(LoggerInterface $logger) {
+	public function setLogger(LoggerInterface $logger): void {
 		$this->logger = $logger;
 	}
 
-	public function run() {
-		$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
+    /**
+     * @return void
+     * @throws Exception
+     */
+    public function run(): void {
+		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 		if ($unscannedTagIsDisabled) {
 			$this->tagService->removeTag(TagService::UNSCANNED);
 			return;

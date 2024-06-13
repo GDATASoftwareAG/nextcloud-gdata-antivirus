@@ -7,12 +7,12 @@ use OCA\GDataVaas\Service\TagUnscannedService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\DB\Exception;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class TagUnscannedJob extends TimedJob {
 	private TagUnscannedService $tagUnscannedService;
-	public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService, LoggerInterface $logger) {
+	public function __construct(ITimeFactory $time, IAppConfig $appConfig, TagService $tagService, LoggerInterface $logger) {
 		parent::__construct($time);
 
 		$this->tagUnscannedService = new TagUnscannedService($logger, $tagService, $appConfig);
@@ -22,11 +22,11 @@ class TagUnscannedJob extends TimedJob {
 		$this->setTimeSensitivity(self::TIME_SENSITIVE);
 	}
 
-	/**
-	 * @param $argument
-	 * @return void
-	 * @throws Exception if the database platform is not supported
-	 */
+    /**
+     * @param $argument
+     * @return void
+     * @throws Exception
+     */
 	protected function run($argument): void {
 		$this->tagUnscannedService->run();
 	}

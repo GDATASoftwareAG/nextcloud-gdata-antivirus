@@ -8,29 +8,32 @@ use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
-use OCP\IConfig;
+use OCP\DB\Exception;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class ScanJob extends TimedJob {
 	private ScanService $scanService;
+    private IAppConfig $appConfig;
 
-	public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, ITimeFactory $time, TagService $tagService, VerdictService $scanService, IAppConfig $appConfig) {
 		parent::__construct($time);
 
 		$this->scanService = new ScanService($logger, $tagService, $scanService, $appConfig);
 
+        $this->appConfig = $appConfig;
 		$this->setInterval(60);
 		$this->setAllowParallelRuns(false);
 		$this->setTimeSensitivity(self::TIME_SENSITIVE);
 	}
 
-	/**
-	 * @param $argument
-	 * @return void
-	 * @throws \OCP\DB\Exception if the database platform is not supported
-	 */
+    /**
+     * @param $argument
+     * @return void
+     * @throws Exception
+     */
 	protected function run($argument): void {
-		$autoScan = $this->appConfig->getAppValue(Application::APP_ID, 'autoScanFiles');
+		$autoScan = $this->appConfig->getValueBool(Application::APP_ID, 'autoScanFiles');
 		if (!$autoScan) {
 			return;
 		}

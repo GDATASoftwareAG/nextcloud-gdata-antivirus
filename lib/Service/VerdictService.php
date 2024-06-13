@@ -8,7 +8,7 @@ use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 use VaasSdk\ClientCredentialsGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
@@ -32,41 +32,37 @@ class VerdictService {
 	private string $tokenEndpoint;
 	private string $vaasUrl;
 	private ResourceOwnerPasswordGrantAuthenticator|ClientCredentialsGrantAuthenticator $authenticator;
-	private IConfig $appConfig;
+	private IAppConfig $appConfig;
 	private FileService $fileService;
 	private TagService $tagService;
 	private ?Vaas $vaas = null;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, IConfig $appConfig, FileService $fileService, TagService $tagService) {
+	public function __construct(LoggerInterface $logger, IAppConfig $appConfig, FileService $fileService, TagService $tagService) {
 		$this->logger = $logger;
 		$this->appConfig = $appConfig;
 		$this->fileService = $fileService;
 		$this->tagService = $tagService;
 
-		$this->authMethod = $this->appConfig->getAppValue(Application::APP_ID, 'authMethod', 'ClientCredentials');
-		$this->tokenEndpoint = $this->appConfig->getAppValue(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
-		$this->vaasUrl = $this->appConfig->getAppValue(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
-		$this->clientId = $this->appConfig->getAppValue(Application::APP_ID, 'clientId');
-		$this->clientSecret = $this->appConfig->getAppValue(Application::APP_ID, 'clientSecret');
-		$this->username = $this->appConfig->getAppValue(Application::APP_ID, 'username');
-		$this->password = $this->appConfig->getAppValue(Application::APP_ID, 'password');
+		$this->authMethod = $this->appConfig->getValueString(Application::APP_ID, 'authMethod', 'ClientCredentials');
+		$this->tokenEndpoint = $this->appConfig->getValueString(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
+		$this->vaasUrl = $this->appConfig->getValueString(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
+		$this->clientId = $this->appConfig->getValueString(Application::APP_ID, 'clientId');
+		$this->clientSecret = $this->appConfig->getValueString(Application::APP_ID, 'clientSecret');
+		$this->username = $this->appConfig->getValueString(Application::APP_ID, 'username');
+		$this->password = $this->appConfig->getValueString(Application::APP_ID, 'password');
 	}
 
-	/**
-	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
-	 * @param int $fileId
-	 * @return VaasVerdict
-	 * @throws InvalidPathException
-	 * @throws InvalidSha256Exception
-	 * @throws NotFoundException
-	 * @throws UploadFailedException
-	 * @throws TimeoutException
-	 * @throws NotPermittedException
-	 * @throws FileDoesNotExistException if the VaaS SDK could not find the file
-	 * @throws EntityTooLargeException if the file that should be scanned is too large
-	 * @throws VaasAuthenticationException if the authentication with the VaaS service fails
-	 */
+    /**
+     * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
+     * @param int $fileId
+     * @return VaasVerdict
+     * @throws InvalidPathException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     * @throws EntityTooLargeException if the file that should be scanned is too large
+     * @throws Exception
+     */
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
@@ -125,15 +121,20 @@ class VerdictService {
 		return $verdict;
 	}
 
-	public function scan(string $filePath): VaasVerdict {
+    /**
+     * @throws UploadFailedException
+     * @throws TimeoutException
+     * @throws FileDoesNotExistException
+     * @throws InvalidSha256Exception
+     * @throws VaasAuthenticationException
+     */
+    public function scan(string $filePath): VaasVerdict {
 		if ($this->vaas == null) {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
 		try {
-			$verdict = $this->vaas->ForFile($filePath);
-
-			return $verdict;
+            return $this->vaas->ForFile($filePath);
 		} catch (Exception $e) {
 			$this->logger->error("Vaas for file: " . $e->getMessage());
 			$this->vaas = null;
@@ -146,7 +147,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getAllowlist(): array {
-		$allowlist = $this->appConfig->getAppValue(Application::APP_ID, 'allowlist');
+		$allowlist = $this->appConfig->getValueString(Application::APP_ID, 'allowlist');
 		$allowlist = preg_replace('/\s+/', '', $allowlist);
 		if (empty($allowlist)) {
 			return [];
@@ -159,7 +160,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getBlocklist(): array {
-		$blocklist = $this->appConfig->getAppValue(Application::APP_ID, 'blocklist');
+		$blocklist = $this->appConfig->getValueString(Application::APP_ID, 'blocklist');
 		$blocklist = preg_replace('/\s+/', '', $blocklist);
 		if (empty($blocklist)) {
 			return [];
