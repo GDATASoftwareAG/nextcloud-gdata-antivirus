@@ -12,7 +12,7 @@ use OCP\Files\Cache\CacheEntryInsertedEvent;
 use OCP\Files\Cache\CacheEntryUpdatedEvent;
 use Psr\Log\LoggerInterface;
 
-class EventListener implements IEventListener
+class CacheEntryListener implements IEventListener
 {
     private LoggerInterface $logger;
 
@@ -28,8 +28,8 @@ class EventListener implements IEventListener
     }
 
     public static function register(IRegistrationContext $context): void {
-        $context->registerEventListener(CacheEntryInsertedEvent::class, EventListener::class);
-        $context->registerEventListener(CacheEntryUpdatedEvent::class, EventListener::class);
+        $context->registerEventListener(CacheEntryInsertedEvent::class, CacheEntryListener::class);
+        $context->registerEventListener(CacheEntryUpdatedEvent::class, CacheEntryListener::class);
     }
 
     public function handle(Event $event): void

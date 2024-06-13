@@ -129,12 +129,23 @@ class VerdictService {
         }
     }
 
-    public static function isFileTooLargeToScan($path) {
+	/**
+	 * Checks if a file is too large to be scanned.
+	 * @param string $path
+	 * @return bool
+	 */
+    public static function isFileTooLargeToScan(string $path): bool {
         $size = filesize($path);
         return !$size || $size > self::MAX_FILE_SIZE;
     }
 
-	public function scan(string $filePath): VaasVerdict {
+
+	/**
+	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
+	 * @param string $filePath The local path to the file to scan.
+	 * @return VaasVerdict The verdict.
+	 */
+	 public function scan(string $filePath): VaasVerdict {
         $this->lastLocalPath = $filePath;
         $this->lastVaasVerdict = null;
 
@@ -155,14 +166,27 @@ class VerdictService {
 		}
 	}
 
-    public function onRename(string $localSource, string $localTarget)
+	/**
+	 * Call this from a StorageWrapper, when a local file was renamed. This allows the scanner to track the name
+	 * of the file that was scanned last.
+	 * @param string $localSource The local source path.
+	 * @param string $localTarget The local destination path.
+	 */
+    public function onRename(string $localSource, string $localTarget): void
     {
         if ($localSource === $this->lastLocalPath) {
             $this->lastLocalPath = $localTarget;
         }
     }
 
-    public function tagLastScannedFile(string $localPath, int $fileId) {
+
+	/**
+	 * Tag the file that was scanned last with it's verdict. Call this from an EventListener on CacheEntryInsertedEvent or
+	 * CacheEntryUpdatedEvent.
+	 * @param string $localPath The local path.
+	 * @param int $fileId The corresponding file id to tag.
+	 */
+    public function tagLastScannedFile(string $localPath, int $fileId): void {
         if (self::isFileTooLargeToScan($localPath)) {
             $this->tagFile($fileId, TagService::WONT_SCAN);
             return;
