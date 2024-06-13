@@ -8,11 +8,25 @@ setup_nextcloud () {
   sleep 1
   docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
 
-  until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
+  until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do
-    echo "Trying installation"
+    echo "waiting for nextcloud to be initialized"
     sleep 2
   done
+
+  echo "copy config for empty skeleton"
+  docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
+  docker exec -i nextcloud-container chown www-data:www-data /var/www/html/config/config.php
+
+  until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
+  do
+    echo "waiting for installation to finish"
+    sleep 2
+  done
+
+  docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
+  docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
+
   echo "setup nextcloud finished"
 }
 
@@ -46,8 +60,5 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
-
-docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
-docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
 
 source install.local || echo "No additional install script found."

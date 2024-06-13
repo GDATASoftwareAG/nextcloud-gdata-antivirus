@@ -16,12 +16,13 @@
 		"vscode": {
 			"extensions": [
 				"CharlieGerard.pride-vscode-themes",
-				"junstyle.php-cs-fixer"
+				"junstyle.php-cs-fixer",
+				"stylelint.vscode-stylelint"
 			]
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "make build && composer install",
+	"postStartCommand": "make build && composer install",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {},
 		"ghcr.io/edouard-lopez/devcontainer-features/bats:0": {}
