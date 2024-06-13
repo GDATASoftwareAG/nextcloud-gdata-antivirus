@@ -4,9 +4,6 @@ namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
 use OCA\GDataVaas\Service\ScanService;
-use OCA\GDataVaas\Service\TagService;
-use OCA\GDataVaas\Service\VerdictService;
-use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,11 +13,11 @@ class ScanCommand extends Command {
 	private ScanService $scanService;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $scanService, IConfig $appConfig) {
+	public function __construct(ScanService $scanService, LoggerInterface $logger) {
 		parent::__construct();
 
+		$this->scanService = $scanService;
 		$this->logger = $logger;
-		$this->scanService = new ScanService($logger, $tagService, $scanService, $appConfig);
 	}
 
 	/**
@@ -37,8 +34,16 @@ class ScanCommand extends Command {
 	 * @throws \OCP\DB\Exception if the database platform is not supported
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output): int {
-		$this->scanService->setLogger(new ConsoleCommandLogger($this->logger, $output));
-		$this->scanService->run();
+		$logger = new ConsoleCommandLogger($this->logger, $output);
+		$logger->info("scanning files");
+		$start = microtime(true);
+		$scannedFilesCount = $this->scanService
+			->withLogger($logger)
+			->run();
+		
+		$time_elapsed_secs = microtime(true) - $start;
+
+		$logger->info("Scanned $scannedFilesCount files in $time_elapsed_secs seconds");
 		return 0;
 	}
 }

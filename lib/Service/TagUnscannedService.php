@@ -17,15 +17,24 @@ class TagUnscannedService {
 		$this->appConfig = $appConfig;
 	}
 
-	public function setLogger(LoggerInterface $logger) {
+	/**
+	 * @param LoggerInterface $logger
+	 * @return TagUnscannedService
+	 */
+	public function withLogger(LoggerInterface $logger): TagUnscannedService {
 		$this->logger = $logger;
+		return $this;
 	}
-
-	public function run() {
+	
+	/**
+	 * @return int how many files where actually processed
+	 * @throws \OCP\DB\Exception if the database platform is not supported
+	 */
+	public function run(): int {
 		$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
 		if ($unscannedTagIsDisabled) {
 			$this->tagService->removeTag(TagService::UNSCANNED);
-			return;
+			return 0;
 		}
 
 		$this->logger->debug("Tagging unscanned files");
@@ -48,6 +57,7 @@ class TagUnscannedService {
 		}
 
 		$this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
+		return count($fileIds);
 	}
 
 }

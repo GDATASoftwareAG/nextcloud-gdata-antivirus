@@ -2,20 +2,17 @@
 
 namespace OCA\GDataVaas\BackgroundJobs;
 
-use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\TagUnscannedService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use OCP\DB\Exception;
-use OCP\IConfig;
-use Psr\Log\LoggerInterface;
 
 class TagUnscannedJob extends TimedJob {
 	private TagUnscannedService $tagUnscannedService;
-	public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService, LoggerInterface $logger) {
+	public function __construct(ITimeFactory $time, TagUnscannedService $tagUnscannedService) {
 		parent::__construct($time);
 
-		$this->tagUnscannedService = new TagUnscannedService($logger, $tagService, $appConfig);
+		$this->tagUnscannedService = $tagUnscannedService;
 
 		$this->setInterval(60);
 		$this->setAllowParallelRuns(false);
