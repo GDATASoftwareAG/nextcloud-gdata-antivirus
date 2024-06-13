@@ -6,7 +6,7 @@ use OCA\GDataVaas\Service\TagService;
 use OCP\BackgroundJob\TimedJob;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\DB\Exception;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use Psr\Log\LoggerInterface;
 
 class TagUnscannedJob extends TimedJob
@@ -14,10 +14,10 @@ class TagUnscannedJob extends TimedJob
     private const APP_ID = "gdatavaas";
 
     private TagService $tagService;
-    private IAppConfig $appConfig;
+    private IConfig $appConfig;
     private LoggerInterface $logger;
 
-    public function __construct(ITimeFactory $time, IAppConfig $appConfig, TagService $tagService, LoggerInterface $logger)
+    public function __construct(ITimeFactory $time, IConfig $appConfig, TagService $tagService, LoggerInterface $logger)
     {
         parent::__construct($time);
 
@@ -37,7 +37,7 @@ class TagUnscannedJob extends TimedJob
      */
     protected function run($argument): void
     {
-        $unscannedTagIsDisabled = $this->appConfig->getValueBool(self::APP_ID, 'disableUnscannedTag');
+        $unscannedTagIsDisabled = $this->appConfig->getAppValue(self::APP_ID, 'disableUnscannedTag');
         if ($unscannedTagIsDisabled) {
             $this->tagService->removeTag(TagService::UNSCANNED);
             return;

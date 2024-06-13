@@ -18,7 +18,7 @@
         <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
     </settings>
     <dependencies>
-        <nextcloud min-version="29" max-version="29"/>
+        <nextcloud min-version="27" max-version="28"/>
     </dependencies>
 	<background-jobs>
 		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>

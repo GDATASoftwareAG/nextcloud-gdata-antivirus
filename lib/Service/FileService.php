@@ -2,11 +2,10 @@
 
 namespace OCA\GDataVaas\Service;
 
-use OCP\Files\Config\ICachedMountFileInfo;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotPermittedException;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\Files\Node;
 use OCP\Files\NotFoundException;
 use OCP\Files\IRootFolder;
@@ -19,10 +18,10 @@ class FileService
 
     private IUserMountCache $userMountCache;
     private IRootFolder $rootFolder;
-    private IAppConfig $appConfig;
+    private IConfig $appConfig;
     private LoggerInterface $logger;
 
-    public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig)
+    public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig)
     {
         $this->userMountCache = $userMountCache;
         $this->rootFolder = $rootFolder;
@@ -41,7 +40,7 @@ class FileService
      */
     public function setMaliciousPrefixIfActivated(int $fileId): void
     {
-        if ($this->appConfig->getValueBool(self::APP_ID, 'prefixMalicious')) {
+        if ($this->appConfig->getAppValue(self::APP_ID, 'prefixMalicious')) {
             $file = $this->getNodeFromFileId($fileId);
             if (!str_starts_with($file->getName(), '[MALICIOUS] ')) {
                 $newFileName = "[MALICIOUS] " . $file->getName();
@@ -69,12 +68,12 @@ class FileService
     }
 
     /**
-     * @param ICachedMountFileInfo $mount
+     * @param $mount
      * @param int $fileId
      * @return Node|null
      * @throws NotPermittedException
      */
-    private function findNodeInMount(ICachedMountFileInfo $mount, int $fileId): ?Node
+    private function findNodeInMount(\OCP\Files\Config\ICachedMountFileInfo $mount, int $fileId): ?Node
     {
         $mountUserFolder = $this->rootFolder->getUserFolder($mount->getUser()->getUID());
         $nodes = $mountUserFolder->getById($fileId);
@@ -92,7 +91,7 @@ class FileService
      */
     public function moveFileToQuarantineFolderIfDefined(int $fileId): void
     {
-        $quarantineFolderPath = $this->appConfig->getValueString(self::APP_ID, 'quarantineFolder');
+        $quarantineFolderPath = $this->appConfig->getAppValue(self::APP_ID, 'quarantineFolder');
         if (empty($quarantineFolderPath)) {
             throw new InvalidPathException('Quarantine folder path is not defined');
         }
