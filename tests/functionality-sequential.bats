@@ -34,7 +34,7 @@ setup_file() {
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:scan
 
-    LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "admin.functionality-sequential.eicar.com.txt|admin.functionality-sequential.clean.txt|admin.pup.exe" )
+    LOGS=$(docker exec --user www-data -i nextcloud-container php occ log:tail -nr 5000 | egrep "admin.functionality-sequential.eicar.com.txt|admin.functionality-sequential.clean.txt|admin.pup.exe" )
 
     curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
     curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/admin.pup.exe
@@ -57,7 +57,7 @@ setup_file() {
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
     docker exec -i --user www-data nextcloud-container php occ gdatavaas:scan
 
-    LOGS=$(docker exec --user www-data -i nextcloud-container cat data/nextcloud.log | egrep "$TESTUSER.functionality-sequential.eicar.com.txt|$TESTUSER.functionality-sequential.clean.txt|$TESTUSER.pup.exe")
+    LOGS=$(docker exec --user www-data -i nextcloud-container php occ log:tail -nr 5000 | egrep "$TESTUSER.functionality-sequential.eicar.com.txt|$TESTUSER.functionality-sequential.clean.txt|$TESTUSER.pup.exe")
 
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
