@@ -75,6 +75,9 @@ if (parseInt(OC.config.version.split('.')[0]) >= 28) {
 							case 'Clean':
 								showSuccess(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict Clean'));
 								break;
+							case 'Pup':
+								showWarning(t('gdatavaas', 'The file "' + name + '" has been scanned with G DATA as verdict PUP (Potentially unwanted program)'));
+								break;
 						}
 					} else {
 						try {

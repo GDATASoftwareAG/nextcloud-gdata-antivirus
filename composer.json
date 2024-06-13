@@ -9,15 +9,17 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "^8.0.0"
+		"gdata/vaas": "^8.0.2",
+		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
 		"nextcloud/ocp": "dev-stable28",
-		"psalm/phar": "^5.17.0",
-		"nextcloud/coding-standard": "^v1.1.1"
+		"symfony/console": "v6.4.8",
+		"psalm/phar": "5.24.0",
+		"nextcloud/coding-standard": "v1.2.1"
 	},
 	"scripts": {
-		"lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+		"lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
 		"cs:check": "php-cs-fixer fix --dry-run --diff .",
 		"cs:fix": "php-cs-fixer fix .",
 		"psalm": "vendor/psalm/phar/psalm.phar --threads=1",

@@ -82,10 +82,18 @@ endif
 .PHONY: npm
 npm:
 ifeq (,$(wildcard $(CURDIR)/package.json))
-	npm install
+ifeq (,$(wildcard $(CURDIR)/package-lock.json))
+	npm install --no-audit --progress=false
+else
+	npm ci
+endif
 	cd js && $(npm) run build
 else
-	npm install
+ifeq (,$(wildcard $(CURDIR)/package-lock.json))
+	npm install --no-audit --progress=false
+else
+	npm ci
+endif
 	npm run build
 endif
 
@@ -107,10 +115,10 @@ distclean: clean
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release
 .PHONY: appstore
-appstore:
+appstore: build
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
-	tar cvzf $(appstore_package_name).tar.gz \
+	tar czf $(appstore_package_name).tar.gz \
 	--transform s/$(app_directory_name)/$(app_real_name)/ \
 	--exclude-vcs \
 	--exclude="../$(app_directory_name)/build" \
