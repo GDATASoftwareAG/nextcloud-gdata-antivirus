@@ -22,6 +22,12 @@ jobs:
         with:
           bats-version: 1.11.0
 
+      - name: replace version in ./appinfo/info.xml
+        id: replace-version-in-info
+        run: |
+          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
+          sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
+
       - uses: docker-practice/actions-setup-docker@master
       - name: install nextcloud
         env:
@@ -53,11 +59,10 @@ jobs:
           name: build-dir
           path: build/
 
-      - name: replace version
-        id: replace-version
+      - name: write version to output
+        id: write-version-to-output
         run: |
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
-          sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
           echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
 
       - name: Github Release
