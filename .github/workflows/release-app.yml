@@ -71,7 +71,7 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./build/artifacts/gdatavaas.tar.gz
-          asset_name: gdatavaas-${{ steps.replace-version.outputs.RELEASE_VERSION }}.tar.gz
+          asset_name: gdatavaas.tar.gz
           tag: ${{ github.ref }}
           overwrite: true
 
