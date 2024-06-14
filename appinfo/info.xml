@@ -15,6 +15,7 @@
 * 🕵️‍♂️ **Automatic scans!** Automatically scans all files in the background
 * ⏰ **Customize what should and should not be scanned!** Configuration via Block- and Allowlist
 * ❓ **Use the activity app!** See what happened in your Nextcloud instance
+* ✅ **no additional software required!** The app uses the G DATA Verdict as a Service (VaaS) API to scan files
 
 This app is based on the G DATA Verdict as a Service (VaaS) API. For more information, visit the [G DATA website](https://www.gdata.de/business/security-services/verdict-as-a-service).
 If you have any questions about scanning, usage or similar, please feel free to write an e-mail to vaas@gdata.de.
