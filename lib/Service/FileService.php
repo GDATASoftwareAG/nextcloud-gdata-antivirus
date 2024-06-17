@@ -9,7 +9,7 @@ use OCP\Files\IRootFolder;
 use OCP\Files\Node;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 
@@ -17,10 +17,10 @@ class FileService {
 
 	private IUserMountCache $userMountCache;
 	private IRootFolder $rootFolder;
-	private IConfig $appConfig;
+	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig) {
 		$this->userMountCache = $userMountCache;
 		$this->rootFolder = $rootFolder;
 		$this->appConfig = $appConfig;
@@ -37,7 +37,7 @@ class FileService {
 	 * @throws LockedException
 	 */
 	public function setMaliciousPrefixIfActivated(int $fileId): void {
-		if ($this->appConfig->getAppValue(Application::APP_ID, 'prefixMalicious')) {
+		if ($this->appConfig->getValueBool(Application::APP_ID, 'prefixMalicious')) {
 			$file = $this->getNodeFromFileId($fileId);
 			if (!str_starts_with($file->getName(), '[MALICIOUS] ')) {
 				$newFileName = "[MALICIOUS] " . $file->getName();
@@ -85,7 +85,7 @@ class FileService {
 	 * @throws NotPermittedException
 	 */
 	public function moveFileToQuarantineFolderIfDefined(int $fileId): void {
-		$quarantineFolderPath = $this->appConfig->getAppValue(Application::APP_ID, 'quarantineFolder');
+		$quarantineFolderPath = $this->appConfig->getValueString(Application::APP_ID, 'quarantineFolder');
 		if (empty($quarantineFolderPath)) {
 			throw new InvalidPathException('Quarantine folder path is not defined');
 		}

@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   nextcloud:
-    image: nextcloud:stable
+    image: nextcloud:29
     volumes:
       - nextcloud_data:/var/www/html
     environment:

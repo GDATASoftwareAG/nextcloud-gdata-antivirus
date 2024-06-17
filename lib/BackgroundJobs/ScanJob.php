@@ -6,13 +6,13 @@ use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\ScanService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
-use OCP\IConfig;
+use OCP\IAppConfig;
 
 class ScanJob extends TimedJob {
 	private ScanService $scanService;
-	private IConfig $appConfig;
+	private IAppConfig $appConfig;
 
-	public function __construct(ITimeFactory $time, ScanService $scanService, IConfig $appConfig) {
+	public function __construct(ITimeFactory $time, ScanService $scanService, IAppConfig $appConfig) {
 		parent::__construct($time);
 
 		$this->scanService = $scanService;
@@ -29,7 +29,7 @@ class ScanJob extends TimedJob {
 	 * @throws \OCP\DB\Exception if the database platform is not supported
 	 */
 	protected function run($argument): void {
-		$autoScan = $this->appConfig->getAppValue(Application::APP_ID, 'autoScanFiles');
+		$autoScan = $this->appConfig->getValueBool(Application::APP_ID, 'autoScanFiles');
 		if (!$autoScan) {
 			return;
 		}
