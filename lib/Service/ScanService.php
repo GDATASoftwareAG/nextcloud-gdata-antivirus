@@ -3,16 +3,16 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
-use OCP\IConfig;
+use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class ScanService {
 	private TagService $tagService;
 	private VerdictService $verdictService;
-	private IConfig $appConfig;
+	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService, IConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService, IAppConfig $appConfig) {
 		$this->logger = $logger;
 		$this->tagService = $tagService;
 		$this->verdictService = $verdictService;
@@ -33,8 +33,8 @@ class ScanService {
 	 * @throws \OCP\DB\Exception if the database platform is not supported
 	 */
 	public function run(): int {
-		$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
-		$quantity = $this->appConfig->getAppValue(Application::APP_ID, 'scanQueueLength');
+		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+		$quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength');
 		try {
 			$quantity = intval($quantity);
 		} catch (\Exception) {

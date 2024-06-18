@@ -6,7 +6,7 @@ setup_nextcloud () {
   echo "setup nextcloud"
   docker stop nextcloud-container || echo "No container to stop"
   sleep 1
-  docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:28
+  docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:29
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do

@@ -2,7 +2,7 @@ version: '3'
 services:
   
   nextcloud-server:
-    image: nextcloud:28.0.6-fpm
+    image: nextcloud:29.0.0-fpm
     container_name: nextcloud-server
     hostname: nextcloud-server
     environment:
