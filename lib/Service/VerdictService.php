@@ -80,19 +80,19 @@ class VerdictService {
 		}
 
 		$blocklist = $this->getBlocklist();
-		$this->logger->info("Blocklist: " . implode(", ", $blocklist));
+		$this->logger->debug("Blocklist: " . implode(", ", $blocklist));
 		foreach ($blocklist as $blocklistItem) {
 			if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
-				$this->logger->info("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
+				$this->logger->debug("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
 				throw new NotPermittedException("File is in the blocklist");
 			}
 		}
 
 		$allowlist = $this->getAllowlist();
-		$this->logger->info("Allowlist: " . implode(", ", $allowlist));
+		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
 		foreach ($allowlist as $allowlistItem) {
 			if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
-				$this->logger->info("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");
+				$this->logger->debug("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");
 				throw new NotPermittedException("File is not in the allowlist");
 			}
 		}
@@ -160,7 +160,7 @@ class VerdictService {
 
 			return $verdict;
 		} catch (Exception $e) {
-			$this->logger->error("Vaas for file: " . $e->getMessage());
+			$this->logger->error("VaaS scan error: " . $e->getMessage());
 			$this->vaas = null;
 			throw $e;
 		}
