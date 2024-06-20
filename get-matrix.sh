@@ -34,15 +34,11 @@ if [ "$MIN_VERSION" -gt "$MAX_VERSION" ]; then
 fi
 
 VERSIONS=""
-FIRST_RUN="YES"
+DELIMITER=""
 for i in $(eval echo {$MIN_VERSION..$MAX_VERSION})
 do
-    if [ "$FIRST_RUN" == "YES" ]; then
-        VERSIONS="$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$i/g")"
-        FIRST_RUN="NO"
-        continue
-    fi
-    VERSIONS="$VERSIONS,$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$i/g")"
+    VERSIONS="${VERSIONS}${DELIMITER}$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$i/g")"
+    DELIMITER=","
 done
 echo $BASE_TEMPLATE | sed "s/VERSIONS/$VERSIONS/g"
 
