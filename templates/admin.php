@@ -107,6 +107,10 @@
             <td><div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", but they will still be scanned if "Automatic file scanning" is switched on.'));?>" class="visible"><label><?php p($l->t('Disable Unscanned tag'));?></label></div></td>
         </tr>
     </table>
+    <h3>
+        <label><?php p($l->t('Files scanned: '));?></label>
+        <label id="scan_counter"></label>
+    </h3>
 </div>
 </body>
 </html>

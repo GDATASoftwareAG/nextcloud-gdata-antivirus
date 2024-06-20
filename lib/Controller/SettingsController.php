@@ -5,6 +5,7 @@ namespace OCA\GDataVaas\Controller;
 use OCA\GDataVaas\Service\TagService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
 
@@ -81,4 +82,21 @@ class SettingsController extends Controller {
 		$this->tagService->resetAllTags();
 		return new JSONResponse(['status' => 'success']);
 	}
+
+    public function getCounters(): JSONResponse {
+        try {
+            $filesCount = $this->tagService->getScannedFilesCount();
+        }
+        catch (Exception $e) {
+            return new JSONResponse([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ]);
+        }
+        return new JSONResponse([
+            'status' => 'success',
+            'all' => $filesCount['all'],
+            'scanned' => $filesCount['scanned']
+        ]);
+    }
 }
