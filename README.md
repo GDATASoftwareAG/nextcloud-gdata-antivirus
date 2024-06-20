@@ -21,6 +21,39 @@ This project is licensed under the GNU Affero General Public License. For more d
 
 Please read on for information about setting up a development environment and contributing to the project.
 
+## Features
+
+- **Automatic file scanning:** Files from users are automatically scanned 24/7 in the background.
+- **Protection during upload:** Files are scanned during upload and tagged with a verdict.
+- **Manual scanning:** Users can manually scan files at any time.
+- **Nextcloud Activities:** The behavior of the antivirus can be tracked in the Activities app through smart logging.
+- **File tagging:** Files are tagged with a verdict, providing immediate feedback to users.
+- **No additional software required:** The app works out of the box with the G DATA VaaS cloud service.
+- **Scanning rules:** The app offers both a block list and an allow list to easily set what should and should not be scanned.
+- **Quarantine:**  If malicious files are already found in an existing Nextcloud environment, they can be moved to a quarantine area of the affected user.
+
+## Tags
+
+- **Clean:** The scanners did not find any malicious content in the file.
+- **Malicious:** The scanners found a virus or other malicious content in the file.
+- **Pup:** The scanners found a potentially unwanted program in the file. Could be adware, spyware, etc.
+- **Unscanned:** The file has not been scanned yet.
+- **Won't Scan:** The file is not scanned because it is too large or in a format that cannot be scanned.
+
+## Settings
+
+The app offers a variety of settings to customize the behavior of the antivirus. The settings can be found in the Nextcloud admin settings page under the "Verdict-as-a-Service" section.
+
+- **Authentication Method:** If you have created your own account on https://vaas.gdata.de/login, select 'Resource Owner Password Flow' here. If you have received access data from your provider (Client ID and Secret), select 'Client Credentials Flow'. You can simply leave the other fields empty.
+- **Scan only this:** Equivalent to an allowlist. If the values here are separated by commas, e.g. "Documents, .exe, Scan", only those containing the corresponding values in the path are scanned. In this example, *.exe files and the contents of the Documents/ and Scan/ folders would be scanned.
+- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.
+- **Scan queue length:** Determines the number of files to be scanned per background job of the Nextcloud instance, see Basic settings. Helps to balance the server load and the time until all files are scanned. Recommended are values between 10 and 100.
+- **Advanced Settings:** The token endpoint and the VaaS URL determine the scan backend. By default, the public G DATA Cloud is used for scanning. If the VaaS backend is self-hosted, the corresponding values for the self-hosted instance must be entered here.
+
+## Self-hosting the scanning backend (VaaS)
+
+If you want to self-host the scanning backend, take a look at the [repository of our helm chart](https://github.com/GDATASoftwareAG/vaas-helm).
+
 ## Setting up a development environment
 
 Before you start, make sure you have the following tools installed:
