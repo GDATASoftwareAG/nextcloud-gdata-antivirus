@@ -196,4 +196,23 @@ class TagService {
 		$this->removeTag(self::WONT_SCAN);
 		$this->logger->info("All tags removed");
 	}
+
+    /**
+     * @return array
+     * @throws Exception
+     */
+    public function getScannedFilesCount(): array {
+        $tags = [
+            $this->getTag(self::CLEAN)->getId(),
+            $this->getTag(self::MALICIOUS)->getId(),
+            $this->getTag(self::PUP)->getId(),
+            $this->getTag(self::WONT_SCAN)->getId()
+        ];
+        $allFiles = $this->dbFileMapper->getFilesCount();
+        $scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tags, $allFiles);
+        return [
+            'all' => $allFiles,
+            'scanned' => count($scannedFiles)
+        ];
+    }
 }
