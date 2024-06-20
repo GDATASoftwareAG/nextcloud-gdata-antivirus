@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const prefixMalicious = document.querySelector('#prefixMalicious');
 	const authMethod = document.querySelector('#authMethod');
 	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
+	const scanCounter = document.querySelector('#scan_counter');
 
 	authSubmit.addEventListener('click', async (e) => {
 		e.preventDefault();
@@ -110,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	}
 
-	// Set checkbox values on page load
+	// Set values on page load
 	const autoScanResponse = await getData(OC.generateUrl('apps/gdatavaas/getAutoScan'));
 	if (autoScanResponse.status) {
 		autoScanFiles.checked = true;
@@ -119,4 +120,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
 	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;
+	
+	let filesCounter = await getData(OC.generateUrl('apps/gdatavaas/getCounters'));
+	if (filesCounter['status'] === 'success') {
+		scanCounter.textContent = filesCounter["scanned"] + ' / ' + filesCounter["all"];
+	}
+	else {
+		scanCounter.textContent = ' N/A';
+		console.log('Error getting files counter:', filesCounter['message']);
+	}
 });

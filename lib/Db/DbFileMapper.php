@@ -89,4 +89,35 @@ class DbFileMapper extends QBMapper {
 		}
 		return $cast;
 	}
+
+    /**
+     * Get the number of files in the nextcloud instance
+     * @return int
+     * @throws Exception
+     */
+    public function getFilesCount(): int {
+        $fileCount = 0;
+        
+        $fileQuery = $this->db->getQueryBuilder();
+        $fileQuery->select($fileQuery->func()->count())
+            ->from('filecache', 'f')
+            ->leftJoin('f', 'mimetypes', 'm', $fileQuery->expr()->eq('f.mimetype', 'm.id'))
+            ->where($fileQuery->expr()->eq('storage', $fileQuery->createParameter('storageId')))
+            ->andWhere($fileQuery->expr()->notLike('m.mimetype', $fileQuery->createNamedParameter('%unix-directory%')))
+            ->andWhere($fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')));
+
+        $storageQuery = $this->db->getQueryBuilder();
+        $storageQuery->selectAlias('numeric_id', 'id')
+            ->from('storages');
+        $storageResult = $storageQuery->executeQuery();
+        while ($storageRow = $storageResult->fetch()) {
+            $fileQuery->setParameter('storageId', $storageRow['id']);
+            $fileResult = $fileQuery->executeQuery();
+            $fileCount += (int)$fileResult->fetchOne();
+            $fileResult->closeCursor();
+        }
+        $storageResult->closeCursor();
+        
+        return $fileCount;
+    }
 }
