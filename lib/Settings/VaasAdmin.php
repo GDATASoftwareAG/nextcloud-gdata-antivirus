@@ -25,13 +25,13 @@ class VaasAdmin implements ISettings {
 			'tokenEndpoint' => $this->config->getValueString(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token'),
 			'vaasUrl' => $this->config->getValueString(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de'),
 			'quarantineFolder' => $this->config->getValueString(Application::APP_ID, 'quarantineFolder', 'Quarantine'),
-			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles', false),
+			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles'),
 			'scanOnlyNewFiles' => $this->config->getValueBool(Application::APP_ID, 'scanOnlyNewFiles', true),
 			'prefixMalicious' => $this->config->getValueBool(Application::APP_ID, 'prefixMalicious', true),
-			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag', false),
+			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag'),
 			'allowlist' => $this->config->getValueString(Application::APP_ID, 'allowlist'),
 			'blocklist' => $this->config->getValueString(Application::APP_ID, 'blocklist'),
-			'scanQueueLength' => $this->config->getValueInt(Application::APP_ID, 'scanQueueLength', 5),
+			'scanQueueLength' => $this->config->getValueInt(Application::APP_ID, 'scanQueueLength', 50),
 		];
 
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);
