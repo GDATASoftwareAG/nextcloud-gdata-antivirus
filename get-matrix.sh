@@ -1,14 +1,14 @@
 #!/bin/bash
 
-MIN_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo 'min-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
-MAX_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo 'max-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
+MIN_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo '<nextcloud[^>]*min-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
+MAX_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo '<nextcloud[^>]*max-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
 
 BASE_TEMPLATE='[VERSIONS]'
 VERSION_TEMPLATE='"NEXTCLOUD_VERSION"'
 
 if [ -z "$MIN_VERSION" ] && [ -z "$MAX_VERSION" ]; then
-    echo '["29"]'
-    exit 0
+    echo 'A version constraint should be set'
+    exit 1
 fi
 
 if [ -z "$MIN_VERSION" ] && [ -n "$MAX_VERSION" ] ; then
