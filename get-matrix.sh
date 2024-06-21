@@ -3,44 +3,12 @@
 MIN_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo '<nextcloud[^>]*min-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
 MAX_VERSION=$([[ $(cat appinfo/info.xml) =~ $(echo '<nextcloud[^>]*max-version=[^[0-9]]*([0-9]+).*') ]] && echo ${BASH_REMATCH[1]})
 
-BASE_TEMPLATE='[VERSIONS]'
-VERSION_TEMPLATE='"NEXTCLOUD_VERSION"'
+[ -z "$MIN_VERSION" ] && [ -z "$MAX_VERSION" ] && echo 'A version constraint should be set' && exit 1
 
-if [ -z "$MIN_VERSION" ] && [ -z "$MAX_VERSION" ]; then
-    echo 'A version constraint should be set'
-    exit 1
-fi
+MIN_VERSION=${MIN_VERSION:-$MAX_VERSION}
+MAX_VERSION=${MAX_VERSION:-$MIN_VERSION}
 
-if [ -z "$MIN_VERSION" ] && [ -n "$MAX_VERSION" ] ; then
-    VERSIONS=$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$MAX_VERSION/g")
-    echo $BASE_TEMPLATE | sed "s/VERSIONS/$VERSIONS/g"
-    exit 0
-fi
+[ "$MIN_VERSION" -gt "$MAX_VERSION" ] && echo 'Min version should be less or equal to max version' && exit 1
 
-if [ -n "$MIN_VERSION" ] && [ -z "$MAX_VERSION" ] ; then
-    VERSIONS=$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$MIN_VERSION/g")
-    echo $BASE_TEMPLATE | sed "s/VERSIONS/$VERSIONS/g"
-fi
-
-if [ "$MIN_VERSION" -eq "$MAX_VERSION" ]; then
-    VERSIONS=$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$MIN_VERSION/g")
-    echo $BASE_TEMPLATE | sed "s/VERSIONS/$VERSIONS/g"
-    exit 0
-fi
-
-if [ "$MIN_VERSION" -gt "$MAX_VERSION" ]; then
-    echo 'Min version should be less or equal to max version'
-    exit 1
-fi
-
-VERSIONS=""
-DELIMITER=""
-for i in $(eval echo {$MIN_VERSION..$MAX_VERSION})
-do
-    VERSIONS="${VERSIONS}${DELIMITER}$(echo $VERSION_TEMPLATE | sed "s/NEXTCLOUD_VERSION/$i/g")"
-    DELIMITER=","
-done
-echo $BASE_TEMPLATE | sed "s/VERSIONS/$VERSIONS/g"
-
-
+echo "[$(echo "\"$(seq -s '","' $MIN_VERSION $MAX_VERSION)\"")]"
 
