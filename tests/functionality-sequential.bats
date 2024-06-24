@@ -15,6 +15,10 @@ setup_file() {
     BATS_NO_PARALLELIZE_WITHIN_FILE=true
 }
 
+setup () {
+    docker exec -it --user www-data nextcloud-container bash -c 'echo "" > data/nextcloud.log'
+}
+
 @test "test upload when vaas does not function" {
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
     RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt)
@@ -107,6 +111,25 @@ setup_file() {
     [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
     [[ $LOGS =~ ^.*$TESTUSER.pup.exe.*Verdict:.*Pup ]]
     [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.clean.txt.*Verdict:.*Clean ]]
+}
+
+@test "test when unscanned tag is deactivated" {
+    docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
+    docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="true"
+    
+    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+
+    docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
+
+    # check for unscanned tag
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Unscanned" | wc -l) -eq "0" ]]
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Unscanned" | wc -l ) -eq "0" ]]
+
+    docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="false"
+
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 }
 
 tearddown_file() {
