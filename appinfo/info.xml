@@ -39,6 +39,7 @@ If you have any questions about scanning, usage or similar, please feel free to 
     <commands>
         <command>OCA\GDataVaas\Command\ScanCommand</command>
         <command>OCA\GDataVaas\Command\TagUnscannedCommand</command>
+        <command>OCA\GDataVaas\Command\GetTagsForFileCommand</command>
 	</commands>
     <dependencies>
         <nextcloud min-version="29" max-version="29"/>
