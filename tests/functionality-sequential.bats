@@ -10,13 +10,10 @@ setup_file() {
     mkdir -p $FOLDER_PREFIX/
     curl --output $FOLDER_PREFIX/pup.exe http://amtso.eicar.org/PotentiallyUnwanted.exe
     docker exec --env OC_PASS=$TESTUSER_PASSWORD --user www-data nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
+    docker exec -u www-data -i nextcloud-container mkdir -p /var/www/html/data/$TESTUSER/files
 
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
     BATS_NO_PARALLELIZE_WITHIN_FILE=true
-}
-
-setup () {
-    docker exec -it --user www-data nextcloud-container bash -c 'echo "" > data/nextcloud.log'
 }
 
 @test "test upload when vaas does not function" {

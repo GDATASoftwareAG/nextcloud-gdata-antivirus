@@ -10,6 +10,7 @@ setup_file() {
     mkdir -p $FOLDER_PREFIX
     curl --output $FOLDER_PREFIX/pup.exe http://amtso.eicar.org/PotentiallyUnwanted.exe
     docker exec --env OC_PASS=$TESTUSER_PASSWORD --user www-data nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
+    docker exec -u www-data -i nextcloud-container mkdir -p /var/www/html/data/$TESTUSER/files
 
     docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
     sleep 2
@@ -52,7 +53,7 @@ setup_file() {
 }
 
 @test "test testuser pup Upload" {
-   RESULT=$(curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://127.0.0.1/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe)
+    RESULT=$(curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://127.0.0.1/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe)
     echo "Actual: $RESULT"
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe || echo "file not found"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]] || exit 1
@@ -82,6 +83,20 @@ setup_file() {
     docker exec -i --user www-data nextcloud-container rm /var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
 }
 
+@test "test wontscan tag for testuser" {
+    dd if=/dev/zero of=$FOLDER_PREFIX/too-large.dat  bs=268435457  count=1
+
+    docker cp $FOLDER_PREFIX/too-large.dat nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
+    docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
+    docker exec -i --user www-data nextcloud-container php occ files:scan --all
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:tag-unscanned
+
+    docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.too-large.dat
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.too-large.dat | grep "Won't scan") ]]
+    [[ $(docker exec -i --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.too-large.dat | wc -l ) -eq "1" ]]
+
+    docker exec -i --user www-data nextcloud-container rm /var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
+}
 
 @tearddown_file() {
     rm -rf $FOLDER_PREFIX/
