@@ -120,6 +120,10 @@ class VerdictService {
                 } catch (Exception) {
                 }
                 break;
+			case TagService::UNSCANNED:
+				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				if (!$unscannedTagIsDisabled)
+					$this->tagService->setTag($fileId, $tagName);
             case TagService::CLEAN:
             case TagService::PUP:
             case TagService::WONT_SCAN:
@@ -195,9 +199,7 @@ class VerdictService {
             if ($this->lastVaasVerdict !== null) {
                 $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
             } else {
-				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
-				if (!$unscannedTagIsDisabled)
-	                $this->tagFile($fileId, TagService::UNSCANNED);
+				$this->tagFile($fileId, TagService::UNSCANNED);
             }
         }
     }
