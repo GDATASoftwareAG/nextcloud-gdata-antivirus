@@ -195,7 +195,9 @@ class VerdictService {
             if ($this->lastVaasVerdict !== null) {
                 $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
             } else {
-                $this->tagFile($fileId, TagService::UNSCANNED);
+				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				if (!$unscannedTagIsDisabled)
+	                $this->tagFile($fileId, TagService::UNSCANNED);
             }
         }
     }
