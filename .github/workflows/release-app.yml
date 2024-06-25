@@ -8,8 +8,21 @@ on:
     branches: ["*"]
 
 jobs:
+  define-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      nextcloud_versions: ${{ steps.get-matrix.outputs.nextcloud_versions }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: get-matrix
+        run: echo "nextcloud_versions=$(./get-matrix.sh)" | tee -a "$GITHUB_OUTPUT"
+
   test:
     runs-on: ubuntu-latest
+    needs: define-matrix
+    strategy:
+      matrix:
+        nextcloud_version: ${{fromJson(needs.define-matrix.outputs.nextcloud_versions)}}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -34,7 +47,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: ./install.sh
+        run: ./install.sh ${{ matrix.nextcloud_version }}
 
       - name: run tests
         env:
