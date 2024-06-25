@@ -120,6 +120,11 @@ class VerdictService {
                 } catch (Exception) {
                 }
                 break;
+			case TagService::UNSCANNED:
+				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				if (!$unscannedTagIsDisabled)
+					$this->tagService->setTag($fileId, $tagName);
+				break;
             case TagService::CLEAN:
             case TagService::PUP:
             case TagService::WONT_SCAN:
@@ -136,7 +141,7 @@ class VerdictService {
 	 */
     public static function isFileTooLargeToScan(string $path): bool {
         $size = filesize($path);
-        return !$size || $size > self::MAX_FILE_SIZE;
+        return ($size === false) || $size > self::MAX_FILE_SIZE;
     }
 
 
@@ -195,7 +200,7 @@ class VerdictService {
             if ($this->lastVaasVerdict !== null) {
                 $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
             } else {
-                $this->tagFile($fileId, TagService::UNSCANNED);
+				$this->tagFile($fileId, TagService::UNSCANNED);
             }
         }
     }
