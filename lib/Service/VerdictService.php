@@ -121,7 +121,7 @@ class VerdictService {
                 }
                 break;
 			case TagService::UNSCANNED:
-				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
 				if (!$unscannedTagIsDisabled)
 					$this->tagService->setTag($fileId, $tagName);
 				break;
