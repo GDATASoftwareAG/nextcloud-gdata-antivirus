@@ -141,7 +141,7 @@ class VerdictService {
 	 */
     public static function isFileTooLargeToScan(string $path): bool {
         $size = filesize($path);
-        return !$size || $size > self::MAX_FILE_SIZE;
+        return ($size === false) || $size > self::MAX_FILE_SIZE;
     }
 
 
