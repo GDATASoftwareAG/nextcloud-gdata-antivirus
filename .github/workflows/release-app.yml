@@ -57,12 +57,14 @@ jobs:
 
       - uses: actions/upload-artifact@master
         with:
+          overwrite: true
           name: build-dir
           path: build/
 
   release:
     needs:
       - test
+      - define-matrix
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
