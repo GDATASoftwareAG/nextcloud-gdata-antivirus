@@ -57,6 +57,10 @@
                 <td><div title="<?php p($l->t('If you have activated "Automatic file scanning", the number of files set here will be scanned every five minutes. This setting should help to influence the server load. '));?>" class="visible"><label for="scan_queue_length"><?php p($l->t('Scan queue length'));?></label></div></td>
                 <td class="input_field"><input id="scan_queue_length" type="text" name="scan_queue_length" value="<?php p($_['scanQueueLength']); ?>"/></td>
             </tr>
+            <tr class="notify_mails">
+                <td><div title="<?php p($l->t('Mail addresses for notifications when malicious files are found or a user tries to upload them. Must be comma-separated.'));?>" class="visible"><label for="notify_mails"><?php p($l->t('Notify Mails'));?></label></div></td>
+                <td class="input_field"><input id="notify_mails" type="text" name="notify_mails" value="<?php p($_['notifyMail']); ?>"/></td>
+            </tr>
         </table>
         <input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
         <span id="auth_save_msg"></span>

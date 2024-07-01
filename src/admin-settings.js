@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const allowlist = document.querySelector('#allowlist').value;
 		const blocklist = document.querySelector('#blocklist').value;
 		const scanQueueLength = document.querySelector('#scan_queue_length').value;
+		const notifyMails = document.querySelector('#notify_mails').value;
 
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
 			username: username,
@@ -52,7 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			quarantineFolder,
 			allowlist,
 			blocklist,
-			scanQueueLength
+			scanQueueLength,
+			notifyMails
 		});
 		const msgElement = document.querySelector('#auth_save_msg');
 

@@ -18,7 +18,7 @@ class SettingsController extends Controller {
 		$this->tagService = $tagService;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength): JSONResponse {
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
 		$this->config->setAppValue($this->appName, 'username', $username);
 		$this->config->setAppValue($this->appName, 'password', $password);
 		$this->config->setAppValue($this->appName, 'clientId', $clientId);
@@ -28,6 +28,7 @@ class SettingsController extends Controller {
 		$this->config->setAppValue($this->appName, 'allowlist', $allowlist);
 		$this->config->setAppValue($this->appName, 'blocklist', $blocklist);
 		$this->config->setAppValue($this->appName, 'scanQueueLength', $scanQueueLength);
+		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
 	}
 
