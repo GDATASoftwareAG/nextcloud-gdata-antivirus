@@ -19,7 +19,7 @@ class SettingsController extends Controller {
 		$this->tagService = $tagService;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength): JSONResponse {
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
 		$this->config->setValueString($this->appName, 'username', $username);
 		$this->config->setValueString($this->appName, 'password', $password);
 		$this->config->setValueString($this->appName, 'clientId', $clientId);
@@ -29,6 +29,7 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'allowlist', $allowlist);
 		$this->config->setValueString($this->appName, 'blocklist', $blocklist);
 		$this->config->setValueInt($this->appName, 'scanQueueLength', $scanQueueLength);
+        $this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
 	}
 
@@ -98,5 +99,23 @@ class SettingsController extends Controller {
             'all' => $filesCount['all'],
             'scanned' => $filesCount['scanned']
         ]);
+    }
+    
+    public function getSendMailOnVirusUpload(): JSONResponse{
+        return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
+    }
+
+    public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
+        $this->config->setValueBool($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
+        return new JSONResponse(['status' => 'success']);
+    }
+
+    public function getSendMailSummaryOfMaliciousFiles(): JSONResponse{
+        return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'notifyAdminEnabled')]);
+    }
+
+    public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
+        $this->config->setValueBool($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
+        return new JSONResponse(['status' => 'success']);
     }
 }
