@@ -9,14 +9,17 @@
 
 namespace OCA\GDataVaas;
 
+use Coduo\PHPHumanizer\NumberHumanizer;
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCA\GDataVaas\Activity\Provider;
 use OCA\GDataVaas\AppInfo\Application;
+use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\InvalidContentException;
+use OCP\IAppConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Message\Verdict;
@@ -29,6 +32,8 @@ class AvirWrapper extends Wrapper {
 	private $writingModes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
 	protected VerdictService $verdictService;
+    protected MailService $mailService;
+    protected IAppConfig $appConfig;
 
 	/** @var IL10N */
 	protected $l10n;
@@ -54,6 +59,8 @@ class AvirWrapper extends Wrapper {
 	public function __construct($parameters) {
 		parent::__construct($parameters);
 		$this->verdictService = $parameters['verdictService'];
+        $this->mailService = $parameters['mailService'];
+        $this->appConfig = $parameters['appConfig'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
@@ -166,6 +173,19 @@ class AvirWrapper extends Wrapper {
 							->setAffectedUser($owner)
 							->setType(Provider::TYPE_VIRUS_DETECTED);
 						$this->activityManager->publish($activity);
+                        
+                        $sendMailOnVirusUpload = $this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload');
+                        if ($sendMailOnVirusUpload)
+                        {
+                            $message = "<html><body>";
+                            $message .= "<p>User '" . $owner . "' tried to upload an infected file that got blocked by G DATA Antivirus:</p>";
+                            $message .= "<p>File path: " . $path . "</p>";
+                            $message .= "<p>File size: " . NumberHumanizer::binarySuffix($filesize, 'de') . "</p>";
+                            $message .= "<p>Detected virus: " . $verdict->Detection . "</p>";
+                            $message .= "</body></html>";
+
+                            $this->mailService->notify("Infected file upload", $message);
+                        }
 
 						throw new InvalidContentException(
 							sprintf(

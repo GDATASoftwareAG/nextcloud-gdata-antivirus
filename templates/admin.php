@@ -110,6 +110,13 @@
             </td>
             <td><div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", but they will still be scanned if "Automatic file scanning" is switched on.'));?>" class="visible"><label><?php p($l->t('Disable Unscanned tag'));?></label></div></td>
         </tr>
+        <tr>
+            <td>
+                <input id="send_mail_on_virus_upload" class="toggle-round" type="checkbox">
+                <label for="send_mail_on_virus_upload"></label>
+            </td>
+            <td><div title="<?php p($l->t('If a user tries to upload an infected file an email is send to all \'Notify Mails\' receiver'));?>" class="visible"><label><?php p($l->t('Send mails on infected file upload'));?></label></div></td>
+        </tr>
     </table>
     <h3>
         <label><?php p($l->t('Files scanned: '));?></label>
