@@ -37,7 +37,7 @@ services:
     container_name: nextcloud-db
     hostname: nextcloud-db
     restart: unless-stopped
-    image: mariadb:10.11
+    image: mariadb:11.4
     ports:
       - "3306:3306"
     environment:
