@@ -33,7 +33,8 @@ class VaasAdmin implements ISettings {
 			'blocklist' => $this->config->getValueString(Application::APP_ID, 'blocklist'),
 			'scanQueueLength' => $this->config->getValueInt(Application::APP_ID, 'scanQueueLength', 50),
             'notifyMail' => $this->config->getValueString(Application::APP_ID, 'notifyMails'),
-            'sendMailOnVirusUpload' => $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')
+            'sendMailOnVirusUpload' => $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload'),
+            'notifyAdminEnabled' => $this->config->getValueBool(Application::APP_ID, 'notifyAdminEnabled')
 		];
 
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);

@@ -22,6 +22,8 @@ return [
 		['name' => 'settings#resetAllTags', 'url' => '/resetalltags', 'verb' => 'POST'],
         ['name' => 'settings#getCounters', 'url' => '/getCounters', 'verb' => 'GET'],
         ['name' => 'settings#getSendMailOnVirusUpload', 'url' => '/getSendMailOnVirusUpload', 'verb' => 'GET'],
-        ['name' => 'settings#setSendMailOnVirusUpload', 'url' => '/setSendMailOnVirusUpload', 'verb' => 'POST']
+        ['name' => 'settings#setSendMailOnVirusUpload', 'url' => '/setSendMailOnVirusUpload', 'verb' => 'POST'],
+        ['name' => 'settings#getSendMailSummaryOfMaliciousFiles', 'url' => '/getSendMailSummaryOfMaliciousFiles', 'verb' => 'GET'],
+        ['name' => 'settings#setSendMailSummaryOfMaliciousFiles', 'url' => '/setSendMailSummaryOfMaliciousFiles', 'verb' => 'POST']
 	]
 ];
