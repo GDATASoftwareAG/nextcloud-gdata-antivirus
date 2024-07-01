@@ -32,6 +32,7 @@ class VaasAdmin implements ISettings {
 			'allowlist' => $this->config->getValueString(Application::APP_ID, 'allowlist'),
 			'blocklist' => $this->config->getValueString(Application::APP_ID, 'blocklist'),
 			'scanQueueLength' => $this->config->getValueInt(Application::APP_ID, 'scanQueueLength', 50),
+            'notifyMail' => $this->config->getValueString(Application::APP_ID, 'notifyMails')
 		];
 
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);
