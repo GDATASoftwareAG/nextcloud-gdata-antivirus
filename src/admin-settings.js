@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const authMethod = document.querySelector('#authMethod');
 	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
 	const scanCounter = document.querySelector('#scan_counter');
+	const sendMailOnVirusUpload = document.querySelector('#send_mail_on_virus_upload');
 
 	authSubmit.addEventListener('click', async (e) => {
 		e.preventDefault();
@@ -104,6 +105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await postData(OC.generateUrl('apps/gdatavaas/setDisableUnscannedTag'), {disableUnscannedTag: disableUnscannedTag.checked});
 	});
 
+	sendMailOnVirusUpload.addEventListener('click', async () => {
+		await postData(OC.generateUrl('apps/gdatavaas/setSendMailOnVirusUpload'), {sendMailOnVirusUpload: sendMailOnVirusUpload.checked});
+	});
+
 	// Activate or deactivate automatic file scanning
 	const toggleAutoScan = async (enable) => {
 		autoScanFiles.checked = enable;
@@ -122,6 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
 	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;
+	sendMailOnVirusUpload.checked = (await getData(OC.generateUrl('apps/gdatavaas/getSendMailOnVirusUpload'))).status;
 	
 	let filesCounter = await getData(OC.generateUrl('apps/gdatavaas/getCounters'));
 	if (filesCounter['status'] === 'success') {

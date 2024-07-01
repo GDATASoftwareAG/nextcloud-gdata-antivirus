@@ -100,4 +100,13 @@ class SettingsController extends Controller {
             'scanned' => $filesCount['scanned']
         ]);
     }
+    
+    public function getSendMailOnVirusUpload(): JSONResponse{
+        return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
+    }
+
+    public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
+        $this->config->setValueBool($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
+        return new JSONResponse(['status' => 'success']);
+    }
 }

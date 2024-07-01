@@ -6,14 +6,17 @@ use Exception;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\IAppConfig;
 use OCP\Mail\IMailer;
+use Psr\Log\LoggerInterface;
 
 class MailService {
     private IMailer $mailer;
     private IAppConfig $config;
+    private LoggerInterface $logger;
 
-    public function __construct(IMailer $mailer, IAppConfig $config) {
+    public function __construct(IMailer $mailer, IAppConfig $config, LoggerInterface $logger) {
         $this->mailer = $mailer;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     /**
@@ -26,10 +29,12 @@ class MailService {
         $msg = $this->mailer->createMessage();
         $msg->setSubject($subject);
         $msg->setHtmlBody(
-            "<!doctype html><html><body>$message</body></html>"
+            "<!doctype html>$message"
         );
-        $msg->setTo($this->getNotifyMails());
+        $receiver = $this->getNotifyMails();
+        $msg->setTo($receiver);
         $this->mailer->send($msg);
+        $this->logger->debug("Mail sent to " . implode(", ", $receiver));
     }
     
     private function getNotifyMails(): array {
