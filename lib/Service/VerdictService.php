@@ -74,7 +74,6 @@ class VerdictService {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 		if (self::isFileTooLargeToScan($filePath)) {
-			$this->tagService->removeAllTagsFromFile($fileId);
 			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
 			throw new EntityTooLargeException("File is too large");
 		}
@@ -109,8 +108,6 @@ class VerdictService {
 	}
 
     private function tagFile(int $fileId, string $tagName) {
-        $this->tagService->removeAllTagsFromFile($fileId);
-
         switch ($tagName) {
             case TagService::MALICIOUS:
                 $this->tagService->setTag($fileId, TagService::MALICIOUS);
