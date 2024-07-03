@@ -57,11 +57,22 @@ class TagService {
 	 * @return void
 	 */
 	public function setTag(int $fileId, string $tagName): void {
-		$tag = $this->getTag($tagName);
+		$tag = $this->tagService->getTag($tagName, true, false);
+		$filesTagIds = $this->tagMapper->getTagIdsForObjects($fileId, 'files');
+
+		if (isset($filesTagIds[$fileId])) {
+			foreach ($filesTagIds[$fileId] as $tagId) {
+				if ($tagId != $tag->getId())
+					$this->tagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
+			}
+			if (\in_array($tag->getId(), $filesTagIds[$fileId]))
+				return;
+		}
 		$this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
+
 		$this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
 	}
-
+	
 	/**
 	 * @param string $tagName
 	 * @param int $fileId
@@ -76,14 +87,6 @@ class TagService {
 		} catch (TagNotFoundException) {
 			return false;
 		}
-	}
-
-	public function removeAllTagsFromFile(int $fileId): void {
-		$this->removeTagFromFile(TagService::CLEAN, $fileId);
-		$this->removeTagFromFile(TagService::MALICIOUS, $fileId);
-		$this->removeTagFromFile(TagService::PUP, $fileId);
-		$this->removeTagFromFile(TagService::UNSCANNED, $fileId);
-		$this->removeTagFromFile(TagService::WONT_SCAN, $fileId);
 	}
 
 	/**
