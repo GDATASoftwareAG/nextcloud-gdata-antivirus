@@ -45,17 +45,17 @@ class ScanService {
 		$pupTag = $this->tagService->getTag(TagService::PUP);
 		$cleanTag = $this->tagService->getTag(TagService::CLEAN);
 		$wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
-		
-		$tagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
-		try {
-			array_push($tagIds, ($this->tagService->getTag(TagService::UNSCANNED, false))->getId());
-		} catch (TagNotFoundException $e) {
-		}
 
+		$tagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
 		if ($unscannedTagIsDisabled) {
+			try {
+				array_push($tagIds, ($this->tagService->getTag(TagService::UNSCANNED, false))->getId());
+			} catch (TagNotFoundException $e) {
+			}
 			$excludedTagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
 			$fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, $quantity);
 		} else {
+			$this->tagService->getTag(TagService::UNSCANNED);
 			$fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
 		}
 
