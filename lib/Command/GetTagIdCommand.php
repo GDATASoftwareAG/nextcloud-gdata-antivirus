@@ -35,7 +35,7 @@ class GetTagIdCommand extends Command {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$tagName = $input->getArgument('tag-name');
 		try {
-			$tag = $this->tagService->getTag($tagName);
+			$tag = $this->tagService->getTag($tagName, false);
 		} catch (TagNotFoundException $e) {
 			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
 		}
