@@ -51,7 +51,7 @@ jobs:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: |
-          composer install
+          composer install --quiet
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
 
       - uses: docker-practice/actions-setup-docker@master
