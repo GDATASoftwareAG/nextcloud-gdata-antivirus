@@ -8,7 +8,7 @@ setup_nextcloud () {
   echo "setup nextcloud"
   docker stop nextcloud-container || echo "No container to stop"
   sleep 1
-  docker run -d --name nextcloud-container --rm --publish 80:80 nextcloud:$NEXTCLOUD_VERSION
+  docker run -d --name nextcloud-container --rm --publish 8080:80 nextcloud:$NEXTCLOUD_VERSION
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do
@@ -64,3 +64,6 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
 
 source install.local || echo "No additional install script found."
+
+# has to be done, to get the dev-requirements installed again
+composer install
