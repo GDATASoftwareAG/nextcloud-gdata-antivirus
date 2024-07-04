@@ -42,6 +42,14 @@ jobs:
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
           sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
 
+      - name: unittests
+        env:
+          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
+        run: |
+          composer install
+          ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
+
       - uses: docker-practice/actions-setup-docker@master
       - name: install nextcloud
         env:
