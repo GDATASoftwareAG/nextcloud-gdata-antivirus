@@ -18,7 +18,8 @@
 				"CharlieGerard.pride-vscode-themes",
 				"junstyle.php-cs-fixer",
 				"stylelint.vscode-stylelint",
-				"jetmartin.bats"
+				"jetmartin.bats",
+				"recca0120.vscode-phpunit"
 			]
 		}
 	},
