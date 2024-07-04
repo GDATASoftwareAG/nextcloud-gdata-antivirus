@@ -29,7 +29,6 @@ use OCP\Activity\IEvent;
 use OCP\Activity\IProvider;
 use OCP\IURLGenerator;
 use OCP\L10N\IFactory;
-use Psr\Log\LoggerInterface;
 
 class Provider implements IProvider {
 	public const TYPE_VIRUS_DETECTED = 'virus_detected';
@@ -45,12 +44,10 @@ class Provider implements IProvider {
 
 	/** @var IURLGenerator */
 	private $urlGenerator;
-	private LoggerInterface $logger;
 
-	public function __construct(IFactory $languageFactory, IURLGenerator $urlGenerator, LoggerInterface $logger) {
+	public function __construct(IFactory $languageFactory, IURLGenerator $urlGenerator) {
 		$this->languageFactory = $languageFactory;
 		$this->urlGenerator = $urlGenerator;
-		$this->logger = $logger;
 	}
 
 	public function parse($language, IEvent $event, ?IEvent $previousEvent = null) {
