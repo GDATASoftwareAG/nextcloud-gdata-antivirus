@@ -4,6 +4,7 @@ namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\IAppConfig;
+use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class ScanService {
