@@ -9,7 +9,6 @@
 
 namespace OCA\GDataVaas;
 
-use Coduo\PHPHumanizer\NumberHumanizer;
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCA\GDataVaas\Activity\Provider;
@@ -174,17 +173,8 @@ class AvirWrapper extends Wrapper {
 							->setType(Provider::TYPE_VIRUS_DETECTED);
 						$this->activityManager->publish($activity);
                         
-                        $sendMailOnVirusUpload = $this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload');
-                        if ($sendMailOnVirusUpload)
-                        {
-                            $message = "<html><body>";
-                            $message .= "<p>User '" . $owner . "' tried to upload an infected file that got blocked by G DATA Antivirus:</p>";
-                            $message .= "<p>File path: " . $path . "</p>";
-                            $message .= "<p>File size: " . NumberHumanizer::binarySuffix($filesize, 'de') . "</p>";
-                            $message .= "<p>Detected virus: " . $verdict->Detection . "</p>";
-                            $message .= "</body></html>";
-
-                            $this->mailService->notify("Infected file upload", $message);
+                        if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
+                            $this->mailService->notifyMaliciousUpload($verdict, $path, $owner, $filesize);
                         }
 
 						throw new InvalidContentException(
