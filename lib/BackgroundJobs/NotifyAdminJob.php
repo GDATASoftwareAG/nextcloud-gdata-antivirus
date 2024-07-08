@@ -74,7 +74,11 @@ class NotifyAdminJob extends TimedJob {
         
         if (count($maliciousFiles) > 0) {
             $this->logger->debug("Sending notification to admin");
-            $this->sendNotificationToAdmin($this->getFilesFromFileIds($maliciousFiles));
+            $this->mailService->notifyWeeklySummary($this->getFilesFromFileIds($maliciousFiles));
+        }
+        else
+        {
+            $this->logger->info("No malicious files found, no weekly summary sent");
         }
     }
 
@@ -93,21 +97,5 @@ class NotifyAdminJob extends TimedJob {
             }
         }
         return $files;
-    }
-
-    /**
-     * @param array $maliciousFiles
-     * @return void
-     * @throws \Exception
-     */
-    private function sendNotificationToAdmin(array $maliciousFiles): void
-    {
-        $subject = "Summary: Malicious files in your Nextcloud instance";
-        $message = "<html><body>The following files have been detected as malicious:<br><br><table><tr><th>File name</th><th>Path</th><th>Owner</th></tr>";
-        foreach ($maliciousFiles as $file) {
-            $message .= "<tr><td>" . $file->getName() . "</td><td>" . $file->getPath() . "</td><td>" . $file->getOwner()->getDisplayName() . "</td></tr>";
-        }
-        $message .= "</table></body></html>";
-        $this->mailService->notify($subject, $message);
     }
 }
