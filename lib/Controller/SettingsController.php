@@ -8,18 +8,34 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
+use OCP\Mail\IMailer;
 
 class SettingsController extends Controller {
 	private IAppConfig $config;
 	private TagService $tagService;
+    private IMailer $mailer;
 
-	public function __construct($appName, IRequest $request, IAppConfig $config, TagService $tagService) {
+	public function __construct($appName, IRequest $request, IAppConfig $config, TagService $tagService, IMailer $mailer) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
+        $this->mailer = $mailer;
 	}
 
 	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
+        if (!empty($notifyMails)) {
+            $mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
+            foreach ($mails as $mail) {
+                if ($this->mailer->validateMailAddress($mail) === false) {
+                    return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
+                }
+            }
+        }
+        if (!empty($scanQueueLength)) {
+            if (!is_numeric($scanQueueLength) || $scanQueueLength < 1) {
+                return new JSONResponse(['status' => 'error', 'message' => 'Invalid scan queue length']);
+            }
+        }
 		$this->config->setValueString($this->appName, 'username', $username);
 		$this->config->setValueString($this->appName, 'password', $password);
 		$this->config->setValueString($this->appName, 'clientId', $clientId);

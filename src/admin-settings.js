@@ -63,7 +63,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (response.status === "success") {
 			msgElement.textContent = 'Data saved successfully.';
 		} else {
-			msgElement.textContent = 'An error occurred when saving the data.';
+			if (response.message) {
+				msgElement.textContent = response.message;
+			}
+			else {
+				msgElement.textContent = 'An error occurred when saving the data.';
+			}
 		}
 	});
 
