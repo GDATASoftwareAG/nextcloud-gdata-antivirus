@@ -87,12 +87,6 @@ class MailService {
         if (empty($notifyMails)) {
             return [];
         }
-        foreach ($notifyMails as $mail) {
-            if ($this->mailer->validateMailAddress($mail) === false) {
-                $this->logger->error("Invalid email address: $mail");
-                return [];
-            }
-        }
         return explode(",", $notifyMails);
     }
 

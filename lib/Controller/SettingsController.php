@@ -7,18 +7,35 @@ use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\IConfig;
 use OCP\IRequest;
+use OCP\Mail\IMailer;
 
 class SettingsController extends Controller {
 	private IConfig $config;
 	private TagService $tagService;
+    private IMailer $mailer;
 
-	public function __construct($appName, IRequest $request, IConfig $config, TagService $tagService) {
+
+	public function __construct($appName, IRequest $request, IConfig $config, TagService $tagService, IMailer $mailer) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
+        $this->mailer = $mailer;
 	}
 
 	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
+        if (!empty($notifyMails)) {
+            $mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
+            foreach ($mails as $mail) {
+                if ($this->mailer->validateMailAddress($mail) === false) {
+                    return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
+                }
+            }
+        }
+        if (!empty($scanQueueLength)) {
+            if (!is_numeric($scanQueueLength) || $scanQueueLength < 1) {
+                return new JSONResponse(['status' => 'error', 'message' => 'Invalid scan queue length']);
+            }
+        }
 		$this->config->setAppValue($this->appName, 'username', $username);
 		$this->config->setAppValue($this->appName, 'password', $password);
 		$this->config->setAppValue($this->appName, 'clientId', $clientId);
@@ -28,7 +45,7 @@ class SettingsController extends Controller {
 		$this->config->setAppValue($this->appName, 'allowlist', $allowlist);
 		$this->config->setAppValue($this->appName, 'blocklist', $blocklist);
 		$this->config->setAppValue($this->appName, 'scanQueueLength', $scanQueueLength);
-		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
+		$this->config->setAppValue($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
 	}
 
