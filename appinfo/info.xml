@@ -47,14 +47,12 @@ If you have any questions about scanning, usage or similar, please feel free to 
 	<background-jobs>
 		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
 		<job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
+		<job>OCA\GDataVaas\BackgroundJobs\NotifyAdminJob</job>
 	</background-jobs>
 	<database>pgsql</database>
 	<database>mysql</database>
 	<database>sqlite</database>
     <activity>
-        <settings>
-            <setting>OCA\GDataVaas\Activity\Setting</setting>
-        </settings>
         <providers>
             <provider>OCA\GDataVaas\Activity\Provider</provider>
         </providers>

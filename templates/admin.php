@@ -57,6 +57,10 @@
                 <td><div title="<?php p($l->t('If you have activated "Automatic file scanning", the number of files set here will be scanned every five minutes. This setting should help to influence the server load. '));?>" class="visible"><label for="scan_queue_length"><?php p($l->t('Scan queue length'));?></label></div></td>
                 <td class="input_field"><input id="scan_queue_length" type="text" name="scan_queue_length" value="<?php p($_['scanQueueLength']); ?>"/></td>
             </tr>
+            <tr class="notify_mails">
+                <td><div title="<?php p($l->t('Mail addresses for notifications when malicious files are found or a user tries to upload them. Must be comma-separated.'));?>" class="visible"><label for="notify_mails"><?php p($l->t('Notify Mails'));?></label></div></td>
+                <td class="input_field"><input id="notify_mails" type="text" name="notify_mails" value="<?php p($_['notifyMail']); ?>"/></td>
+            </tr>
         </table>
         <input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
         <span id="auth_save_msg"></span>
@@ -105,6 +109,20 @@
                 <label for="disable_tag_unscanned"></label>
             </td>
             <td><div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", but they will still be scanned if "Automatic file scanning" is switched on.'));?>" class="visible"><label><?php p($l->t('Disable Unscanned tag'));?></label></div></td>
+        </tr>
+        <tr>
+            <td>
+                <input id="send_mail_on_virus_upload" class="toggle-round" type="checkbox">
+                <label for="send_mail_on_virus_upload"></label>
+            </td>
+            <td><div title="<?php p($l->t('If a user tries to upload an infected file an email is send to all \'Notify Mails\' receiver'));?>" class="visible"><label><?php p($l->t('Send mails on infected file upload'));?></label></div></td>
+        </tr>
+        <tr>
+            <td>
+                <input id="send_summary_mail_for_malicious_files" class="toggle-round" type="checkbox">
+                <label for="send_summary_mail_for_malicious_files"></label>
+            </td>
+            <td><div title="<?php p($l->t('Send a summary of found malicious files to all \'Notify Mails\' receiver'));?>" class="visible"><label><?php p($l->t('Send weekly mails with a summary of malicious files'));?></label></div></td>
         </tr>
     </table>
     <h3>
