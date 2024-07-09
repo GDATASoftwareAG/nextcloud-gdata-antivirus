@@ -19,7 +19,7 @@ use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IHomeStorage;
 use OCP\Files\Storage\IStorage;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\Util;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -75,7 +75,7 @@ class Application extends App implements IBootstrap {
 				$container = $this->getContainer();
 				$verdictService = $container->get(VerdictService::class);
                 $mailService = $container->get(MailService::class);
-                $appConfig = $container->get(IAppConfig::class);
+                $appConfig = $container->get(IConfig::class);
 				// $l10n = $container->get(IL10N::class);
 				$logger = $container->get(LoggerInterface::class);
 				$activityManager = $container->get(IManager::class);

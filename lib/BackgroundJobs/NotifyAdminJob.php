@@ -13,12 +13,12 @@ use OCP\DB\Exception;
 use OCP\Files\File;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class NotifyAdminJob extends TimedJob {
-    private IAppConfig $appConfig;
+    private IConfig $appConfig;
     private TagService $tagService;
     private DbFileMapper $dbFileMapper;
     private MailService $mailService;
@@ -26,7 +26,7 @@ class NotifyAdminJob extends TimedJob {
     private FileService $fileService;
     
     public function __construct(ITimeFactory    $time,
-                                IAppConfig      $appConfig,
+                                IConfig      $appConfig,
                                 TagService      $tagService,
                                 DbFileMapper    $dbFileMapper,
                                 LoggerInterface $logger,
@@ -56,7 +56,7 @@ class NotifyAdminJob extends TimedJob {
      * @throws \Exception
      */
     protected function run($argument): void {
-        $notifyAdminEnabled = $this->appConfig->getValueBool(Application::APP_ID, "notifyAdminEnabled");
+        $notifyAdminEnabled = $this->appConfig->getAppValue(Application::APP_ID, "notifyAdminEnabled");
         if (!$notifyAdminEnabled) {
             return;
         }

@@ -8,17 +8,17 @@ use OCA\GDataVaas\AppInfo\Application;
 use OCP\Files\File;
 use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Message\VaasVerdict;
 
 class MailService {
     private IMailer $mailer;
-    private IAppConfig $config;
+    private IConfig $config;
     private LoggerInterface $logger;
 
-    public function __construct(IMailer $mailer, IAppConfig $config, LoggerInterface $logger) {
+    public function __construct(IMailer $mailer, IConfig $config, LoggerInterface $logger) {
         $this->mailer = $mailer;
         $this->config = $config;
         $this->logger = $logger;
@@ -82,7 +82,7 @@ class MailService {
      * @return array
      */
     private function getNotifyMails(): array {
-        $notifyMails = $this->config->getValueString(Application::APP_ID, 'notifyMails');
+        $notifyMails = $this->config->getAppValue(Application::APP_ID, 'notifyMails');
         $notifyMails = preg_replace('/\s+/', '', $notifyMails);
         if (empty($notifyMails)) {
             return [];
