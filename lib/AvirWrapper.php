@@ -18,7 +18,7 @@ use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\InvalidContentException;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Message\Verdict;
@@ -32,7 +32,7 @@ class AvirWrapper extends Wrapper {
 
 	protected VerdictService $verdictService;
     protected MailService $mailService;
-    protected IAppConfig $appConfig;
+    protected IConfig $appConfig;
 
 	/** @var IL10N */
 	protected $l10n;
@@ -173,7 +173,7 @@ class AvirWrapper extends Wrapper {
 							->setType(Provider::TYPE_VIRUS_DETECTED);
 						$this->activityManager->publish($activity);
                         
-                        if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
+                        if ($this->appConfig->getAppValue(Application::APP_ID, 'sendMailOnVirusUpload')) {
                             $this->mailService->notifyMaliciousUpload($verdict, $path, $owner, $filesize);
                         }
 

@@ -118,20 +118,20 @@ class SettingsController extends Controller {
     }
     
     public function getSendMailOnVirusUpload(): JSONResponse{
-        return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
+        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'sendMailOnVirusUpload')]);
     }
 
     public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
-        $this->config->setValueBool($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
+        $this->config->setAppValue($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
         return new JSONResponse(['status' => 'success']);
     }
 
     public function getSendMailSummaryOfMaliciousFiles(): JSONResponse{
-        return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'notifyAdminEnabled')]);
+        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'notifyAdminEnabled')]);
     }
 
     public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
-        $this->config->setValueBool($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
+        $this->config->setAppValue($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
         return new JSONResponse(['status' => 'success']);
     }
 }
