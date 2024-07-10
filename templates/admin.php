@@ -64,6 +64,9 @@
         </table>
         <input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
         <span id="auth_save_msg"></span>
+        <div class="warning">
+            <strong>Caution:</strong> The use of the <em>"Scan only this"</em> and <em>"Do not scan this"</em> settings should be approached with caution. Using these settings allows malicious users to upload and distribute malicious content via the Nextcloud instance. It is recommended that you carefully consider the implications of these settings and use them in a way that does not jeopardize the security of your system and data.
+        </div>
         <div id="advanced_settings">
             <h3><?php p($l->t('Advanced Settings'));?></h3>
             <h4><?php p($l->t('If you are not sure about this, you can just leave it blank.'));?></h4>
