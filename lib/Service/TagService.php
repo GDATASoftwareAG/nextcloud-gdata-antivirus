@@ -51,6 +51,25 @@ class TagService {
 		return $tag;
 	}
 
+	private function addTagToArray(string $tagName, &$tagIds): array {
+		try {
+			array_push($tagIds, $this->getTag($tagName, false)->getId());
+		} catch (TagNotFoundException) {
+			$this->logger->error("Tag not found: " . $tagName);
+		}
+		return $tagIds;
+	}
+
+	private function getVaasTagIds(): array {
+		$vaasTagIds = [];
+		$vaasTagIds = $this->addTagToArray(self::CLEAN, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::MALICIOUS, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::PUP, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::UNSCANNED, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
+		return $vaasTagIds;
+	}
+
 	/**
 	 * @param int $fileId
 	 * @param string $tagName
@@ -59,10 +78,11 @@ class TagService {
 	public function setTag(int $fileId, string $tagName): void {
 		$tag = $this->tagService->getTag($tagName, true, false);
 		$filesTagIds = $this->tagMapper->getTagIdsForObjects($fileId, 'files');
+		$vaasTagIds = $this->getVaasTagIds();
 
 		if (isset($filesTagIds[$fileId])) {
 			foreach ($filesTagIds[$fileId] as $tagId) {
-				if ($tagId != $tag->getId()) {
+				if ($tagId != $tag->getId() && \in_array($tagId, $vaasTagIds)) {
 					$this->tagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
 				}
 			}
