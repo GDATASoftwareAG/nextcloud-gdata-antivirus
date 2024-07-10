@@ -27,7 +27,7 @@ class RemoveTagCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName('gdatavaas:remove-tag');
-		$this->setDescription('tags all files without tag from this app as unscanned');
+		$this->setDescription('deletes a tag');
 		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name want to delete.");
 	}
 
