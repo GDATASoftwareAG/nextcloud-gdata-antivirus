@@ -5,7 +5,6 @@ namespace OCA\GDataVaas\Service;
 use Exception;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\Files\EntityTooLargeException;
-use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
@@ -56,19 +55,18 @@ class VerdictService {
 		$this->password = $this->appConfig->getValueString(Application::APP_ID, 'password');
 	}
 
-	/**
-	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
+
+	/** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
 	 * @param int $fileId
 	 * @return VaasVerdict
-	 * @throws InvalidPathException
+	 * @throws EntityTooLargeException
+	 * @throws FileDoesNotExistException
 	 * @throws InvalidSha256Exception
 	 * @throws NotFoundException
-	 * @throws UploadFailedException
-	 * @throws TimeoutException
 	 * @throws NotPermittedException
-	 * @throws FileDoesNotExistException if the VaaS SDK could not find the file
-	 * @throws EntityTooLargeException if the file that should be scanned is too large
-	 * @throws VaasAuthenticationException if the authentication with the VaaS service fails
+	 * @throws TimeoutException
+	 * @throws UploadFailedException
+	 * @throws VaasAuthenticationException
 	 */
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
@@ -78,22 +76,8 @@ class VerdictService {
 			throw new EntityTooLargeException("File is too large");
 		}
 
-		$blocklist = $this->getBlocklist();
-		$this->logger->debug("Blocklist: " . implode(", ", $blocklist));
-		foreach ($blocklist as $blocklistItem) {
-			if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
-				$this->logger->debug("File " . $node->getName() . " (" . $fileId . ") is in the blocklist and will not be scanned.");
-				throw new NotPermittedException("File is in the blocklist");
-			}
-		}
-
-		$allowlist = $this->getAllowlist();
-		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
-		foreach ($allowlist as $allowlistItem) {
-			if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
-				$this->logger->debug("File " . $node->getName() . " (" . $fileId . ") is not in the allowlist and will not be scanned.");
-				throw new NotPermittedException("File is not in the allowlist");
-			}
+		if (!$this->isAllowedByAllowAndBlocklist($filePath)) {
+			throw new NotPermittedException("File is not allowed to be scanned by the allowlist/blocklist");
 		}
 
 		$verdict = $this->scan($filePath);
@@ -146,7 +130,12 @@ class VerdictService {
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
 	 * @param string $filePath The local path to the file to scan.
-	 * @return VaasVerdict The verdict.
+	 * @return VaasVerdict
+	 * @throws FileDoesNotExistException
+	 * @throws InvalidSha256Exception
+	 * @throws TimeoutException
+	 * @throws UploadFailedException
+	 * @throws VaasAuthenticationException
 	 */
 	public function scan(string $filePath): VaasVerdict {
 		$this->lastLocalPath = $filePath;
@@ -183,7 +172,7 @@ class VerdictService {
 
 
 	/**
-	 * Tag the file that was scanned last with it's verdict. Call this from an EventListener on CacheEntryInsertedEvent or
+	 * Tag the file that was scanned last with its verdict. Call this from an EventListener on CacheEntryInsertedEvent or
 	 * CacheEntryUpdatedEvent.
 	 * @param string $localPath The local path.
 	 * @param int $fileId The corresponding file id to tag.
@@ -191,6 +180,10 @@ class VerdictService {
 	public function tagLastScannedFile(string $localPath, int $fileId): void {
 		if (self::isFileTooLargeToScan($localPath)) {
 			$this->tagFile($fileId, TagService::WONT_SCAN);
+			return;
+		}
+		if (!$this->isAllowedByAllowAndBlocklist($localPath)) {
+			$this->tagFile($fileId, TagService::UNSCANNED);
 			return;
 		}
 		if ($localPath === $this->lastLocalPath) {
@@ -251,5 +244,28 @@ class VerdictService {
 		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
 		$vaas->Connect($this->authenticator->getToken());
 		return $vaas;
+	}
+
+	/**
+	 * Checks if the file is in the blocklist or not in the allowlist and throws an exception if it is not allowed to scan the file.
+	 * @param string $filePath
+	 * @return bool
+	 */
+	public function isAllowedByAllowAndBlocklist(string $filePath): bool {
+		$blocklist = $this->getBlocklist();
+		$this->logger->debug("Blocklist: " . implode(", ", $blocklist));
+		foreach ($blocklist as $blocklistItem) {
+			if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
+				return false;
+			}
+		}
+		$allowlist = $this->getAllowlist();
+		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
+		foreach ($allowlist as $allowlistItem) {
+			if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
