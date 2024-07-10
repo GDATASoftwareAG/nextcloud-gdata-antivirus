@@ -27,7 +27,7 @@ class GetTagIdCommand extends Command {
 	 */
 	protected function configure() {
 		$this->setName('gdatavaas:get-tag-id');
-		$this->setDescription('tags all files without tag from this app as unscanned');
+		$this->setDescription('Gets the ID of a tag');
 		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name you want to get the id for.");
 	}
 
