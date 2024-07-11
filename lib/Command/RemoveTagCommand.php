@@ -39,6 +39,7 @@ class RemoveTagCommand extends Command {
 			$this->tagService->removeTag($tagName);
 		} catch (TagNotFoundException $e) {
 			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
+			return 1;
 		}
 		return 0;
 	}
