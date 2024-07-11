@@ -32,14 +32,14 @@ class TagServiceTest extends TestCase {
 		$tagMapper->expects($unassignTagsMatcher)->method('unassignTags')->willReturnCallback(function ($objectId, $objectType, $tagIds) use ($unassignTagsMatcher) {
 			switch($unassignTagsMatcher->numberOfInvocations()) {
 				case 1:
-					$this->assertEquals($objectId, strval(self::$OBJECT_ID_1));
-					$this->assertEquals($objectType, 'files');
-					$this->assertEquals($tagIds, [TagService::CLEAN]);
+					$this->assertEquals(strval(self::$OBJECT_ID_1), $objectId);
+					$this->assertEquals('files', $objectType);
+					$this->assertEquals([TagService::CLEAN], $tagIds);
 					break;
 				case 2:
-					$this->assertEquals($objectId, strval(self::$OBJECT_ID_1));
-					$this->assertEquals($objectType, 'files');
-					$this->assertEquals($tagIds, [TagService::MALICIOUS]);
+					$this->assertEquals(strval(self::$OBJECT_ID_1), $objectId);
+					$this->assertEquals('files', $objectType);
+					$this->assertEquals([TagService::MALICIOUS], $tagIds);
 					break;
 				default: $this->fail("Unexpected number of calls to unassignTags");
 			}
