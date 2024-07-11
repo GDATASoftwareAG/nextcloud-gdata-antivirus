@@ -52,9 +52,9 @@ class Application extends App implements IBootstrap {
 			require_once $composerAutoloadFile;
 		}
 
-        CacheEntryListener::register($context);
+		CacheEntryListener::register($context);
 
-        // Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
+		// Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
 		Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
 	}
 

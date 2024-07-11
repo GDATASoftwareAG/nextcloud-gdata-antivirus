@@ -15,7 +15,7 @@ class TagServiceTest extends TestCase {
 
 	private function getTagManager(): ISystemTagManager {
 		$tagManager = $this->createMock(ISystemTagManager::class);
-		$tagManager->method('getTag')->willReturnCallback(function ($name, $create) {
+		$tagManager->method('getTag')->willReturnCallback(function ($name) {
 			$tag = $this->createMock(ISystemTag::class);
 			$tag->method('getId')->willReturn($name);
 			return $tag;

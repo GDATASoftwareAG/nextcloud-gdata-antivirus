@@ -38,8 +38,8 @@ class VerdictService {
 	private ?Vaas $vaas = null;
 	private LoggerInterface $logger;
 
-    private string $lastLocalPath = "";
-    private ?VaasVerdict $lastVaasVerdict = null;
+	private string $lastLocalPath = "";
+	private ?VaasVerdict $lastVaasVerdict = null;
 
 	public function __construct(LoggerInterface $logger, IAppConfig $appConfig, FileService $fileService, TagService $tagService) {
 		$this->logger = $logger;
@@ -102,44 +102,45 @@ class VerdictService {
 			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
 			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
 
-        $this->tagFile($fileId, $verdict->Verdict->value);
+		$this->tagFile($fileId, $verdict->Verdict->value);
 
 		return $verdict;
 	}
 
-    private function tagFile(int $fileId, string $tagName) {
-        switch ($tagName) {
-            case TagService::MALICIOUS:
-                $this->tagService->setTag($fileId, TagService::MALICIOUS);
-                try {
-                    $this->fileService->setMaliciousPrefixIfActivated($fileId);
-                    $this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
-                } catch (Exception) {
-                }
-                break;
+	private function tagFile(int $fileId, string $tagName) {
+		switch ($tagName) {
+			case TagService::MALICIOUS:
+				$this->tagService->setTag($fileId, TagService::MALICIOUS);
+				try {
+					$this->fileService->setMaliciousPrefixIfActivated($fileId);
+					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+				} catch (Exception) {
+				}
+				break;
 			case TagService::UNSCANNED:
 				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
-				if (!$unscannedTagIsDisabled)
+				if (!$unscannedTagIsDisabled) {
 					$this->tagService->setTag($fileId, $tagName);
+				}
 				break;
-            case TagService::CLEAN:
-            case TagService::PUP:
-            case TagService::WONT_SCAN:
-            default:
-                $this->tagService->setTag($fileId, $tagName);
-                break;
-        }
-    }
+			case TagService::CLEAN:
+			case TagService::PUP:
+			case TagService::WONT_SCAN:
+			default:
+				$this->tagService->setTag($fileId, $tagName);
+				break;
+		}
+	}
 
 	/**
 	 * Checks if a file is too large to be scanned.
 	 * @param string $path
 	 * @return bool
 	 */
-    public static function isFileTooLargeToScan(string $path): bool {
-        $size = filesize($path);
-        return ($size === false) || $size > self::MAX_FILE_SIZE;
-    }
+	public static function isFileTooLargeToScan(string $path): bool {
+		$size = filesize($path);
+		return ($size === false) || $size > self::MAX_FILE_SIZE;
+	}
 
 
 	/**
@@ -147,9 +148,9 @@ class VerdictService {
 	 * @param string $filePath The local path to the file to scan.
 	 * @return VaasVerdict The verdict.
 	 */
-	 public function scan(string $filePath): VaasVerdict {
-        $this->lastLocalPath = $filePath;
-        $this->lastVaasVerdict = null;
+	public function scan(string $filePath): VaasVerdict {
+		$this->lastLocalPath = $filePath;
+		$this->lastVaasVerdict = null;
 
 		if ($this->vaas == null) {
 			$this->vaas = $this->createAndConnectVaas();
@@ -158,7 +159,7 @@ class VerdictService {
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
 
-            $this->lastVaasVerdict = $verdict;
+			$this->lastVaasVerdict = $verdict;
 
 			return $verdict;
 		} catch (Exception $e) {
@@ -174,12 +175,11 @@ class VerdictService {
 	 * @param string $localSource The local source path.
 	 * @param string $localTarget The local destination path.
 	 */
-    public function onRename(string $localSource, string $localTarget): void
-    {
-        if ($localSource === $this->lastLocalPath) {
-            $this->lastLocalPath = $localTarget;
-        }
-    }
+	public function onRename(string $localSource, string $localTarget): void {
+		if ($localSource === $this->lastLocalPath) {
+			$this->lastLocalPath = $localTarget;
+		}
+	}
 
 
 	/**
@@ -188,19 +188,19 @@ class VerdictService {
 	 * @param string $localPath The local path.
 	 * @param int $fileId The corresponding file id to tag.
 	 */
-    public function tagLastScannedFile(string $localPath, int $fileId): void {
-        if (self::isFileTooLargeToScan($localPath)) {
-            $this->tagFile($fileId, TagService::WONT_SCAN);
-            return;
-        }
-        if ($localPath === $this->lastLocalPath) {
-            if ($this->lastVaasVerdict !== null) {
-                $this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
-            } else {
+	public function tagLastScannedFile(string $localPath, int $fileId): void {
+		if (self::isFileTooLargeToScan($localPath)) {
+			$this->tagFile($fileId, TagService::WONT_SCAN);
+			return;
+		}
+		if ($localPath === $this->lastLocalPath) {
+			if ($this->lastVaasVerdict !== null) {
+				$this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
+			} else {
 				$this->tagFile($fileId, TagService::UNSCANNED);
-            }
-        }
-    }
+			}
+		}
+	}
 
 	/**
 	 * Parses the allowlist from the app settings and returns it as an array.
