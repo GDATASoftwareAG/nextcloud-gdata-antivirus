@@ -41,7 +41,7 @@ class GetTagIdCommand extends Command {
 			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
 			return 1;
 		}
-        $logger->info("tag: ".$tag->getId());
-        return 0;
+		$logger->info("tag: ".$tag->getId());
+		return 0;
 	}
 }

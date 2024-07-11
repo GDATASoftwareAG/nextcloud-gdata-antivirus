@@ -13,7 +13,7 @@ use Psr\Log\Test\TestLogger;
 class TagServiceTest extends TestCase {
 	public static int $OBJECT_ID_1 = 1;
 
-    private function getTagManager(): ISystemTagManager {
+	private function getTagManager(): ISystemTagManager {
 		$tagManager = $this->createMock(ISystemTagManager::class);
 		$tagManager->method('getTag')->willReturnCallback(function ($name) {
 			$tag = $this->createMock(ISystemTag::class);
@@ -23,7 +23,7 @@ class TagServiceTest extends TestCase {
 		return $tagManager;
 	}
 
-    public function testSetWontScan_ShouldDeleteCleanAndMaliciousAndAssignWontScan(): void {
+	public function testSetWontScan_ShouldDeleteCleanAndMaliciousAndAssignWontScan(): void {
 		$tagManager = $this->getTagManager();
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -52,7 +52,7 @@ class TagServiceTest extends TestCase {
 		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
 	}
 
-    public function testSetWontScan_TagAlreadySet_ShouldNotDoAnything(): void {
+	public function testSetWontScan_TagAlreadySet_ShouldNotDoAnything(): void {
 		$tagManager = $this->getTagManager();
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -66,7 +66,7 @@ class TagServiceTest extends TestCase {
 		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
 	}
 
-    public function testSetWontScan_UnscannedTagDoesNotExist_ShouldTagFileWithWontScan_WithNoException(): void {
+	public function testSetWontScan_UnscannedTagDoesNotExist_ShouldTagFileWithWontScan_WithNoException(): void {
 		$tagManager = $this->getTagManager();
 		
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -80,7 +80,7 @@ class TagServiceTest extends TestCase {
 		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
 	}
 
-    public function testSetWontScan_NoneVaasTagIsSet_ShouldTagFileWithWontScan_AndNotDeleteTheNoneVaasTag(): void {
+	public function testSetWontScan_NoneVaasTagIsSet_ShouldTagFileWithWontScan_AndNotDeleteTheNoneVaasTag(): void {
 		$tagManager = $this->getTagManager();
 		
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);

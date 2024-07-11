@@ -6,9 +6,9 @@ namespace OCA\GDataVaas\AppInfo;
 
 use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
+use OCA\GDataVaas\CacheEntryListener;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCA\GDataVaas\CacheEntryListener;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
@@ -74,8 +74,8 @@ class Application extends App implements IBootstrap {
 
 				$container = $this->getContainer();
 				$verdictService = $container->get(VerdictService::class);
-                $mailService = $container->get(MailService::class);
-                $appConfig = $container->get(IAppConfig::class);
+				$mailService = $container->get(MailService::class);
+				$appConfig = $container->get(IAppConfig::class);
 				// $l10n = $container->get(IL10N::class);
 				$logger = $container->get(LoggerInterface::class);
 				$activityManager = $container->get(IManager::class);
@@ -84,8 +84,8 @@ class Application extends App implements IBootstrap {
 				return new AvirWrapper([
 					'storage' => $storage,
 					'verdictService' => $verdictService,
-                    'mailService' => $mailService,
-                    'appConfig' => $appConfig,
+					'mailService' => $mailService,
+					'appConfig' => $appConfig,
 					//'l10n' => $l10n,
 					'logger' => $logger,
 					'activityManager' => $activityManager,

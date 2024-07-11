@@ -31,8 +31,8 @@ class AvirWrapper extends Wrapper {
 	private $writingModes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
 	protected VerdictService $verdictService;
-    protected MailService $mailService;
-    protected IAppConfig $appConfig;
+	protected MailService $mailService;
+	protected IAppConfig $appConfig;
 
 	/** @var IL10N */
 	protected $l10n;
@@ -58,8 +58,8 @@ class AvirWrapper extends Wrapper {
 	public function __construct($parameters) {
 		parent::__construct($parameters);
 		$this->verdictService = $parameters['verdictService'];
-        $this->mailService = $parameters['mailService'];
-        $this->appConfig = $parameters['appConfig'];
+		$this->mailService = $parameters['mailService'];
+		$this->appConfig = $parameters['appConfig'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
@@ -172,10 +172,10 @@ class AvirWrapper extends Wrapper {
 							->setAffectedUser($owner)
 							->setType(Provider::TYPE_VIRUS_DETECTED);
 						$this->activityManager->publish($activity);
-                        
-                        if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
-                            $this->mailService->notifyMaliciousUpload($verdict, $path, $owner, $filesize);
-                        }
+						
+						if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
+							$this->mailService->notifyMaliciousUpload($verdict, $path, $owner, $filesize);
+						}
 
 						throw new InvalidContentException(
 							sprintf(

@@ -24,7 +24,7 @@ class ScanServiceTest extends TestCase {
 		$this->logger = new TestLogger();
 	}
 
-    public function testRun_unscannedTagDisabled_unscannedTagShouldNotBeCreated(): void {
+	public function testRun_unscannedTagDisabled_unscannedTagShouldNotBeCreated(): void {
 		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
@@ -109,7 +109,7 @@ class ScanServiceTest extends TestCase {
 		$scanService->run();
 	}
 
-    public function testRun_unscannedTagEnabled_unscannedTagShouldBeCreated(): void {
+	public function testRun_unscannedTagEnabled_unscannedTagShouldBeCreated(): void {
 		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
