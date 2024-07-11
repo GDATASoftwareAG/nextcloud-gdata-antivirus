@@ -32,7 +32,7 @@ class TagServiceTest extends TestCase {
      * @return void
      * @throws Exception
      */
-    public function testSetWontScan_ShouldDeleteCleanAndMaliciousAndAssignWontScan() {
+    public function testSetWontScan_ShouldDeleteCleanAndMaliciousAndAssignWontScan(): void {
 		$tagManager = $this->getTagManager();
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -65,7 +65,7 @@ class TagServiceTest extends TestCase {
      * @return void
      * @throws Exception
      */
-    public function testSetWontScan_TagAlreadySet_ShouldNotDoAnything() {
+    public function testSetWontScan_TagAlreadySet_ShouldNotDoAnything(): void {
 		$tagManager = $this->getTagManager();
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -83,7 +83,7 @@ class TagServiceTest extends TestCase {
      * @return void
      * @throws Exception
      */
-    public function testSetWontScan_UnscannedTagDoesNotExist_ShouldTagFileWithWontScan_WithNoException() {
+    public function testSetWontScan_UnscannedTagDoesNotExist_ShouldTagFileWithWontScan_WithNoException(): void {
 		$tagManager = $this->getTagManager();
 		
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
@@ -101,7 +101,7 @@ class TagServiceTest extends TestCase {
      * @return void
      * @throws Exception
      */
-    public function testSetWontScan_NoneVaasTagIsSet_ShouldTagFileWithWontScan_AndNotDeleteTheNoneVaasTag() {
+    public function testSetWontScan_NoneVaasTagIsSet_ShouldTagFileWithWontScan_AndNotDeleteTheNoneVaasTag(): void {
 		$tagManager = $this->getTagManager();
 		
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
