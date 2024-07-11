@@ -23,7 +23,7 @@ class ScanCommand extends Command {
 	/**
 	 * @return void
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		$this->setName('gdatavaas:scan');
 		$this->setDescription('scan files for malware');
 	}

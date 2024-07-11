@@ -3,7 +3,9 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
+use OCP\DB\Exception;
 use OCP\IAppConfig;
+use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
 
 class ScanService {
@@ -30,28 +32,28 @@ class ScanService {
 
 	/**
 	 * @return int how many files where actually processed
-	 * @throws \OCP\DB\Exception if the database platform is not supported
+	 * @throws Exception if the database platform is not supported
 	 */
 	public function run(): int {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
-		$quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength');
-		try {
-			$quantity = intval($quantity);
-		} catch (\Exception) {
-			$quantity = 5;
-		}
+		$quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength', 50);
 
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
 		$pupTag = $this->tagService->getTag(TagService::PUP);
 		$cleanTag = $this->tagService->getTag(TagService::CLEAN);
-		$unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
 		$wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
 
+		$tagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
 		if ($unscannedTagIsDisabled) {
-			$excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
+			try {
+				array_push($tagIds, ($this->tagService->getTag(TagService::UNSCANNED, false))->getId());
+			} catch (TagNotFoundException) {
+			}
+			$excludedTagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
 			$fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, $quantity);
 		} else {
-			$fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity, 0);
+			$this->tagService->getTag(TagService::UNSCANNED);
+			$fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $quantity);
 		}
 
 		$this->logger->debug("Scanning files");

@@ -10,6 +10,7 @@ use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\SystemTag\TagAlreadyExistsException;
 use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
+use function in_array;
 
 class TagService {
 	public const CLEAN = 'Clean';
@@ -51,17 +52,50 @@ class TagService {
 		return $tag;
 	}
 
+	private function addTagToArray(string $tagName, &$tagIds): array {
+		try {
+			array_push($tagIds, $this->getTag($tagName, false)->getId());
+		} catch (TagNotFoundException) {
+			$this->logger->error("Tag not found: " . $tagName);
+		}
+		return $tagIds;
+	}
+
+	private function getVaasTagIds(): array {
+		$vaasTagIds = [];
+		$vaasTagIds = $this->addTagToArray(self::CLEAN, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::MALICIOUS, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::PUP, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::UNSCANNED, $vaasTagIds);
+		$vaasTagIds = $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
+		return $vaasTagIds;
+	}
+
 	/**
 	 * @param int $fileId
 	 * @param string $tagName
 	 * @return void
 	 */
 	public function setTag(int $fileId, string $tagName): void {
-		$tag = $this->getTag($tagName);
+		$tag = $this->tagService->getTag($tagName, true, false);
+		$filesTagIds = $this->tagMapper->getTagIdsForObjects($fileId, 'files');
+		$vaasTagIds = $this->getVaasTagIds();
+
+		if (isset($filesTagIds[$fileId])) {
+			foreach ($filesTagIds[$fileId] as $tagId) {
+				if ($tagId != $tag->getId() && in_array($tagId, $vaasTagIds)) {
+					$this->tagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
+				}
+			}
+			if (in_array($tag->getId(), $filesTagIds[$fileId])) {
+				return;
+			}
+		}
 		$this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
+
 		$this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
 	}
-
+	
 	/**
 	 * @param string $tagName
 	 * @param int $fileId
@@ -76,14 +110,6 @@ class TagService {
 		} catch (TagNotFoundException) {
 			return false;
 		}
-	}
-
-	public function removeAllTagsFromFile(int $fileId): void {
-		$this->removeTagFromFile(TagService::CLEAN, $fileId);
-		$this->removeTagFromFile(TagService::MALICIOUS, $fileId);
-		$this->removeTagFromFile(TagService::PUP, $fileId);
-		$this->removeTagFromFile(TagService::UNSCANNED, $fileId);
-		$this->removeTagFromFile(TagService::WONT_SCAN, $fileId);
 	}
 
 	/**
@@ -112,14 +138,14 @@ class TagService {
 		return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED)->getId());
 	}
 
-    /**
-     * Checks if a file has any Vaas tag.
-     * @param int $fileId
-     * @return bool
-     */
-    public function hasAnyVaasTag(int $fileId): bool {
-        return $this->hasAnyButUnscannedTag($fileId) || $this->hasUnscannedTag($fileId);
-    }
+	/**
+	 * Checks if a file has any Vaas tag.
+	 * @param int $fileId
+	 * @return bool
+	 */
+	public function hasAnyVaasTag(int $fileId): bool {
+		return $this->hasAnyButUnscannedTag($fileId) || $this->hasUnscannedTag($fileId);
+	}
 
 	/**
 	 * @param string $tagName
@@ -197,22 +223,22 @@ class TagService {
 		$this->logger->info("All tags removed");
 	}
 
-    /**
-     * @return array
-     * @throws Exception
-     */
-    public function getScannedFilesCount(): array {
-        $tags = [
-            $this->getTag(self::CLEAN)->getId(),
-            $this->getTag(self::MALICIOUS)->getId(),
-            $this->getTag(self::PUP)->getId(),
-            $this->getTag(self::WONT_SCAN)->getId()
-        ];
-        $allFiles = $this->dbFileMapper->getFilesCount();
-        $scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tags, $allFiles);
-        return [
-            'all' => $allFiles,
-            'scanned' => count($scannedFiles)
-        ];
-    }
+	/**
+	 * @return array
+	 * @throws Exception
+	 */
+	public function getScannedFilesCount(): array {
+		$tags = [
+			$this->getTag(self::CLEAN)->getId(),
+			$this->getTag(self::MALICIOUS)->getId(),
+			$this->getTag(self::PUP)->getId(),
+			$this->getTag(self::WONT_SCAN)->getId()
+		];
+		$allFiles = $this->dbFileMapper->getFilesCount();
+		$scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tags, $allFiles);
+		return [
+			'all' => $allFiles,
+			'scanned' => count($scannedFiles)
+		];
+	}
 }

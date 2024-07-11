@@ -12,44 +12,41 @@ use OCP\Files\Cache\CacheEntryInsertedEvent;
 use OCP\Files\Cache\CacheEntryUpdatedEvent;
 use Psr\Log\LoggerInterface;
 
-class CacheEntryListener implements IEventListener
-{
-    private LoggerInterface $logger;
+class CacheEntryListener implements IEventListener {
+	private LoggerInterface $logger;
 
-    private TagService $tagService;
+	private TagService $tagService;
 
-    private VerdictService $verdictService;
+	private VerdictService $verdictService;
 
-    public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService)
-    {
-        $this->logger = $logger;
-        $this->tagService = $tagService;
-        $this->verdictService = $verdictService;
-    }
+	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService) {
+		$this->logger = $logger;
+		$this->tagService = $tagService;
+		$this->verdictService = $verdictService;
+	}
 
-    public static function register(IRegistrationContext $context): void {
-        $context->registerEventListener(CacheEntryInsertedEvent::class, CacheEntryListener::class);
-        $context->registerEventListener(CacheEntryUpdatedEvent::class, CacheEntryListener::class);
-    }
+	public static function register(IRegistrationContext $context): void {
+		$context->registerEventListener(CacheEntryInsertedEvent::class, CacheEntryListener::class);
+		$context->registerEventListener(CacheEntryUpdatedEvent::class, CacheEntryListener::class);
+	}
 
-    public function handle(Event $event): void
-    {
-        if (!$event instanceof AbstractCacheEvent) {
-            return;
-        }
+	public function handle(Event $event): void {
+		if (!$event instanceof AbstractCacheEvent) {
+			return;
+		}
 
-        $storage = $event->getStorage();
-        $path = $event->getPath();
-        $fileId = $event->getFileId();
+		$storage = $event->getStorage();
+		$path = $event->getPath();
+		$fileId = $event->getFileId();
 
-        if (self::shouldTag($path) && !$this->tagService->hasAnyVaasTag($fileId)) {
-            $this->logger->debug("Handling " . get_class($event) . " for " . $path);
+		if (self::shouldTag($path) && !$this->tagService->hasAnyVaasTag($fileId)) {
+			$this->logger->debug("Handling " . get_class($event) . " for " . $path);
 
-            $this->verdictService->tagLastScannedFile($storage->getLocalFile($path), $fileId);
-        }
-    }
+			$this->verdictService->tagLastScannedFile($storage->getLocalFile($path), $fileId);
+		}
+	}
 
-    private static function shouldTag(string $path): bool {
-        return str_starts_with($path, 'files/');
-    }
+	private static function shouldTag(string $path): bool {
+		return str_starts_with($path, 'files/');
+	}
 }

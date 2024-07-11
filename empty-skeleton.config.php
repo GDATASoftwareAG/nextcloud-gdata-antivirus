@@ -1,4 +1,5 @@
 <?php
-$CONFIG = array (
-  'skeletondirectory' => '',
-);
+
+$CONFIG = [
+	'skeletondirectory' => '',
+];
