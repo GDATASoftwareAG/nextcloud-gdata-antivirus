@@ -82,20 +82,20 @@ class NotifyAdminJob extends TimedJob {
         }
     }
 
-    /**
-     * @param array $fileIds
-     * @return array
-     * @throws NotFoundException
-     * @throws NotPermittedException
-     */
-    private function getFilesFromFileIds(array $fileIds): array {
-        $files = [];
-        foreach ($fileIds as $fileId) {
-            $file = $this->fileService->getNodeFromFileId($fileId);
-            if ($file instanceof File) {
-                $files[] = $file;
-            }
-        }
-        return $files;
-    }
+	/**
+	 * @param array $fileIds
+	 * @return array
+	 * @throws NotFoundException
+	 * @throws NotPermittedException
+	 */
+	private function getFilesFromFileIds(array $fileIds): array {
+		$files = [];
+		foreach ($fileIds as $fileId) {
+			$file = $this->fileService->getNodeFromFileId($fileId);
+			if ($file instanceof File) {
+				$files[] = $file;
+			}
+		}
+		return $files;
+	}
 }

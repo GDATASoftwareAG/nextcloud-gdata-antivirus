@@ -12,14 +12,14 @@ use OCP\Mail\IMailer;
 class SettingsController extends Controller {
 	private IConfig $config;
 	private TagService $tagService;
-    private IMailer $mailer;
+	private IMailer $mailer;
 
 
 	public function __construct($appName, IRequest $request, IConfig $config, TagService $tagService, IMailer $mailer) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
-        $this->mailer = $mailer;
+		$this->mailer = $mailer;
 	}
 
 	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {

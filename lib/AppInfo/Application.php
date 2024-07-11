@@ -6,9 +6,9 @@ namespace OCA\GDataVaas\AppInfo;
 
 use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
+use OCA\GDataVaas\CacheEntryListener;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCA\GDataVaas\CacheEntryListener;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
@@ -52,9 +52,9 @@ class Application extends App implements IBootstrap {
 			require_once $composerAutoloadFile;
 		}
 
-        CacheEntryListener::register($context);
+		CacheEntryListener::register($context);
 
-        // Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
+		// Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
 		Util::connectHook('OC_Filesystem', 'preSetup', $this, 'setupWrapper');
 	}
 
@@ -84,8 +84,8 @@ class Application extends App implements IBootstrap {
 				return new AvirWrapper([
 					'storage' => $storage,
 					'verdictService' => $verdictService,
-                    'mailService' => $mailService,
-                    'appConfig' => $appConfig,
+					'mailService' => $mailService,
+					'appConfig' => $appConfig,
 					//'l10n' => $l10n,
 					'logger' => $logger,
 					'activityManager' => $activityManager,

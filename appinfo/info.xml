@@ -37,6 +37,8 @@ If you have any questions about scanning, usage or similar, please feel free to 
         <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
     </settings>
     <commands>
+        <command>OCA\GDataVaas\Command\GetTagIdCommand</command>
+        <command>OCA\GDataVaas\Command\RemoveTagCommand</command>
         <command>OCA\GDataVaas\Command\ScanCommand</command>
         <command>OCA\GDataVaas\Command\TagUnscannedCommand</command>
         <command>OCA\GDataVaas\Command\GetTagsForFileCommand</command>
