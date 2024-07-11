@@ -4,6 +4,7 @@ namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
 use OCA\GDataVaas\Service\TagService;
+use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -25,7 +26,7 @@ class RemoveTagCommand extends Command {
 	/**
 	 * @return void
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		$this->setName('gdatavaas:remove-tag');
 		$this->setDescription('deletes a tag');
 		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name want to delete.");
