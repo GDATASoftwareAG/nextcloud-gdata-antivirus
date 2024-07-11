@@ -9,14 +9,21 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "^8.0.2",
+		"gdata/vaas": "9.0.0",
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "dev-stable29",
+		"nextcloud/ocp": "v29.0.3",
 		"psalm/phar": "5.25.0",
 		"nextcloud/coding-standard": "v1.2.1",
-		"symfony/console": "v7.1.2"
+		"phpunit/phpunit": "^11.2",
+		"symfony/console": "^7.1"
+	},
+	"autoload": {
+		"psr-4": {
+			"OCP\\": "vendor/nextcloud/ocp/OCP",
+			"OCA\\GDataVaas\\": "lib"
+		}
 	},
 	"scripts": {
 		"lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",

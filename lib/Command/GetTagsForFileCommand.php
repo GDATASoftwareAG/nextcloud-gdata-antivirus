@@ -32,7 +32,7 @@ class GetTagsForFileCommand extends Command {
 	/**
 	 * @return void
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		$this->setName('gdatavaas:get-tags-for-file');
 		$this->setDescription('get tags for file');
 		
