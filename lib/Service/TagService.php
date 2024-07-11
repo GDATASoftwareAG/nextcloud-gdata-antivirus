@@ -10,6 +10,7 @@ use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\SystemTag\TagAlreadyExistsException;
 use OCP\SystemTag\TagNotFoundException;
 use Psr\Log\LoggerInterface;
+use function in_array;
 
 class TagService {
 	public const CLEAN = 'Clean';
@@ -82,11 +83,11 @@ class TagService {
 
 		if (isset($filesTagIds[$fileId])) {
 			foreach ($filesTagIds[$fileId] as $tagId) {
-				if ($tagId != $tag->getId() && \in_array($tagId, $vaasTagIds)) {
+				if ($tagId != $tag->getId() && in_array($tagId, $vaasTagIds)) {
 					$this->tagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
 				}
 			}
-			if (\in_array($tag->getId(), $filesTagIds[$fileId])) {
+			if (in_array($tag->getId(), $filesTagIds[$fileId])) {
 				return;
 			}
 		}

@@ -7,6 +7,7 @@ use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\ScanService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
+use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\SystemTag\ISystemTag;
 use OCP\SystemTag\ISystemTagManager;
@@ -24,7 +25,12 @@ class ScanServiceTest extends TestCase {
 		$this->logger = new TestLogger();
 	}
 
-	public function testRun_unscannedTagDisabled_unscannedTagShouldNotBeCreated() {
+    /**
+     * @return void
+     * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    public function testRun_unscannedTagDisabled_unscannedTagShouldNotBeCreated() {
 		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
@@ -109,7 +115,12 @@ class ScanServiceTest extends TestCase {
 		$scanService->run();
 	}
 
-	public function testRun_unscannedTagEnabled_unscannedTagShouldBeCreated() {
+    /**
+     * @return void
+     * @throws Exception
+     * @throws \PHPUnit\Framework\MockObject\Exception
+     */
+    public function testRun_unscannedTagEnabled_unscannedTagShouldBeCreated() {
 		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
