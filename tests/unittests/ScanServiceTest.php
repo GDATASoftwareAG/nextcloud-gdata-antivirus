@@ -57,8 +57,8 @@ class ScanServiceTest extends TestCase {
 						throw new TagNotFoundException();
 					case 5:
 						$this->assertEquals(TagService::UNSCANNED, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						throw new TagNotFoundException();
 					default: $this->fail("Unexpected number of calls to unassignTags");
 				}
@@ -72,23 +72,23 @@ class ScanServiceTest extends TestCase {
 				switch($createTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 2:
 						$this->assertEquals(TagService::PUP, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 3:
 						$this->assertEquals(TagService::CLEAN, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 4:
 						$this->assertEquals(TagService::WONT_SCAN, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					default: $this->fail("Unexpected number of calls to unassignTags");
 				}
@@ -142,8 +142,8 @@ class ScanServiceTest extends TestCase {
 						throw new TagNotFoundException();
 					case 5:
 						$this->assertEquals(TagService::UNSCANNED, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						throw new TagNotFoundException();
 					default: $this->fail("Unexpected number of calls to unassignTags");
 				}
@@ -157,28 +157,28 @@ class ScanServiceTest extends TestCase {
 				switch($createTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 2:
 						$this->assertEquals(TagService::PUP, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 3:
 						$this->assertEquals(TagService::CLEAN, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 4:
 						$this->assertEquals(TagService::WONT_SCAN, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					case 5:
 						$this->assertEquals(TagService::UNSCANNED, $tagName);
-						$this->assertEquals($userVisible, true);
-						$this->assertEquals($userAssignable, false);
+						$this->assertTrue($userVisible);
+						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
 					default: $this->fail("Unexpected number of calls to unassignTags");
 				}
