@@ -77,31 +77,17 @@ class MailService {
 		$this->logger->debug("Mail sent to " . implode(", ", $receiver));
 	}
 
-
-    /**
-     * @param array $maliciousFiles
-     * @return void
-     * @throws Exception
-     */
-    public function notifyWeeklySummary(array $maliciousFiles): void
-    {
-        $msg = $this->mailer->createMessage();
-        $msg->setSubject("Summary: Malicious files in your Nextcloud instance");
-        $msg->setHtmlBody($this->createSummaryHtml($maliciousFiles));
-        $msg->setPlainBody($this->createSummaryPlain($maliciousFiles));
-        $receiver = $this->getNotifyMails();
-        $msg->setTo($receiver);
-        
-        $this->mailer->send($msg);
-        $this->logger->debug("Mail sent to " . implode(", ", $receiver));
-    }
-
     /**
      * @return array
      */
     private function getNotifyMails(): array {
         $notifyMails = $this->config->getAppValue(Application::APP_ID, 'notifyMails');
         $notifyMails = preg_replace('/\s+/', '', $notifyMails);
+        if (empty($notifyMails)) {
+            return [];
+        }
+        return explode(",", $notifyMails);
+    }
 
 	/**
 	 * @param array $maliciousFiles
