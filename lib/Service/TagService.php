@@ -56,7 +56,7 @@ class TagService {
 		try {
 			array_push($tagIds, $this->getTag($tagName, false)->getId());
 		} catch (TagNotFoundException) {
-			$this->logger->error("Tag not found: " . $tagName);
+			$this->logger->debug("Tag not found: " . $tagName);
 		}
 		return $tagIds;
 	}
@@ -77,7 +77,7 @@ class TagService {
 	 * @return void
 	 */
 	public function setTag(int $fileId, string $tagName): void {
-		$tag = $this->tagService->getTag($tagName, true, false);
+		$tag = $this->getTag($tagName);
 		$filesTagIds = $this->tagMapper->getTagIdsForObjects($fileId, 'files');
 		$vaasTagIds = $this->getVaasTagIds();
 
@@ -103,7 +103,7 @@ class TagService {
 	 */
 	public function removeTagFromFile(string $tagName, int $fileId): bool {
 		try {
-			$tag = $this->tagService->getTag($tagName, true, false);
+			$tag = $this->getTag($tagName, false);
 			$this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
 			$this->logger->debug("Tag removed: " . $tagName . " for file " . $fileId);
 			return true;
@@ -118,15 +118,17 @@ class TagService {
 	 * @return bool
 	 */
 	public function hasAnyButUnscannedTag(int $fileId): bool {
-		if (
-			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::CLEAN)->getId()) ||
-			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::MALICIOUS)->getId()) ||
-			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::PUP)->getId()) ||
-			$this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::WONT_SCAN)->getId())
-		) {
-			return true;
-		}
-		return false;
+        $anyButUnscannedTagIds = [];
+        $anyButUnscannedTagIds = $this->addTagToArray(self::CLEAN, $anyButUnscannedTagIds);
+        $anyButUnscannedTagIds = $this->addTagToArray(self::MALICIOUS, $anyButUnscannedTagIds);
+        $anyButUnscannedTagIds = $this->addTagToArray(self::PUP, $anyButUnscannedTagIds);
+        $anyButUnscannedTagIds = $this->addTagToArray(self::WONT_SCAN, $anyButUnscannedTagIds);
+        foreach ($anyButUnscannedTagIds as $tagId) {
+            if ($this->tagMapper->haveTag([$fileId], 'files', $tagId)) {
+                return true;
+            }
+        }
+        return false;
 	}
 
 	/**
@@ -135,7 +137,11 @@ class TagService {
 	 * @return bool
 	 */
 	public function hasUnscannedTag(int $fileId): bool {
-		return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED)->getId());
+        try {
+            return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId());
+        } catch (TagNotFoundException) {
+            return false;
+        }
 	}
 
 	/**
@@ -228,14 +234,13 @@ class TagService {
 	 * @throws Exception
 	 */
 	public function getScannedFilesCount(): array {
-		$tags = [
-			$this->getTag(self::CLEAN)->getId(),
-			$this->getTag(self::MALICIOUS)->getId(),
-			$this->getTag(self::PUP)->getId(),
-			$this->getTag(self::WONT_SCAN)->getId()
-		];
+		$tagIds = [];
+        $tagIds = $this->addTagToArray(self::CLEAN, $tagIds);
+        $tagIds = $this->addTagToArray(self::MALICIOUS, $tagIds);
+        $tagIds = $this->addTagToArray(self::PUP, $tagIds);
+        $tagIds = $this->addTagToArray(self::WONT_SCAN, $tagIds);
 		$allFiles = $this->dbFileMapper->getFilesCount();
-		$scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tags, $allFiles);
+		$scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tagIds, $allFiles);
 		return [
 			'all' => $allFiles,
 			'scanned' => count($scannedFiles)
