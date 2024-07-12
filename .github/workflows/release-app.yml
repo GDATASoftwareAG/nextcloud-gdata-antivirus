@@ -43,6 +43,18 @@ jobs:
           sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
 
       - uses: docker-practice/actions-setup-docker@master
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: unittests
+        env:
+          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
+        run: |
+          composer install --quiet
+          ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
+
       - name: install nextcloud
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
@@ -53,7 +65,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: bats --no-parallelize-across-files --jobs 2 ./tests
+        run: bats --no-parallelize-across-files --jobs 2 ./tests/bats
 
       - uses: actions/upload-artifact@master
         with:

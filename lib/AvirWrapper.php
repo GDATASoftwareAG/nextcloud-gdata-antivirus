@@ -43,7 +43,7 @@ class AvirWrapper extends Wrapper {
 	/** @var ActivityManager */
 	protected $activityManager;
 
-    /** @var bool */
+	/** @var bool */
 	protected $isHomeStorage;
 
 	/** @var bool */
@@ -58,8 +58,8 @@ class AvirWrapper extends Wrapper {
 	public function __construct($parameters) {
 		parent::__construct($parameters);
 		$this->verdictService = $parameters['verdictService'];
-        $this->mailService = $parameters['mailService'];
-        $this->appConfig = $parameters['appConfig'];
+		$this->mailService = $parameters['mailService'];
+		$this->appConfig = $parameters['appConfig'];
 		$this->logger = $parameters['logger'];
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
@@ -98,14 +98,14 @@ class AvirWrapper extends Wrapper {
 		return parent::writeStream($path, $stream, $size);
 	}
 
-    public function rename($source, $target) {
-        if ($this->shouldWrap($source)) {
-            // After the upload apps/dav/lib/Connector/Sabre/File.php calls moveFromStorage which calls rename
-            $this->logger->debug(sprintf("rename(%s, %s)", $source, $target));
-            $this->verdictService->onRename($this->getLocalFile($source), $this->getLocalFile($target));
-        }
-        return parent::rename($source, $target);
-    }
+	public function rename($source, $target) {
+		if ($this->shouldWrap($source)) {
+			// After the upload apps/dav/lib/Connector/Sabre/File.php calls moveFromStorage which calls rename
+			$this->logger->debug(sprintf("rename(%s, %s)", $source, $target));
+			$this->verdictService->onRename($this->getLocalFile($source), $this->getLocalFile($target));
+		}
+		return parent::rename($source, $target);
+	}
 
 	private function shouldWrap(string $path): bool {
 		return $this->shouldScan

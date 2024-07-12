@@ -10,23 +10,24 @@
 	// "customizations": {},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
-		8080
+		80
 	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"CharlieGerard.pride-vscode-themes",
 				"junstyle.php-cs-fixer",
-				"stylelint.vscode-stylelint"
+				"stylelint.vscode-stylelint",
+				"jetmartin.bats",
+				"recca0120.vscode-phpunit"
 			]
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postStartCommand": "make build && composer install",
+	"postStartCommand": ".devcontainer/postCreateCommands.sh",
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {},
-		"ghcr.io/edouard-lopez/devcontainer-features/bats:0": {}
+		"ghcr.io/edouard-lopez/devcontainer-features/bats:0": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
 	}
-	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-	// "remoteUser": "root"
 }

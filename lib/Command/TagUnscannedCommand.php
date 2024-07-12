@@ -25,7 +25,7 @@ class TagUnscannedCommand extends Command {
 	/**
 	 * @return void
 	 */
-	protected function configure() {
+	protected function configure(): void {
 		$this->setName('gdatavaas:tag-unscanned');
 		$this->setDescription('tags all files without tag from this app as unscanned');
 	}
