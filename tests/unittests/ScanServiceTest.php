@@ -7,7 +7,7 @@ use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\ScanService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use OCP\SystemTag\ISystemTag;
 use OCP\SystemTag\ISystemTagManager;
 use OCP\SystemTag\ISystemTagObjectMapper;
@@ -25,8 +25,8 @@ class ScanServiceTest extends TestCase {
 	}
 
 	public function testRun_unscannedTagDisabled_unscannedTagShouldNotBeCreated(): void {
-		$appConfig = $this->createMock(IAppConfig::class);
-		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
+		$appConfig = $this->createMock(IConfig::class);
+		$appConfig->method('getAppValue')->willReturnOnConsecutiveCalls([Application::APP_ID, 'disableUnscannedTag'], [Application::APP_ID, 'scanQueueLength'])->willReturnOnConsecutiveCalls('true', '50');
 
 		$tagManager = $this->createMock(ISystemTagManager::class);
 		$getTagMatcher = $this->exactly(5);
@@ -110,8 +110,8 @@ class ScanServiceTest extends TestCase {
 	}
 
 	public function testRun_unscannedTagEnabled_unscannedTagShouldBeCreated(): void {
-		$appConfig = $this->createMock(IAppConfig::class);
-		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
+		$appConfig = $this->createMock(IConfig::class);
+		$appConfig->method('getAppValue')->willReturnOnConsecutiveCalls([Application::APP_ID, 'disableUnscannedTag'], [Application::APP_ID, 'scanQueueLength'])->willReturnOnConsecutiveCalls('false', '50');
 
 		$tagManager = $this->createMock(ISystemTagManager::class);
 		$getTagMatcher = $this->exactly(5);
