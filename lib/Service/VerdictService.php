@@ -260,12 +260,15 @@ class VerdictService {
 			}
 		}
 		$allowlist = $this->getAllowlist();
+		if (count($allowlist) === 0) {
+			return true;
+		}
 		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
 		foreach ($allowlist as $allowlistItem) {
-			if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
-				return false;
+			if (str_contains(strtolower($filePath), strtolower($allowlistItem))) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 }
