@@ -153,29 +153,31 @@ class TagService {
 		return $this->hasAnyButUnscannedTag($fileId) || $this->hasUnscannedTag($fileId);
 	}
 
-	/**
-	 * @param string $tagName
-	 * @param int $limit Count of object ids you want to get
-	 * @return array
-	 * @throws Exception if the database platform is not supported
-	 */
-	public function getFileIdsWithTag(string $tagName, int $limit): array {
+    /**
+     * @param string $tagName
+     * @param int $limit Count of object ids you want to get
+     * @param int $offset
+     * @return array
+     * @throws Exception if the database platform is not supported
+     */
+	public function getFileIdsWithTag(string $tagName, int $limit, int $offset=0): array {
 		try {
 			$tag = $this->getTag($tagName, false);
 		} catch (TagNotFoundException) {
 			return [];
 		}
-		return $this->dbFileMapper->getFileIdsWithTags([$tag->getId()], $limit);
+		return $this->dbFileMapper->getFileIdsWithTags([$tag->getId()], $limit, $offset);
 	}
 
-	/**
-	 * @param array $excludedTagIds
-	 * @param int $limit
-	 * @return array
-	 * @throws Exception if the database platform is not supported
-	 */
-	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array {
-		return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit);
+    /**
+     * @param array $excludedTagIds
+     * @param int $limit
+     * @param int $offset The offset of the first result, default is 0
+     * @return array
+     * @throws Exception if the database platform is not supported
+     */
+	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit, int $offset=0): array {
+		return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit, $offset);
 	}
 
 	/**
