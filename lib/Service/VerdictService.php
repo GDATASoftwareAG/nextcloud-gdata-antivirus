@@ -201,25 +201,34 @@ class VerdictService {
 	 */
 	private function getAllowlist(): array {
 		$allowlist = $this->appConfig->getValueString(Application::APP_ID, 'allowlist');
-		$allowlist = preg_replace('/\s+/', '', $allowlist);
+		$allowlist = $this->removeWhitespacesAroundComma($allowlist);
 		if (empty($allowlist)) {
 			return [];
 		}
 		return explode(",", $allowlist);
 	}
-
+    
 	/**
 	 * Parses the blocklist from the app settings and returns it as an array.
 	 * @return array
 	 */
 	private function getBlocklist(): array {
 		$blocklist = $this->appConfig->getValueString(Application::APP_ID, 'blocklist');
-		$blocklist = preg_replace('/\s+/', '', $blocklist);
+		$blocklist = $this->removeWhitespacesAroundComma($blocklist);
 		if (empty($blocklist)) {
 			return [];
 		}
 		return explode(",", $blocklist);
 	}
+
+    /**
+     * Removes whitespaces around commas in a string and trims it.
+     * @param string $s
+     * @return string
+     */
+    public function removeWhitespacesAroundComma(string $s): string {
+        return trim(preg_replace('/\s*,\s*/', ',', $s));
+    }
 
 	/**
 	 * @throws VaasAuthenticationException
@@ -260,12 +269,15 @@ class VerdictService {
 			}
 		}
 		$allowlist = $this->getAllowlist();
+		if (count($allowlist) === 0) {
+			return true;
+		}
 		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
 		foreach ($allowlist as $allowlistItem) {
-			if (!str_contains(strtolower($filePath), strtolower($allowlistItem))) {
-				return false;
+			if (str_contains(strtolower($filePath), strtolower($allowlistItem))) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 }
