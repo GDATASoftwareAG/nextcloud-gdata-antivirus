@@ -126,7 +126,11 @@ class AvirWrapper extends Wrapper {
 					$localPath = $this->getLocalFile($path);
 					$filesize = $this->filesize($path);
 					$logger->debug("Closing " . $localPath . " with size " . $filesize);
-
+					
+					if (!$this->verdictService->isAllowedToScan($localPath)) {
+						return;
+					}
+					
 					if ($filesize > VerdictService::MAX_FILE_SIZE) {
 						return;
 					}
