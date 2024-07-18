@@ -4,6 +4,7 @@ namespace unittests;
 
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Db\DbFileMapper;
+use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\ScanService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
@@ -29,7 +30,7 @@ class ScanServiceTest extends TestCase {
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
 		$tagManager = $this->createMock(ISystemTagManager::class);
-		$getTagMatcher = $this->exactly(5);
+		$getTagMatcher = $this->exactly(4);
 		$tagManager
 			->expects($getTagMatcher)
 			->method('getTag')
@@ -98,11 +99,13 @@ class ScanServiceTest extends TestCase {
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $dbFileMapper);
 		$verdictService = $this->createMock(VerdictService::class);
+		$fileService = $this->createMock(FileService::class);
 
 		$scanService = new ScanService(
 			$this->logger,
 			$tagService,
 			$verdictService,
+            $fileService,
 			$appConfig
 		);
 
@@ -114,7 +117,7 @@ class ScanServiceTest extends TestCase {
 		$appConfig->method('getValueBool')->with(Application::APP_ID, 'disableUnscannedTag')->willReturn(true);
 
 		$tagManager = $this->createMock(ISystemTagManager::class);
-		$getTagMatcher = $this->exactly(5);
+		$getTagMatcher = $this->exactly(4);
 		$tagManager
 			->expects($getTagMatcher)
 			->method('getTag')
@@ -188,11 +191,13 @@ class ScanServiceTest extends TestCase {
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $dbFileMapper);
 		$verdictService = $this->createMock(VerdictService::class);
+        $fileService = $this->createMock(FileService::class);
 
 		$scanService = new ScanService(
 			$this->logger,
 			$tagService,
 			$verdictService,
+            $fileService,
 			$appConfig
 		);
 
