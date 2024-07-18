@@ -19,183 +19,183 @@ class VerdictServiceTest extends TestCase {
 		$this->logger = new TestLogger();
 	}
 
-	public function testIsAllowedByAllowAndBlocklist_multipleAllowListEntries_ShouldAllowWhenMatching(): void {
-        $allowlist = ["eicar.txt", "eicar2.txt"];
-        $blocklist = [];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+	public function testIsAllowedToScan_multipleScanOnlyThisEntries_ShouldAllowWhenMatching(): void {
+		$scanOnlyThis = ["eicar.txt", "eicar2.txt"];
+		$doNotScanThis = [];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
+		$verdictService = new VerdictService(
 			$this->logger,
 			$appConfig,
 			$this->createMock(FileService::class),
 			$this->createMock(TagService::class));
 
-		$result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar.txt');
+		$result = $verdictService->isAllowedToScan('/mypath/eicar.txt');
 		$this->assertTrue($result);
 	}
-    
-    public function testIsAllowedByAllowAndBlocklist_multipleAllowListEntries_ShouldNotAllowWhenNotMatching(): void {
-        $allowlist = ["eicar.txt", "eicar2.txt"];
-        $blocklist = [];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+	
+	public function testIsAllowedToScan_multipleScanOnlyThisEntries_ShouldNotAllowWhenNotMatching(): void {
+		$scanOnlyThis = ["eicar.txt", "eicar2.txt"];
+		$doNotScanThis = [];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar3.txt');
-        $this->assertFalse($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_multipleBlockListEntries_ShouldNotAllowWhenMatching(): void {
-        $allowlist = [];
-        $blocklist = ["eicar.txt", "eicar2.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar3.txt');
+		$this->assertFalse($result);
+	}
+	
+	public function testIsAllowedToScan_multipleDoNotScanThisEntries_ShouldNotAllowWhenMatching(): void {
+		$scanOnlyThis = [];
+		$doNotScanThis = ["eicar.txt", "eicar2.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar.txt');
-        $this->assertFalse($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_multipleBlockListEntries_ShouldAllowWhenNotMatching(): void {
-        $allowlist = [];
-        $blocklist = ["eicar.txt", "eicar2.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar.txt');
+		$this->assertFalse($result);
+	}
+	
+	public function testIsAllowedToScan_multipleDoNotScanThisEntries_ShouldAllowWhenNotMatching(): void {
+		$scanOnlyThis = [];
+		$doNotScanThis = ["eicar.txt", "eicar2.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar3.txt');
-        $this->assertTrue($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_allowAndBlockListEntries_ShouldAllowWhenMatchingAllowList(): void {
-        $allowlist = ["eicar.txt", "eicar2.txt"];
-        $blocklist = ["eicar2.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar3.txt');
+		$this->assertTrue($result);
+	}
+	
+	public function testIsAllowedToScan_scanOnlyThisAndDoNotScanThisEntries_ShouldAllowWhenMatchingScanOnlyThis(): void {
+		$scanOnlyThis = ["eicar.txt", "eicar2.txt"];
+		$doNotScanThis = ["eicar2.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar.txt');
-        $this->assertTrue($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_allowAndBlockListEntries_ShouldNotAllowWhenMatchingBlockList(): void {
-        $allowlist = ["eicar.txt", "eicar2.txt"];
-        $blocklist = ["eicar2.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar.txt');
+		$this->assertTrue($result);
+	}
+	
+	public function testIsAllowedToScan_scanOnlyThisAndDoNotScanThisEntries_ShouldNotAllowWhenMatchingDoNotScanThis(): void {
+		$scanOnlyThis = ["eicar.txt", "eicar2.txt"];
+		$doNotScanThis = ["eicar2.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar2.txt');
-        $this->assertFalse($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_allowAndBlockListEntries_ShouldWorkWithEmptyLists(): void {
-        $allowlist = [];
-        $blocklist = [];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar2.txt');
+		$this->assertFalse($result);
+	}
+	
+	public function testIsAllowedToScan_scanOnlyThisAndDoNotScanThisEntries_ShouldWorkWithEmptyLists(): void {
+		$scanOnlyThis = [];
+		$doNotScanThis = [];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/eicar2.txt');
-        $this->assertTrue($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_withAllowedScanPath_ShouldScanWithSpacesInLists(): void {
-        $allowlist = ["Scan folder ", "eicar2.txt"];
-        $blocklist = ["eicar3.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/eicar2.txt');
+		$this->assertTrue($result);
+	}
+	
+	public function testIsAllowedToScan_withAllowedScanPath_ShouldScanWithSpacesInLists(): void {
+		$scanOnlyThis = ["Scan folder ", "eicar2.txt"];
+		$doNotScanThis = ["eicar3.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/Scan folder/eicar1.txt');
-        $this->assertTrue($result);
-    }
-    
-    public function testIsAllowedByAllowAndBlocklist_withForbiddenScanPath_ShouldNotScanWithSpacesInLists(): void {
-        $allowlist = ["eicar2.txt"];
-        $blocklist = [" Scan folder", "eicar3.txt"];
-        $appConfig = $this->getAppConfigMock($allowlist, $blocklist);
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/Scan folder/eicar1.txt');
+		$this->assertTrue($result);
+	}
+	
+	public function testIsAllowedToScan_withForbiddenScanPath_ShouldNotScanWithSpacesInLists(): void {
+		$scanOnlyThis = ["eicar2.txt"];
+		$doNotScanThis = [" Scan folder", "eicar3.txt"];
+		$appConfig = $this->getAppConfigMock($scanOnlyThis, $doNotScanThis);
 
-        $verdictService = new VerdictService(
-            $this->logger,
-            $appConfig,
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->isAllowedByAllowAndBlocklist('/mypath/Scan folder/eicar4.txt');
-        $this->assertFalse($result);
-    }
-    
-    public function testRemoveWhitespacesAroundComma_ShouldRemoveWhitespaces(): void {
-        $verdictService = new VerdictService(
-            $this->logger,
-            $this->createMock(IAppConfig::class),
-            $this->createMock(FileService::class),
-            $this->createMock(TagService::class));
-        
-        $result = $verdictService->removeWhitespacesAroundComma('a, b, c');
-        $result2 = $verdictService->removeWhitespacesAroundComma('a,b,c');
-        $result3 = $verdictService->removeWhitespacesAroundComma(' a, b , c,d');
-        
-        $this->assertEquals('a,b,c', $result);
-        $this->assertEquals('a,b,c', $result2);
-        $this->assertEquals('a,b,c,d', $result3);
-    }
+		$verdictService = new VerdictService(
+			$this->logger,
+			$appConfig,
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->isAllowedToScan('/mypath/Scan folder/eicar4.txt');
+		$this->assertFalse($result);
+	}
+	
+	public function testRemoveWhitespacesAroundComma_ShouldRemoveWhitespaces(): void {
+		$verdictService = new VerdictService(
+			$this->logger,
+			$this->createMock(IAppConfig::class),
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+		
+		$result = $verdictService->removeWhitespacesAroundComma('a, b, c');
+		$result2 = $verdictService->removeWhitespacesAroundComma('a,b,c');
+		$result3 = $verdictService->removeWhitespacesAroundComma(' a, b , c,d');
+		
+		$this->assertEquals('a,b,c', $result);
+		$this->assertEquals('a,b,c', $result2);
+		$this->assertEquals('a,b,c,d', $result3);
+	}
 
-    private function getAppConfigMock(array $allowlist, array $blocklist): IAppConfig {
-        $appConfig = $this->createMock(IAppConfig::class);
-        $appConfig
-            ->method('getValueString')
-            ->willReturnCallback(function ($appId, $key, $default) use ($blocklist, $allowlist) {
-                if ($appId === Application::APP_ID) {
-                    switch ($key) {
-                        case 'authMethod':
-                            return 'ClientCredentials';
-                        case 'tokenEndpoint':
-                            return 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token';
-                        case 'vaasUrl':
-                            return 'wss://gateway.staging.vaas.gdatasecurity.de';
-                        case 'clientSecret':
-                        case 'username':
-                        case 'password':
-                        case 'clientId':
-                            return 'something';
-                        case 'allowlist':
-                            return implode(', ', $allowlist);
-                        case 'blocklist':
-                            return implode(', ', $blocklist);
-                    }
-                }
-                return $default;
-            });
-        return $appConfig;
-    }
+	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IAppConfig {
+		$appConfig = $this->createMock(IAppConfig::class);
+		$appConfig
+			->method('getValueString')
+			->willReturnCallback(function ($appId, $key, $default) use ($doNotScanThis, $scanOnlyThis) {
+				if ($appId === Application::APP_ID) {
+					switch ($key) {
+						case 'authMethod':
+							return 'ClientCredentials';
+						case 'tokenEndpoint':
+							return 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token';
+						case 'vaasUrl':
+							return 'wss://gateway.staging.vaas.gdatasecurity.de';
+						case 'clientSecret':
+						case 'username':
+						case 'password':
+						case 'clientId':
+							return 'something';
+						case 'scanOnlyThis':
+							return implode(', ', $scanOnlyThis);
+						case 'doNotScanThis':
+							return implode(', ', $doNotScanThis);
+					}
+				}
+				return $default;
+			});
+		return $appConfig;
+	}
 }

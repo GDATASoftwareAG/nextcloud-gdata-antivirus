@@ -3,7 +3,9 @@
 namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
+use OCP\Files\InvalidPathException;
 use OCP\Files\IRootFolder;
+use OCP\Files\NotFoundException;
 use OCP\SystemTag\ISystemTagManager;
 use OCP\SystemTag\ISystemTagObjectMapper;
 use Psr\Log\LoggerInterface;
@@ -39,12 +41,14 @@ class GetTagsForFileCommand extends Command {
 		$this->addArgument(self::FILE_PATH, InputArgument::REQUIRED, "path to file (username/files/filename)");
 	}
 
-	/**
-	 * @param $argument
-	 * @return void
-	 * @throws \OCP\DB\Exception if the database platform is not supported
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws InvalidPathException
+     * @throws NotFoundException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 
 		$filePath = $input->getArgument('file-path');

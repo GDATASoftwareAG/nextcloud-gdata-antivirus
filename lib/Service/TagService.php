@@ -52,7 +52,7 @@ class TagService {
 		return $tag;
 	}
 
-	private function addTagToArray(string $tagName, &$tagIds): array {
+	private function addTagToArray(string $tagName, array &$tagIds): array {
 		try {
 			array_push($tagIds, $this->getTag($tagName, false)->getId());
 		} catch (TagNotFoundException) {
@@ -118,17 +118,17 @@ class TagService {
 	 * @return bool
 	 */
 	public function hasAnyButUnscannedTag(int $fileId): bool {
-        $anyButUnscannedTagIds = [];
-        $anyButUnscannedTagIds = $this->addTagToArray(self::CLEAN, $anyButUnscannedTagIds);
-        $anyButUnscannedTagIds = $this->addTagToArray(self::MALICIOUS, $anyButUnscannedTagIds);
-        $anyButUnscannedTagIds = $this->addTagToArray(self::PUP, $anyButUnscannedTagIds);
-        $anyButUnscannedTagIds = $this->addTagToArray(self::WONT_SCAN, $anyButUnscannedTagIds);
-        foreach ($anyButUnscannedTagIds as $tagId) {
-            if ($this->tagMapper->haveTag([$fileId], 'files', $tagId)) {
-                return true;
-            }
-        }
-        return false;
+		$anyButUnscannedTagIds = [];
+		$anyButUnscannedTagIds = $this->addTagToArray(self::CLEAN, $anyButUnscannedTagIds);
+		$anyButUnscannedTagIds = $this->addTagToArray(self::MALICIOUS, $anyButUnscannedTagIds);
+		$anyButUnscannedTagIds = $this->addTagToArray(self::PUP, $anyButUnscannedTagIds);
+		$anyButUnscannedTagIds = $this->addTagToArray(self::WONT_SCAN, $anyButUnscannedTagIds);
+		foreach ($anyButUnscannedTagIds as $tagId) {
+			if ($this->tagMapper->haveTag([$fileId], 'files', $tagId)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -137,11 +137,11 @@ class TagService {
 	 * @return bool
 	 */
 	public function hasUnscannedTag(int $fileId): bool {
-        try {
-            return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId());
-        } catch (TagNotFoundException) {
-            return false;
-        }
+		try {
+			return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId());
+		} catch (TagNotFoundException) {
+			return false;
+		}
 	}
 
 	/**
@@ -156,26 +156,28 @@ class TagService {
 	/**
 	 * @param string $tagName
 	 * @param int $limit Count of object ids you want to get
+	 * @param int $offset
 	 * @return array
 	 * @throws Exception if the database platform is not supported
 	 */
-	public function getFileIdsWithTag(string $tagName, int $limit): array {
+	public function getFileIdsWithTag(string $tagName, int $limit, int $offset = 0): array {
 		try {
 			$tag = $this->getTag($tagName, false);
 		} catch (TagNotFoundException) {
 			return [];
 		}
-		return $this->dbFileMapper->getFileIdsWithTags([$tag->getId()], $limit);
+		return $this->dbFileMapper->getFileIdsWithTags([$tag->getId()], $limit, $offset);
 	}
 
 	/**
 	 * @param array $excludedTagIds
 	 * @param int $limit
+	 * @param int $offset The offset of the first result, default is 0
 	 * @return array
 	 * @throws Exception if the database platform is not supported
 	 */
-	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit): array {
-		return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit);
+	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit, int $offset = 0): array {
+		return $this->dbFileMapper->getFileIdsWithoutTags($excludedTagIds, $limit, $offset);
 	}
 
 	/**
@@ -235,10 +237,10 @@ class TagService {
 	 */
 	public function getScannedFilesCount(): array {
 		$tagIds = [];
-        $tagIds = $this->addTagToArray(self::CLEAN, $tagIds);
-        $tagIds = $this->addTagToArray(self::MALICIOUS, $tagIds);
-        $tagIds = $this->addTagToArray(self::PUP, $tagIds);
-        $tagIds = $this->addTagToArray(self::WONT_SCAN, $tagIds);
+		$tagIds = $this->addTagToArray(self::CLEAN, $tagIds);
+		$tagIds = $this->addTagToArray(self::MALICIOUS, $tagIds);
+		$tagIds = $this->addTagToArray(self::PUP, $tagIds);
+		$tagIds = $this->addTagToArray(self::WONT_SCAN, $tagIds);
 		$allFiles = $this->dbFileMapper->getFilesCount();
 		$scannedFiles = $this->dbFileMapper->getFileIdsWithTags($tagIds, $allFiles);
 		return [

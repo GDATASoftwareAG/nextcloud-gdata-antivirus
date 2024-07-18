@@ -46,12 +46,12 @@
                 <td class="input_field"><input id="quarantine_folder" type="text" name="quarantineFolder" value="<?php p($_['quarantineFolder']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
-                <td><div title="<?php p($l->t('Comma-separated allow list values. Can be paths, folders, file names or file types. Wildcards are not supported.'));?>" class="visible"><label for="allowlist"><?php p($l->t('Scan only this'));?></label></div></td>
-                <td class="input_field"><input id="allowlist" type="text" name="allowlist" value="<?php p($_['allowlist']); ?>"/></td>
+                <td><div title="<?php p($l->t('Comma-separated allow list values. Can be paths, folders, file names or file types. Wildcards are not supported.'));?>" class="visible"><label for="scanOnlyThis"><?php p($l->t('Scan only this'));?></label></div></td>
+                <td class="input_field"><input id="scanOnlyThis" type="text" name="scanOnlyThis" value="<?php p($_['scanOnlyThis']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
-                <td><div title="<?php p($l->t('Comma-separated block list values. Can be paths, folders, file names or file types. Wildcards are not supported.'));?>" class="visible"><label for="blocklist"><?php p($l->t('Do not scan this'));?></label></div></td>
-                <td class="input_field"><input id="blocklist" type="text" name="blocklist" value="<?php p($_['blocklist']); ?>"/></td>
+                <td><div title="<?php p($l->t('Comma-separated block list values. Can be paths, folders, file names or file types. Wildcards are not supported.'));?>" class="visible"><label for="doNotScanThis"><?php p($l->t('Do not scan this'));?></label></div></td>
+                <td class="input_field"><input id="doNotScanThis" type="text" name="doNotScanThis" value="<?php p($_['doNotScanThis']); ?>"/></td>
             </tr>
             <tr class="basic_settings">
                 <td><div title="<?php p($l->t('If you have activated "Automatic file scanning", the number of files set here will be scanned every five minutes. This setting should help to influence the server load. '));?>" class="visible"><label for="scan_queue_length"><?php p($l->t('Scan queue length'));?></label></div></td>
