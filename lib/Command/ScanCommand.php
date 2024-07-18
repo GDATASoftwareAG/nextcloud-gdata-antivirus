@@ -4,6 +4,9 @@ namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
 use OCA\GDataVaas\Service\ScanService;
+use OCP\DB\Exception;
+use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,12 +31,15 @@ class ScanCommand extends Command {
 		$this->setDescription('scan files for malware');
 	}
 
-	/**
-	 * @param $argument
-	 * @return void
-	 * @throws \OCP\DB\Exception if the database platform is not supported
-	 */
-	protected function execute(InputInterface $input, OutputInterface $output): int {
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     * @throws Exception
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
+    protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$logger->info("scanning files");
 		$start = microtime(true);

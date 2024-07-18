@@ -5,6 +5,7 @@ namespace OCA\GDataVaas\Controller;
 use OCA\GDataVaas\Service\TagService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\DB\Exception;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
@@ -22,7 +23,7 @@ class SettingsController extends Controller {
 		$this->mailer = $mailer;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $scanQueueLength, $notifyMails): JSONResponse {
         if (!empty($notifyMails)) {
             $mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
             foreach ($mails as $mail) {
@@ -42,8 +43,8 @@ class SettingsController extends Controller {
 		$this->config->setAppValue($this->appName, 'clientSecret', $clientSecret);
 		$this->config->setAppValue($this->appName, 'authMethod', $authMethod);
 		$this->config->setAppValue($this->appName, 'quarantineFolder', $quarantineFolder);
-		$this->config->setAppValue($this->appName, 'allowlist', $allowlist);
-		$this->config->setAppValue($this->appName, 'blocklist', $blocklist);
+		$this->config->setAppValue($this->appName, 'scanOnlyThis', $scanOnlyThis);
+		$this->config->setAppValue($this->appName, 'doNotScanThis', $doNotScanThis);
 		$this->config->setAppValue($this->appName, 'scanQueueLength', $scanQueueLength);
 		$this->config->setAppValue($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
