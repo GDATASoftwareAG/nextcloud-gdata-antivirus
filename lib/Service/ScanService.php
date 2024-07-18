@@ -4,19 +4,23 @@ namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
+use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class ScanService {
 	private TagService $tagService;
 	private VerdictService $verdictService;
+    private FileService $fileService;
 	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService, IAppConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, TagService $tagService, VerdictService $verdictService, FileService $fileService, IAppConfig $appConfig) {
 		$this->logger = $logger;
 		$this->tagService = $tagService;
 		$this->verdictService = $verdictService;
+        $this->fileService = $fileService;
 		$this->appConfig = $appConfig;
 	}
 	
@@ -29,11 +33,13 @@ class ScanService {
 		return $this;
 	}
 
-	/**
-	 * @return int how many files where actually processed
-	 * @throws Exception if the database platform is not supported
-	 */
-	public function run(): int {
+    /**
+     * @return int
+     * @throws Exception
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
+    public function run(): int {
         $quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength');
         
         $fileIds = $this->getFileIdsToScan($quantity);
@@ -55,6 +61,8 @@ class ScanService {
      * @param int $quantity
      * @return array
      * @throws Exception
+     * @throws NotFoundException
+     * @throws NotPermittedException
      */
     private function getFileIdsToScan(int $quantity): array {
         $unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
@@ -63,35 +71,24 @@ class ScanService {
         $pupTag = $this->tagService->getTag(TagService::PUP);
         $cleanTag = $this->tagService->getTag(TagService::CLEAN);
         $wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
-        
-        // TODO: If quantity is higher than the number of files available, this could loop forever
+
+        $limit = 50;
+        $offset = 0;
+        $tagParam = $unscannedTagIsDisabled ? [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()] : TagService::UNSCANNED;
         $fileIdsAllowedToScan = [];
-        if ($unscannedTagIsDisabled) {
-            $excludedTagIds = [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
-            $limit = 50;
-            $offset = 0;
-            while (count($fileIdsAllowedToScan) < $quantity) {
-                $fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, $limit, $offset);
-                foreach ($fileIds as $fileId) {
-                    if ($this->verdictService->isAllowedByAllowAndBlocklist($fileId)) {
-                        $fileIdsAllowedToScan[] = $fileId;
-                    }
-                }
-                $offset += $limit;
+        while (count($fileIdsAllowedToScan) < $quantity) {
+            $fileIds = $unscannedTagIsDisabled ? $this->tagService->getFileIdsWithoutTags($tagParam, $limit, $offset) : $this->tagService->getFileIdsWithTag($tagParam, $limit, $offset);
+            if (empty($fileIds)) {
+                break;
             }
-        } else {
-            $this->tagService->getTag(TagService::UNSCANNED);
-            $limit = 50;
-            $offset = 0;
-            while (count($fileIdsAllowedToScan) < $quantity) {
-                $fileIds = $this->tagService->getFileIdsWithTag(TagService::UNSCANNED, $limit, $offset);
-                foreach ($fileIds as $fileId) {
-                    if ($this->verdictService->isAllowedByAllowAndBlocklist($fileId)) {
-                        $fileIdsAllowedToScan[] = $fileId;
-                    }
+            foreach ($fileIds as $fileId) {
+                $node = $this->fileService->getNodeFromFileId($fileId);
+                $filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
+                if ($this->verdictService->isAllowedByAllowAndBlocklist($filePath)) {
+                    $fileIdsAllowedToScan[] = $fileId;
                 }
-                $offset += $limit;
             }
+            $offset += $limit;
         }
         
         return $fileIdsAllowedToScan;
