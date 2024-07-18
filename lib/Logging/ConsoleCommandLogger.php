@@ -45,7 +45,7 @@ class ConsoleCommandLogger implements LoggerInterface {
 	/**
 	 * @return void
 	 */
-	public function error(string $message, array $context = []): void {
+	public function error($message, array $context = []): void {
 		$this->consoleOutput->writeln("<error>[error] $message</error>");
 
 		$this->inner->error($message, $context);
