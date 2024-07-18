@@ -40,7 +40,12 @@ class ScanService {
 	 * @throws NotPermittedException
 	 */
 	public function run(): int {
-		$quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength');
+        $quantity = $this->appConfig->getAppValue(Application::APP_ID, 'scanQueueLength');
+        try {
+            $quantity = intval($quantity);
+        } catch (\Exception) {
+            $quantity = 5;
+        }
 		
 		$fileIds = $this->getFileIdsToScan($quantity);
 		$this->logger->debug("Scanning " . count($fileIds) . " files");
@@ -65,7 +70,7 @@ class ScanService {
 	 * @throws NotPermittedException
 	 */
 	private function getFileIdsToScan(int $quantity): array {
-		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+		$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
 		
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
 		$pupTag = $this->tagService->getTag(TagService::PUP);

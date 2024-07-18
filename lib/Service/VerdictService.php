@@ -199,7 +199,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getScanOnlyThis(): array {
-		$scanOnlyThis = $this->appConfig->getValueString(Application::APP_ID, 'scanOnlyThis');
+		$scanOnlyThis = $this->appConfig->getAppValue(Application::APP_ID, 'scanOnlyThis');
 		$scanOnlyThis = $this->removeWhitespacesAroundComma($scanOnlyThis);
 		if (empty($scanOnlyThis)) {
 			return [];
@@ -212,7 +212,7 @@ class VerdictService {
 	 * @return array
 	 */
 	private function getDoNotScanThis(): array {
-		$doNotScanThis = $this->appConfig->getValueString(Application::APP_ID, 'doNotScanThis');
+		$doNotScanThis = $this->appConfig->getAppValue(Application::APP_ID, 'doNotScanThis');
 		$doNotScanThis = $this->removeWhitespacesAroundComma($doNotScanThis);
 		if (empty($doNotScanThis)) {
 			return [];

@@ -6,7 +6,7 @@ use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCP\IAppConfig;
+use OCP\IConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
@@ -157,7 +157,7 @@ class VerdictServiceTest extends TestCase {
 	public function testRemoveWhitespacesAroundComma_ShouldRemoveWhitespaces(): void {
 		$verdictService = new VerdictService(
 			$this->logger,
-			$this->createMock(IAppConfig::class),
+			$this->getAppConfigMock([], []),
 			$this->createMock(FileService::class),
 			$this->createMock(TagService::class));
 		
@@ -170,10 +170,10 @@ class VerdictServiceTest extends TestCase {
 		$this->assertEquals('a,b,c,d', $result3);
 	}
 
-	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IAppConfig {
-		$appConfig = $this->createMock(IAppConfig::class);
+	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IConfig {
+		$appConfig = $this->createMock(IConfig::class);
 		$appConfig
-			->method('getValueString')
+			->method('getAppValue')
 			->willReturnCallback(function ($appId, $key, $default) use ($doNotScanThis, $scanOnlyThis) {
 				if ($appId === Application::APP_ID) {
 					switch ($key) {
