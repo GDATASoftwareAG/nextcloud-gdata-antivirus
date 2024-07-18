@@ -22,7 +22,7 @@ class SettingsController extends Controller {
 		$this->mailer = $mailer;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $allowlist, $blocklist, $scanQueueLength, $notifyMails): JSONResponse {
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $scanQueueLength, $notifyMails): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
 			foreach ($mails as $mail) {
@@ -42,8 +42,8 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'clientSecret', $clientSecret);
 		$this->config->setValueString($this->appName, 'authMethod', $authMethod);
 		$this->config->setValueString($this->appName, 'quarantineFolder', $quarantineFolder);
-		$this->config->setValueString($this->appName, 'allowlist', $allowlist);
-		$this->config->setValueString($this->appName, 'blocklist', $blocklist);
+		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
+		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
 		$this->config->setValueInt($this->appName, 'scanQueueLength', $scanQueueLength);
 		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);

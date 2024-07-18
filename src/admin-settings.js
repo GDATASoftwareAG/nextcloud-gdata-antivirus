@@ -41,8 +41,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const clientId = document.querySelector('#clientId').value;
 		const clientSecret = document.querySelector('#clientSecret').value;
 		const quarantineFolder = document.querySelector('#quarantine_folder').value;
-		const allowlist = document.querySelector('#allowlist').value;
-		const blocklist = document.querySelector('#blocklist').value;
+		const scanOnlyThis = document.querySelector('#scanOnlyThis').value;
+		const doNotScanThis = document.querySelector('#doNotScanThis').value;
 		const scanQueueLength = document.querySelector('#scan_queue_length').value;
 		const notifyMails = document.querySelector('#notify_mails').value;
 
@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			clientSecret: clientSecret,
 			authMethod: authMethod.value,
 			quarantineFolder,
-			allowlist,
-			blocklist,
+			scanOnlyThis,
+			doNotScanThis,
 			scanQueueLength,
 			notifyMails
 		});
