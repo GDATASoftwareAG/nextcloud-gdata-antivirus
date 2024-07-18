@@ -84,7 +84,7 @@ class ScanService {
             foreach ($fileIds as $fileId) {
                 $node = $this->fileService->getNodeFromFileId($fileId);
                 $filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-                if ($this->verdictService->isAllowedByAllowAndBlocklist($filePath)) {
+                if ($this->verdictService->isAllowedToScan($filePath)) {
                     $fileIdsAllowedToScan[] = $fileId;
                 }
             }
