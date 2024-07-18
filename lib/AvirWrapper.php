@@ -127,7 +127,7 @@ class AvirWrapper extends Wrapper {
 					$filesize = $this->filesize($path);
 					$logger->debug("Closing " . $localPath . " with size " . $filesize);
                     
-                    if (!$this->verdictService->isAllowedByAllowAndBlocklist($localPath)) {
+                    if (!$this->verdictService->isAllowedToScan($localPath)) {
                         return;
                     }
                     

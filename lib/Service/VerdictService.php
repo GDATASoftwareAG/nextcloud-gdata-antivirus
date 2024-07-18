@@ -76,8 +76,8 @@ class VerdictService {
 			throw new EntityTooLargeException("File is too large");
 		}
 
-		if (!$this->isAllowedByAllowAndBlocklist($filePath)) {
-			throw new NotPermittedException("File is not allowed to be scanned by the allowlist/blocklist");
+		if (!$this->isAllowedToScan($filePath)) {
+			throw new NotPermittedException("File is not allowed to be scanned by the 'Do not scan this' or 'Scan only this' settings");
 		}
 
 		$verdict = $this->scan($filePath);
@@ -91,7 +91,7 @@ class VerdictService {
 		return $verdict;
 	}
 
-	private function tagFile(int $fileId, string $tagName) {
+	private function tagFile(int $fileId, string $tagName): void {
 		switch ($tagName) {
 			case TagService::MALICIOUS:
 				$this->tagService->setTag($fileId, TagService::MALICIOUS);
@@ -181,7 +181,7 @@ class VerdictService {
 			$this->tagFile($fileId, TagService::WONT_SCAN);
 			return;
 		}
-		if (!$this->isAllowedByAllowAndBlocklist($localPath)) {
+		if (!$this->isAllowedToScan($localPath)) {
 			$this->tagFile($fileId, TagService::UNSCANNED);
 			return;
 		}
@@ -195,29 +195,29 @@ class VerdictService {
 	}
 
 	/**
-	 * Parses the allowlist from the app settings and returns it as an array.
+	 * Parses the scanOnlyThis from the app settings and returns it as an array.
 	 * @return array
 	 */
-	private function getAllowlist(): array {
-		$allowlist = $this->appConfig->getValueString(Application::APP_ID, 'allowlist');
-		$allowlist = $this->removeWhitespacesAroundComma($allowlist);
-		if (empty($allowlist)) {
+	private function getScanOnlyThis(): array {
+		$scanOnlyThis = $this->appConfig->getValueString(Application::APP_ID, 'scanOnlyThis');
+		$scanOnlyThis = $this->removeWhitespacesAroundComma($scanOnlyThis);
+		if (empty($scanOnlyThis)) {
 			return [];
 		}
-		return explode(",", $allowlist);
+		return explode(",", $scanOnlyThis);
 	}
     
 	/**
-	 * Parses the blocklist from the app settings and returns it as an array.
+	 * Parses the doNotScanThis from the app settings and returns it as an array.
 	 * @return array
 	 */
-	private function getBlocklist(): array {
-		$blocklist = $this->appConfig->getValueString(Application::APP_ID, 'blocklist');
-		$blocklist = $this->removeWhitespacesAroundComma($blocklist);
-		if (empty($blocklist)) {
+	private function getDoNotScanThis(): array {
+		$doNotScanThis = $this->appConfig->getValueString(Application::APP_ID, 'doNotScanThis');
+		$doNotScanThis = $this->removeWhitespacesAroundComma($doNotScanThis);
+		if (empty($doNotScanThis)) {
 			return [];
 		}
-		return explode(",", $blocklist);
+		return explode(",", $doNotScanThis);
 	}
 
     /**
@@ -255,25 +255,25 @@ class VerdictService {
 	}
 
 	/**
-	 * Checks if the file is in the blocklist or not in the allowlist and throws an exception if it is not allowed to scan the file.
+	 * Checks if the file is in the doNotScanThis or not in the scanOnlyThis and throws an exception if it is not allowed to scan the file.
 	 * @param string $filePath
 	 * @return bool
 	 */
-	public function isAllowedByAllowAndBlocklist(string $filePath): bool {
-		$blocklist = $this->getBlocklist();
-		$this->logger->debug("Blocklist: " . implode(", ", $blocklist));
-		foreach ($blocklist as $blocklistItem) {
-			if (str_contains(strtolower($filePath), strtolower($blocklistItem))) {
+	public function isAllowedToScan(string $filePath): bool {
+		$doNotScanThis = $this->getDoNotScanThis();
+		$this->logger->debug("doNotScanThis: " . implode(", ", $doNotScanThis));
+		foreach ($doNotScanThis as $doNotScanThisItem) {
+			if (str_contains(strtolower($filePath), strtolower($doNotScanThisItem))) {
 				return false;
 			}
 		}
-		$allowlist = $this->getAllowlist();
-		if (count($allowlist) === 0) {
+		$scanOnlyThis = $this->getScanOnlyThis();
+		if (count($scanOnlyThis) === 0) {
 			return true;
 		}
-		$this->logger->debug("Allowlist: " . implode(", ", $allowlist));
-		foreach ($allowlist as $allowlistItem) {
-			if (str_contains(strtolower($filePath), strtolower($allowlistItem))) {
+		$this->logger->debug("scanOnlyThis: " . implode(", ", $scanOnlyThis));
+		foreach ($scanOnlyThis as $scanOnlyThisItem) {
+			if (str_contains(strtolower($filePath), strtolower($scanOnlyThisItem))) {
 				return true;
 			}
 		}
