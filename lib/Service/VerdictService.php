@@ -207,7 +207,7 @@ class VerdictService {
 		}
 		return explode(",", $scanOnlyThis);
 	}
-    
+	
 	/**
 	 * Parses the doNotScanThis from the app settings and returns it as an array.
 	 * @return array
@@ -221,14 +221,14 @@ class VerdictService {
 		return explode(",", $doNotScanThis);
 	}
 
-    /**
-     * Removes whitespaces around commas in a string and trims it.
-     * @param string $s
-     * @return string
-     */
-    public function removeWhitespacesAroundComma(string $s): string {
-        return trim(preg_replace('/\s*,\s*/', ',', $s));
-    }
+	/**
+	 * Removes whitespaces around commas in a string and trims it.
+	 * @param string $s
+	 * @return string
+	 */
+	public function removeWhitespacesAroundComma(string $s): string {
+		return trim(preg_replace('/\s*,\s*/', ',', $s));
+	}
 
 	/**
 	 * @throws VaasAuthenticationException

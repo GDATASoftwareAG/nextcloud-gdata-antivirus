@@ -12,15 +12,15 @@ class DbFileMapper extends QBMapper {
 		parent::__construct($db, 'filecache');
 	}
 
-    /**
-     * Get file ids that do not have any of the given tags
-     * @param array $excludedTagIds
-     * @param int $limit
-     * @param int $offset default 0
-     * @return array of file ids
-     * @throws Exception if the database platform is not supported
-     */
-	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit, int $offset=0): array {
+	/**
+	 * Get file ids that do not have any of the given tags
+	 * @param array $excludedTagIds
+	 * @param int $limit
+	 * @param int $offset default 0
+	 * @return array of file ids
+	 * @throws Exception if the database platform is not supported
+	 */
+	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit, int $offset = 0): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->automaticTablePrefix(true);
 
@@ -33,7 +33,7 @@ class DbFileMapper extends QBMapper {
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
 			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
 			->orderBy('f.fileid', 'DESC')
-            ->setFirstResult($offset)
+			->setFirstResult($offset)
 			->setMaxResults($limit);
 
 		$fileIds = [];
@@ -44,15 +44,15 @@ class DbFileMapper extends QBMapper {
 		return $fileIds;
 	}
 
-    /**
-     * Get file ids that have at least one of the given tags
-     * @param array $includedTagIds
-     * @param int $limit
-     * @param int $offset
-     * @return array of file ids
-     * @throws Exception if the database platform is not supported
-     */
-	public function getFileIdsWithTags(array $includedTagIds, int $limit, int $offset=0): array {
+	/**
+	 * Get file ids that have at least one of the given tags
+	 * @param array $includedTagIds
+	 * @param int $limit
+	 * @param int $offset
+	 * @return array of file ids
+	 * @throws Exception if the database platform is not supported
+	 */
+	public function getFileIdsWithTags(array $includedTagIds, int $limit, int $offset = 0): array {
 		$qb = $this->db->getQueryBuilder();
 		$qb->automaticTablePrefix(true);
 
@@ -64,7 +64,7 @@ class DbFileMapper extends QBMapper {
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
 			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
 			->orderBy('f.fileid', 'DESC')
-            ->setFirstResult($offset)
+			->setFirstResult($offset)
 			->setMaxResults($limit);
 
 		$fileIds = [];
