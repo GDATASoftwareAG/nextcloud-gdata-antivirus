@@ -78,6 +78,16 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas notifyMails --value="test@example.com"
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas sendMailOnVirusUpload --value=true
+
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpmode --value="smtp"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtphost --value="smtp-server"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpport --value="25"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_from_address --value="test"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
+docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
+
 
 source install.local || echo "No additional install script found."
 
