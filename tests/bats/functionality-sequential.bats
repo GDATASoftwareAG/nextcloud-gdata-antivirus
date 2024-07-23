@@ -129,6 +129,21 @@ setup_file() {
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 }
 
+@test "test mailing on eicar upload" {
+    echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
+    sleep 2
+    
+    until RESULT=$(curl -X 'GET' 'http://127.0.0.1:8081/api/Messages/new?mailboxName=Default&pageSize=1' -H 'accept: application/json')
+    do
+        echo "waiting for mail server to be ready"
+        sleep 2
+    done
+    
+    [[ $RESULT =~ "Infected file upload" ]]
+    
+    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt  
+}
+
 tearddown_file() {
     sleep 2   
     rm -rf $FOLDER_PREFIX/
