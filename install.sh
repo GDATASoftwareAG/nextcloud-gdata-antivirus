@@ -57,13 +57,31 @@ do
   sleep 2
 done
 
+# Configure the app for scanning
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientId --value="$CLIENT_ID"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
 
+# Configure Nextcloud to send emails
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas notifyMails --value="test@example.com"
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas sendMailOnVirusUpload --value=true
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpmode --value="smtp"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtphost --value="smtp-server"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpport --value="25"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_from_address --value="test"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
+docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
+
+# Setup the SMTP test server
+echo "setup smtp test server"
+docker stop smtp-server || echo "No container to stop"
+docker container rm smtp-server || echo "No container to remove"
+sleep 1
+docker run --quiet --network nextcloud -d --name smtp-server -p 8081:80 rnwood/smtp4dev:v3
+
 source install.local || echo "No additional install script found."
 
-# has to be done, to get the dev-requirements installed again
+# Has to be done, to get the dev-requirements installed again
 composer install
