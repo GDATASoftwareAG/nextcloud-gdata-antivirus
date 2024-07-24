@@ -26,6 +26,8 @@ services:
     container_name: smtp
     hostname: smtp
     restart: unless-stopped
+    environment:
+      ServerOptions__DisableIPv6: true
     ports:
       - "8081:80"
     networks:
