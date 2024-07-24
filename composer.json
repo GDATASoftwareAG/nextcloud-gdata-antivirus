@@ -13,7 +13,7 @@
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "v29.0.3",
+		"nextcloud/ocp": "v29.0.4",
 		"psalm/phar": "5.25.0",
 		"nextcloud/coding-standard": "v1.2.1",
 		"phpunit/phpunit": "^11.2",
