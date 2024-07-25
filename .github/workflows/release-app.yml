@@ -1,11 +1,10 @@
-name: Makefile CI
+name: Build and Test
 
 on:
   push:
-    branches: ["main", "*"]
+    branches: ["main"]
     tags: ["*"]
   pull_request:
-    branches: ["*"]
   workflow_dispatch:
 
 jobs:
