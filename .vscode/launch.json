@@ -5,6 +5,24 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Listen for XDebug remote",
+            "type": "php",
+            "request": "launch",
+            "port": 9080,
+            "pathMappings": {
+                "/var/www/html/": "${workspaceFolder}/nextcloud-server",
+                "/var/www/html/apps/gdatavaas": "${workspaceFolder}/",
+            },
+            "runtimeArgs": [
+                "-dxdebug.mode=debug",
+                "-dxdebug.start_with_request=yes",
+                "-dxdebug.client_host=nextcloud-server",
+                "-dxdebug.client_port=9080",
+                "-S",
+                "localhost:0"
+            ],
+        },
+        {
             "name": "Listen for Xdebug",
             "type": "php",
             "request": "launch",
