@@ -1,0 +1,37 @@
+services:
+  nextcloud-container:
+    build:
+      context: .
+      dockerfile: Dockerfile.Nextcloud
+      args:
+        - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-29.0.3}
+    environment:
+      - XDEBUG_MODE=${XDEBUG_MODE:-develop}
+    ports:
+      - "80:80"
+    container_name: nextcloud-container
+    hostname: nextcloud-container
+    depends_on:
+      - smtp
+    restart: unless-stopped
+    networks:
+      - nextcloud-network
+    healthcheck:
+      test: 'php occ status | grep "installed: false"'
+      interval: 5s
+      timeout: 2s
+      retries: 10
+  smtp:
+    image: rnwood/smtp4dev:v3
+    container_name: smtp
+    hostname: smtp
+    restart: unless-stopped
+    environment:
+      ServerOptions__DisableIPv6: true
+    ports:
+      - "8081:80"
+    networks:
+      - nextcloud-network
+
+networks:
+  nextcloud-network:
