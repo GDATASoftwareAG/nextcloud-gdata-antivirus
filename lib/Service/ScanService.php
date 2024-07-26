@@ -4,6 +4,7 @@ namespace OCA\GDataVaas\Service;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
 use GuzzleHttp\Exception\ServerException;
+use Generator;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
 use OCP\Files\EntityTooLargeException;
@@ -47,13 +48,10 @@ class ScanService {
 	 * @throws NotFoundException
 	 * @throws NotPermittedException
 	 */
-	public function run(): int {
-		$quantity = $this->appConfig->getValueInt(Application::APP_ID, 'scanQueueLength');
-		
-		$fileIds = $this->getFileIdsToScan($quantity);
-		$this->logger->debug("Scanning " . count($fileIds) . " files");
-		
-		foreach ($fileIds as $fileId) {
+	public function run(): int {		
+		$startTime = time();
+
+		foreach ($this->getFileIdsToScan($quantity) as $fileId) {
 			try {
 				$this->verdictService->scanFileById($fileId);
 			} catch (EntityTooLargeException) {
@@ -75,10 +73,12 @@ class ScanService {
             } catch (\Exception $e) {
 				$this->logger->error("Unexpected error while scanning file with id " . $fileId . ": " . $e->getMessage());
 			}
+
+			$elapsed = time() - $startTime;
+            if ($elapsed > 120) {
+                break;
+            }
 		}
-		$this->logger->debug("Scanned " . count($fileIds) . " files");
-		
-		return count($fileIds);
 	}
 
 	/**
@@ -88,7 +88,7 @@ class ScanService {
 	 * @throws NotFoundException
 	 * @throws NotPermittedException
 	 */
-	private function getFileIdsToScan(int $quantity): array {
+	private function getFileIdsToScan(): Generator {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 		
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
@@ -99,8 +99,7 @@ class ScanService {
 		$limit = 50;
 		$offset = 0;
 		$tagParam = $unscannedTagIsDisabled ? [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()] : TagService::UNSCANNED;
-		$fileIdsAllowedToScan = [];
-		while (count($fileIdsAllowedToScan) < $quantity) {
+		while (true) {
 			$fileIds = $unscannedTagIsDisabled ? $this->tagService->getFileIdsWithoutTags($tagParam, $limit, $offset) : $this->tagService->getFileIdsWithTag($tagParam, $limit, $offset);
 			if (empty($fileIds)) {
 				break;
@@ -109,12 +108,10 @@ class ScanService {
 				$node = $this->fileService->getNodeFromFileId($fileId);
 				$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 				if ($this->verdictService->isAllowedToScan($filePath)) {
-					$fileIdsAllowedToScan[] = $fileId;
+					yield $fileId;
 				}
 			}
 			$offset += $limit;
 		}
-		
-		return $fileIdsAllowedToScan;
 	}
 }
