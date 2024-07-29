@@ -3,11 +3,11 @@
 namespace OCA\GDataVaas\Controller;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
+use GuzzleHttp\Exception\ServerException;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Files\EntityTooLargeException;
-use OCP\Files\InvalidPathException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IRequest;
@@ -40,8 +40,6 @@ class ScanController extends Controller {
 			return new JSONResponse(['error' => 'File is larger than ' . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de')], 413);
 		} catch (FileDoesNotExistException) {
 			return new JSONResponse(['error' => 'File does not exist'], 404);
-		} catch (InvalidPathException) {
-			return new JSONResponse(['error' => 'Invalid path'], 400);
 		} catch (InvalidSha256Exception) {
 			return new JSONResponse(['error' => 'Invalid SHA256'], 400);
 		} catch (NotFoundException) {
@@ -50,8 +48,8 @@ class ScanController extends Controller {
 			return new JSONResponse(['error' => 'Current settings do not permit scanning this.'], 403);
 		} catch (TimeoutException) {
 			return new JSONResponse(['error' => 'Scanning timed out'], 408);
-		} catch (UploadFailedException) {
-			return new JSONResponse(['error' => 'File upload failed'], 500);
+		} catch (UploadFailedException|ServerException) {
+			return new JSONResponse(['error' => "File $fileId could not be scanned with GData VaaS because there was a temporary upstream server error"], 500);
 		} catch (VaasAuthenticationException) {
 			return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
 		}
