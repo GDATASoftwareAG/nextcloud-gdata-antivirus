@@ -9,14 +9,14 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
-use VaasSdk\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
 use VaasSdk\Exceptions\InvalidSha256Exception;
 use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\VaasVerdict;
-use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
 use VaasSdk\VaasOptions;
 
@@ -231,25 +231,28 @@ class VerdictService {
 		return trim(preg_replace('/\s*,\s*/', ',', $s));
 	}
 
-	/**
-	 * @throws VaasAuthenticationException
-	 */
-	private function createAndConnectVaas(): Vaas {
-		if ($this->authMethod === 'ResourceOwnerPassword') {
-			$this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
+	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+		if ($authMethod === 'ResourceOwnerPassword') {
+			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
 				$this->username,
 				$this->password,
 				$this->tokenEndpoint
 			);
-		} elseif ($this->authMethod === 'ClientCredentials') {
-			$this->authenticator = new ClientCredentialsGrantAuthenticator(
+		} elseif ($authMethod === 'ClientCredentials') {
+			return new ClientCredentialsGrantAuthenticator(
 				$this->clientId,
 				$this->clientSecret,
 				$this->tokenEndpoint
 			);
 		}
+	}
 
+	/**
+	 * @throws VaasAuthenticationException
+	 */
+	public function createAndConnectVaas(): Vaas {
+		$this->authenticator = $this->getAuthenticator($this->authMethod);
 		$options = new VaasOptions(false, false);
 		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
 		$vaas->Connect($this->authenticator->getToken());
