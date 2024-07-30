@@ -3,6 +3,7 @@
 namespace OCA\GDataVaas\Controller;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
+use Exception;
 use GuzzleHttp\Exception\ServerException;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
@@ -43,7 +44,7 @@ class ScanController extends Controller {
 		} catch (InvalidSha256Exception) {
 			return new JSONResponse(['error' => 'Invalid SHA256'], 400);
 		} catch (NotFoundException) {
-			return new JSONResponse(['error' => 'Not found'], 404);
+			return new JSONResponse(['error' => 'File not found'], 404);
 		} catch (NotPermittedException) {
 			return new JSONResponse(['error' => 'Current settings do not permit scanning this.'], 403);
 		} catch (TimeoutException) {
@@ -52,6 +53,8 @@ class ScanController extends Controller {
 			return new JSONResponse(['error' => "File $fileId could not be scanned with GData VaaS because there was a temporary upstream server error"], 500);
 		} catch (VaasAuthenticationException) {
 			return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
-		}
+		} catch (Exception $e) {
+            return new JSONResponse(['error' => $e->getMessage()], 500);
+        }
 	}
 }
