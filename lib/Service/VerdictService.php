@@ -231,7 +231,12 @@ class VerdictService {
 		return trim(preg_replace('/\s*,\s*/', ',', $s));
 	}
 
-	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+    /**
+     * @param string $authMethod
+     * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
+     * @throws VaasAuthenticationException
+     */
+    public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
 		if ($authMethod === 'ResourceOwnerPassword') {
 			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
@@ -245,7 +250,9 @@ class VerdictService {
 				$this->clientSecret,
 				$this->tokenEndpoint
 			);
-		}
+		} else {
+            throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
+        }
 	}
 
 	/**
