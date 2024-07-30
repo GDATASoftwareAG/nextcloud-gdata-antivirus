@@ -54,7 +54,7 @@ class ScanController extends Controller {
 		} catch (VaasAuthenticationException) {
 			return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
 		} catch (Exception $e) {
-            return new JSONResponse(['error' => $e->getMessage()], 500);
+            return new JSONResponse(['error' => "An unknown error occurred while scanning file $fileId with GData VaaS. Please check the logs for more information and contact your administrator."], 500);
         }
 	}
 }
