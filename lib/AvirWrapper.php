@@ -9,6 +9,8 @@
 
 namespace OCA\GDataVaas;
 
+use Coduo\PHPHumanizer\NumberHumanizer;
+use GuzzleHttp\Exception\ServerException;
 use OC\Files\Storage\Wrapper\Wrapper;
 use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCA\GDataVaas\Activity\Provider;
@@ -17,10 +19,18 @@ use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
 use OCP\EventDispatcher\IEventDispatcher;
+use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidContentException;
+use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use OCP\IL10N;
 use Psr\Log\LoggerInterface;
+use VaasSdk\Exceptions\FileDoesNotExistException;
+use VaasSdk\Exceptions\InvalidSha256Exception;
+use VaasSdk\Exceptions\TimeoutException;
+use VaasSdk\Exceptions\UploadFailedException;
+use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\Verdict;
 
 class AvirWrapper extends Wrapper {
@@ -135,12 +145,27 @@ class AvirWrapper extends Wrapper {
 						return;
 					}
 
-					try {
-						$verdict = $this->verdictService->scan($localPath);
-					} catch (\Exception $e) {
-						$this->logger->error($e->getMessage(), ['exception' => $e]);
-						return;
-					}
+                    try {
+                        $verdict = $this->verdictService->scan($localPath);
+                    } catch (EntityTooLargeException) {
+                        $this->logger->error("File $localPath is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
+                    } catch (FileDoesNotExistException) {
+                        $this->logger->error("File $localPath does not exist on upload");
+                    } catch (InvalidSha256Exception) {
+                        $this->logger->error("Invalid SHA256 for file $localPath on upload");
+                    } catch (NotFoundException) {
+                        $this->logger->error("File $localPath not found on upload");
+                    } catch (NotPermittedException) {
+                        $this->logger->error("Current settings do not permit scanning file $localPath on upload");
+                    } catch (TimeoutException) {
+                        $this->logger->error("Scanning timed out for file $localPath on upload");
+                    } catch (UploadFailedException|ServerException) {
+                        $this->logger->error("File $localPath could not be scanned on upload with GData VaaS because there was a temporary upstream server error");
+                    } catch (VaasAuthenticationException) {
+                        $this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
+                    } catch (\Exception $e) {
+                        $this->logger->error("Unexpected error while scanning file " . $localPath . " on upload: " . $e->getMessage());
+                    }
 					$logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
 
 					if ($verdict->Verdict == Verdict::MALICIOUS) {
