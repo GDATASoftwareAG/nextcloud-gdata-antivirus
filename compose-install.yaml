@@ -16,11 +16,6 @@ services:
     restart: unless-stopped
     networks:
       - nextcloud-network
-    healthcheck:
-      test: 'php occ status | grep "installed: false"'
-      interval: 5s
-      timeout: 2s
-      retries: 10
   smtp:
     image: rnwood/smtp4dev:v3
     container_name: smtp

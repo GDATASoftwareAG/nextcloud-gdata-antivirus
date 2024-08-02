@@ -121,6 +121,14 @@ appstore: build
 	tar czf $(appstore_package_name).tar.gz \
 	--transform s/$(app_directory_name)/$(app_real_name)/ \
 	--exclude-vcs \
+	--exclude="../$(app_directory_name)/artifacts" \
+	--exclude="../$(app_directory_name)/tmp*" \
+	--exclude="../$(app_directory_name)/Dockerfile*" \
+	--exclude="../$(app_directory_name)/nextcloud-server*" \
+	--exclude="../$(app_directory_name)/compose-install.yaml" \
+	--exclude="../$(app_directory_name)/empty-skeleton.config.php" \
+	--exclude="../$(app_directory_name)/get-matrix.sh" \
+	--exclude="../$(app_directory_name)/xdebug.*" \
 	--exclude="../$(app_directory_name)/build" \
 	--exclude="../$(app_directory_name)/tests" \
 	--exclude="../$(app_directory_name)/Makefile" \

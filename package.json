@@ -40,7 +40,8 @@
   },
   "overrides": {
     "@nextcloud/webpack-vue-config": {
-      "webpack-dev-server": "5.0.4"
+      "webpack-dev-server": "5.0.4",
+      "vue-loader": "^17"
     }
   }
 }
