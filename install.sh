@@ -11,6 +11,12 @@ setup_nextcloud () {
   docker compose -f compose-install.yaml rm --force --stop --volumes
   docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
 
+  until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
+  do
+    echo "waiting for nextcloud to be initialized"
+    sleep 2
+  done
+
   echo "copy config for empty skeleton"
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
   docker exec -i nextcloud-container chown www-data:www-data /var/www/html/config/config.php
@@ -23,6 +29,8 @@ setup_nextcloud () {
 
   docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
   docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
+  docker exec --user www-data -i nextcloud-container php occ app:disable weather_status
+  docker exec --user www-data -i nextcloud-container php occ config:system:set trusted_domains 2 --value=192.168.5.80
 
   echo "setup nextcloud finished"
 }
@@ -71,4 +79,4 @@ docker exec --user www-data -i nextcloud-container php occ user:setting admin se
 source install.local || echo "No additional install script found."
 
 # Has to be done, to get the dev-requirements installed again
-composer install
+composer install --quiet &
