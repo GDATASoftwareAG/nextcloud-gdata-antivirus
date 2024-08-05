@@ -12,6 +12,9 @@
 	"forwardPorts": [
 		80
 	],
+	"containerEnv": {
+		"XDEBUG_MODE": "debug,develop"
+	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
