@@ -151,7 +151,6 @@ class VerdictService {
 
 			return $verdict;
 		} catch (Exception $e) {
-			$this->logger->error("VaaS scan error: " . $e->getMessage());
 			$this->vaas = null;
 			throw $e;
 		}

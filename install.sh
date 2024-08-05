@@ -1,20 +1,15 @@
 #!/bin/bash
 
-NEXTCLOUD_VERSION=${1:-29}
+NEXTCLOUD_VERSION=${1:-29.0.4}
+XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
 source .env-local || echo "No .env-local file found."
 
 setup_nextcloud () {
   echo "setup nextcloud"
-  docker stop nextcloud-container || echo "No container to stop"
-  sleep 1
-  docker run --quiet -d --name nextcloud-container --rm --publish 80:80 nextcloud:$NEXTCLOUD_VERSION
-
-  until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
-  do
-    echo "waiting for nextcloud to be initialized"
-    sleep 2
-  done
+  docker compose -f compose-install.yaml kill
+  docker compose -f compose-install.yaml rm --force --stop --volumes
+  NEXTCLOUD_VERSION=$NEXTCLOUD_VERSION XDEBUG_MODE=$XDEBUG_MODE docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
 
   echo "copy config for empty skeleton"
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
@@ -57,13 +52,24 @@ do
   sleep 2
 done
 
+# Configure the app for scanning
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientId --value="$CLIENT_ID"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
 
+# Configure Nextcloud to send emails
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas notifyMails --value="test@example.com"
+docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas sendMailOnVirusUpload --value=true
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpmode --value="smtp"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtphost --value="smtp"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_smtpport --value="25"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_from_address --value="test@example.com"
+docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
+docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
+
 source install.local || echo "No additional install script found."
 
-# has to be done, to get the dev-requirements installed again
+# Has to be done, to get the dev-requirements installed again
 composer install
