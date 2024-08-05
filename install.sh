@@ -9,7 +9,7 @@ setup_nextcloud () {
   echo "setup nextcloud"
   docker compose -f compose-install.yaml kill
   docker compose -f compose-install.yaml rm --force --stop --volumes
-  docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans NEXTCLOUD_VERSION=$NEXTCLOUD_VERSION XDEBUG_MODE=$XDEBUG_MODE
+  docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans -e NEXTCLOUD_VERSION=$NEXTCLOUD_VERSION -e XDEBUG_MODE=$XDEBUG_MODE
 
   echo "copy config for empty skeleton"
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
