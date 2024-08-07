@@ -9,14 +9,14 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
-use VaasSdk\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
 use VaasSdk\Exceptions\InvalidSha256Exception;
 use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\VaasVerdict;
-use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
 use VaasSdk\VaasOptions;
 
@@ -126,6 +126,18 @@ class VerdictService {
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
 
+	public function invalidateOpcache(): void {
+		if (!function_exists("opcache_get_status")) {
+			return;
+		}
+		$status = opcache_get_status();
+		foreach($status["scripts"] as $script) {
+			if (stristr($script["full_path"], "gdatavaas")) {
+				$this->logger->debug("Invalidating opcache for " . $script["full_path"]);
+				opcache_invalidate($script["full_path"], true);
+			}
+		}
+	}
 
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
@@ -138,6 +150,7 @@ class VerdictService {
 	 * @throws VaasAuthenticationException
 	 */
 	public function scan(string $filePath): VaasVerdict {
+		$this->invalidateOpcache();
 		$this->lastLocalPath = $filePath;
 		$this->lastVaasVerdict = null;
 
@@ -147,6 +160,7 @@ class VerdictService {
 
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
+			$this->invalidateOpcache();
 
 			$this->lastVaasVerdict = $verdict;
 
@@ -230,24 +244,34 @@ class VerdictService {
 	}
 
 	/**
+	 * @param string $authMethod
+	 * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
 	 * @throws VaasAuthenticationException
 	 */
-	private function createAndConnectVaas(): Vaas {
-		if ($this->authMethod === 'ResourceOwnerPassword') {
-			$this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
+	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+		if ($authMethod === 'ResourceOwnerPassword') {
+			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
 				$this->username,
 				$this->password,
 				$this->tokenEndpoint
 			);
-		} elseif ($this->authMethod === 'ClientCredentials') {
-			$this->authenticator = new ClientCredentialsGrantAuthenticator(
+		} elseif ($authMethod === 'ClientCredentials') {
+			return new ClientCredentialsGrantAuthenticator(
 				$this->clientId,
 				$this->clientSecret,
 				$this->tokenEndpoint
 			);
+		} else {
+			throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
 		}
+	}
 
+	/**
+	 * @throws VaasAuthenticationException
+	 */
+	public function createAndConnectVaas(): Vaas {
+		$this->authenticator = $this->getAuthenticator($this->authMethod);
 		$options = new VaasOptions(false, false);
 		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
 		$vaas->Connect($this->authenticator->getToken());

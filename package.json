@@ -10,7 +10,7 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "build": "webpack --node-env production --progress",
+    "build": "webpack --node-env production",
     "dev": "webpack --node-env development --progress",
     "watch": "webpack --node-env development --progress --watch",
     "serve": "webpack --node-env development serve --progress",
@@ -40,7 +40,8 @@
   },
   "overrides": {
     "@nextcloud/webpack-vue-config": {
-      "webpack-dev-server": "5.0.4"
+      "webpack-dev-server": "5.0.4",
+      "vue-loader": "^17"
     }
   }
 }
