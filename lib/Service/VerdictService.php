@@ -126,6 +126,18 @@ class VerdictService {
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
 
+	public function invalidateOpcache(): void {
+		if (!function_exists("opcache_get_status")) {
+			return;
+		}
+		$status = opcache_get_status();
+		foreach($status["scripts"] as $script) {
+			if (stristr($script["full_path"], "gdatavaas")) {
+				$this->logger->debug("Invalidating opcache for " . $script["full_path"]);
+				opcache_invalidate($script["full_path"], true);
+			}
+		}
+	}
 
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
@@ -138,6 +150,7 @@ class VerdictService {
 	 * @throws VaasAuthenticationException
 	 */
 	public function scan(string $filePath): VaasVerdict {
+		$this->invalidateOpcache();
 		$this->lastLocalPath = $filePath;
 		$this->lastVaasVerdict = null;
 
@@ -147,6 +160,7 @@ class VerdictService {
 
 		try {
 			$verdict = $this->vaas->ForFile($filePath);
+			$this->invalidateOpcache();
 
 			$this->lastVaasVerdict = $verdict;
 
@@ -229,12 +243,12 @@ class VerdictService {
 		return trim(preg_replace('/\s*,\s*/', ',', $s));
 	}
 
-    /**
-     * @param string $authMethod
-     * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
-     * @throws VaasAuthenticationException
-     */
-    public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+	/**
+	 * @param string $authMethod
+	 * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
+	 * @throws VaasAuthenticationException
+	 */
+	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
 		if ($authMethod === 'ResourceOwnerPassword') {
 			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
@@ -249,8 +263,8 @@ class VerdictService {
 				$this->tokenEndpoint
 			);
 		} else {
-            throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
-        }
+			throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
+		}
 	}
 
 	/**

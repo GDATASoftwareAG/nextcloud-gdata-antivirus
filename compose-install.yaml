@@ -6,7 +6,7 @@ services:
       args:
         - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-29.0.3}
     environment:
-      - XDEBUG_MODE=${XDEBUG_MODE:-develop}
+      XDEBUG_MODE: ${XDEBUG_MODE:-develop}
     ports:
       - "80:80"
     container_name: nextcloud-container
