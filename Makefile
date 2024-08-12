@@ -150,14 +150,16 @@ appstore: build
 	--exclude="../$(app_directory_name)/LICENSES" \
 	--exclude="../$(app_directory_name)/src" \
 	--exclude="../$(app_directory_name)/babel.config.js" \
-	--exclude="../$(app_directory_name)/compose.yaml" \
-	--exclude="../$(app_directory_name)/nginx.conf" \
 	--exclude="../$(app_directory_name)/devcontainer.yaml" \
 	--exclude="../$(app_directory_name)/psalm.xml" \
 	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
 	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
 	--exclude="../$(app_directory_name)/dev-environment*" \
-	--exclude="../$(app_directory_name)/docker-compose.yml" \
 	--exclude="../$(app_directory_name)/install.sh" \
 	--exclude="../$(app_directory_name)/renovate.json" \
+	--exclude="../$(app_directory_name)/get-matrix.sh" \
+	--exclude="../$(app_directory_name)/xdebug.ini" \
+	--exclude="../$(app_directory_name)/compose-install.yaml" \
+	--exclude="../$(app_directory_name)/Dockerfile.Nextcloud" \
+	--exclude="../$(app_directory_name)/empty-skeleton.config.php" \
 	../$(app_directory_name) \

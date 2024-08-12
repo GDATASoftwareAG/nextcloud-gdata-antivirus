@@ -69,23 +69,34 @@ You always need to do this before you start the development environment or copy 
 If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
 
 ### Windows
-For Windows you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
+For Windows, you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
 
 ### Linux
-* For a quick development environment you can use the provided ```start-dev-environment.sh``` script. Or you use the following steps:
-* Make sure you have docker compose installed
-* Run the following command with bash in the folder where you want your Nextcloud in
-```bash
-git clone https://github.com/juliushaertl/nextcloud-docker-dev
-cd nextcloud-docker-dev
-./bootstrap.sh
-sudo sh -c "echo '127.0.0.1 nextcloud.local' >> /etc/hosts"
-docker-compose up nextcloud proxy
-```
-The command may take a while and starts Nextcloud directly. Nextcloud can then be accessed with your browser at http://nextcloud.local.
+* For a quick lite development environment you can use the provided ```start-dev-environment.sh``` script. Or you use the following steps:
+* Make sure you have the tools mentioned above installed.
+* With the provided ./install.sh script you can install the dependencies and build the node modules.
 
-In the future, Nextcloud can then be started again by changing to the
-folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy```. For more information see the [Nextcloud app development tutorials](https://cloud.nextcloud.com/s/iyNGp8ryWxc7Efa). These steps set up the official Nextcloud Dev Environment. It uses an SQLite databse. If you want to test on a production like instance you can set up a real Nextcloud Server using this [compose file](compose.yaml).
+### `install.sh` Script
+
+The `install.sh` script is used to set up and configure a Nextcloud instance with the G DATA VaaS app and Smtp4Dev. Below is an explanation of the script's features:
+
+1. **Environment Variables in `.env-local`**:
+    - `CLIENT_ID`: Sets the client ID for the G DATA VaaS app.
+    - `CLIENT_SECRET`: Sets the client secret for the G DATA VaaS app.
+   
+   If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
+
+2. **Specify the Nextcloud server version**:
+    - The Nextcloud version defaults to 29.0.4
+    - You can start the `install.sh` script with the desired Nextcloud version as an argument, e.g. `./install.sh 29`
+
+3. **Smtp4Dev**:
+    - Starts a container with the Smtp4Dev tool to capture emails sent by Nextcloud.
+    - The tool is accessible at `http://localhost:8081` and can be used to view emails sent by Nextcloud.
+
+4. **Additional Install Script**:
+    - Sources `install.local` if it exists for any additional installation steps.
+
 
 ### Useful commands
 
@@ -96,3 +107,8 @@ folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy``
 | Watch logs                | `docker exec --user www-data nextcloud-container php occ log:watch`                                      |
 | Watch raw logs            | `docker exec --user www-data nextcloud-container php occ log:watch --raw \| jq .message`                 |
 | Set log level to debug    | `docker exec --user www-data nextcloud-container php occ log:manage --level DEBUG`                       |
+
+
+## Smtp4Dev
+
+For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).

@@ -55,7 +55,6 @@ js/*hot-update.*
 /fuel/app/logs/*/*/*
 /fuel/app/cache/*/*
 /fuel/app/config/crypt.php
-.env
 package-lock.json
 move_app.sh
 dev-environment*/
