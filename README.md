@@ -54,6 +54,51 @@ The app offers a variety of settings to customize the behavior of the antivirus.
 
 If you want to self-host the scanning backend, take a look at the [repository of our helm chart](https://github.com/GDATASoftwareAG/vaas-helm).
 
+## Nextcloud Commands
+
+The following commands are available for managing and interacting with the G DATA VaaS app in your Nextcloud instance:
+
+#### `gdatavaas:scan`
+
+- **Description**: Scans files for malware.
+- **Usage**: `php occ gdatavaas:scan`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:scan`
+- **Details**: This command scans all files in the Nextcloud instance for malware and logs the results.
+
+#### `gdatavaas:get-tags-for-file`
+
+- **Description**: Retrieves tags for a specified file.
+- **Usage**: `php occ gdatavaas:get-tags-for-file <file-path>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file <file-path>`
+- **Arguments**:
+   - `<file-path>`: The path to the file (e.g., `username/files/filename`).
+- **Details**: This command fetches and logs all tags associated with the specified file.
+
+#### `gdatavaas:remove-tag`
+
+- **Description**: Deletes a specified tag.
+- **Usage**: `php occ gdatavaas:remove-tag <tag-name>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:remove-tag <tag-name>`
+- **Arguments**:
+   - `<tag-name>`: The name of the tag to delete.
+- **Details**: This command removes the specified tag from the system. If the tag does not exist, an error is logged.
+
+#### `gdatavaas:tag-unscanned`
+
+- **Description**: Tags all files without a tag from this app as unscanned.
+- **Usage**: `php occ gdatavaas:tag-unscanned`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:tag-unscanned`
+- **Details**: This command tags all files that have not been tagged by the G DATA VaaS app as "unscanned" and logs the results.
+
+#### `gdatavaas:get-tag-id`
+
+- **Description**: Gets the ID of a specified tag.
+- **Usage**: `php occ gdatavaas:get-tag-id <tag-name>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tag-id <tag-name>`
+- **Arguments**:
+   - `<tag-name>`: The name of the tag to get the ID for.
+- **Details**: This command retrieves and logs the ID of the specified tag. If the tag does not exist, an error is logged.
+
 ## Setting up a development environment
 
 Before you start, make sure you have the following tools installed:

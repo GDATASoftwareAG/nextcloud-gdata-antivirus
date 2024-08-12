@@ -4,6 +4,7 @@ namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
 use OCA\GDataVaas\Service\ScanService;
+use OCA\GDataVaas\Service\TagUnscannedService;
 use OCP\DB\Exception;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
@@ -14,12 +15,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ScanCommand extends Command {
 	private ScanService $scanService;
+    private TagUnscannedService $tagUnscannedService;
 	private LoggerInterface $logger;
 
-	public function __construct(ScanService $scanService, LoggerInterface $logger) {
+	public function __construct(ScanService $scanService, TagUnscannedService $tagUnscannedService, LoggerInterface $logger) {
 		parent::__construct();
 
 		$this->scanService = $scanService;
+        $this->tagUnscannedService = $tagUnscannedService;
 		$this->logger = $logger;
 	}
 
@@ -43,6 +46,9 @@ class ScanCommand extends Command {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$logger->info("scanning files");
 		$start = microtime(true);
+        $this->tagUnscannedService
+            ->withLogger($logger)
+            ->run();
 		$scannedFilesCount = $this->scanService
 			->withLogger($logger)
 			->run();
