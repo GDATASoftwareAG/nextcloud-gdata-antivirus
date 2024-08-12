@@ -10,7 +10,7 @@
   "license": "AGPL-3.0-or-later",
   "private": true,
   "scripts": {
-    "build": "webpack --node-env production --progress",
+    "build": "webpack --node-env production",
     "dev": "webpack --node-env development --progress",
     "watch": "webpack --node-env development --progress --watch",
     "serve": "webpack --node-env development serve --progress",

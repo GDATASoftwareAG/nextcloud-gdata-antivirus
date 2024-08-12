@@ -128,7 +128,6 @@ class VerdictService {
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
 
-
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
 	 * @param string $filePath The local path to the file to scan.
@@ -231,12 +230,12 @@ class VerdictService {
 		return trim(preg_replace('/\s*,\s*/', ',', $s));
 	}
 
-    /**
-     * @param string $authMethod
-     * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
-     * @throws VaasAuthenticationException
-     */
-    public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+	/**
+	 * @param string $authMethod
+	 * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
+	 * @throws VaasAuthenticationException
+	 */
+	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
 		if ($authMethod === 'ResourceOwnerPassword') {
 			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
@@ -251,8 +250,8 @@ class VerdictService {
 				$this->tokenEndpoint
 			);
 		} else {
-            throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
-        }
+			throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
+		}
 	}
 
 	/**

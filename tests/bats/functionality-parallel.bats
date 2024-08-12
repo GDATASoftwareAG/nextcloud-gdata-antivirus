@@ -15,14 +15,45 @@ setup_file() {
 }
 
 @test "test admin eicar Upload" {
-    RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt)
+    EICAR_LENGTH=$(echo $EICAR_STRING | wc -c)
+    RESULT=$(echo $EICAR_STRING | curl -v -X PUT -d"$EICAR_STRING" -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
+
+    if [[ "$RESULT" =~ "curl failed" ]]; then
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat .htaccess
+        df -h
+        free
+        mpstat
+        docker stats --no-stream --no-trunc
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat data/nextcloud.log
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat /var/www/html/data/php.log
+        docker logs nextcloud-container
+    fi
+
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
     [[ "$RESULT" =~ "Upload cannot be completed." ]]
 }
 
 @test "test admin clean upload" {
-    RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.clean.txt)
+    RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "curl failed")
+
+    if [[ "$RESULT" =~ "curl failed" ]]; then
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat .htaccess
+        df -h
+        free
+        mpstat
+        docker stats --no-stream --no-trunc
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat data/nextcloud.log
+        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat /var/www/html/data/php.log
+        docker logs nextcloud-container
+    fi
+
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "file not found"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]]

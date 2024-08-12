@@ -121,6 +121,8 @@ appstore: build
 	tar czf $(appstore_package_name).tar.gz \
 	--transform s/$(app_directory_name)/$(app_real_name)/ \
 	--exclude-vcs \
+	--exclude="../$(app_directory_name)/opcache-disabled.ini" \
+	--exclude="../$(app_directory_name)/opcache-blacklist.txt" \
 	--exclude="../$(app_directory_name)/artifacts" \
 	--exclude="../$(app_directory_name)/tmp*" \
 	--exclude="../$(app_directory_name)/Dockerfile*" \
