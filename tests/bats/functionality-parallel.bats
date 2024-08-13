@@ -19,6 +19,11 @@ setup_file() {
     RESULT=$(echo $EICAR_STRING | curl -v -X PUT -d"$EICAR_STRING" -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
 
     if [[ "$RESULT" =~ "curl failed" ]]; then
+        echo "debugging stuff"
+        docker exec -i nextcloud-container ls -lha /tmp/apache2-coredump
+        mkdir -p ./coredumps
+        docker container cp nextcloud-container:/tmp/apache2-coredump/* ./coredumps
+        ls -lha ./coredumps
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files
@@ -41,6 +46,7 @@ setup_file() {
     RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "curl failed")
 
     if [[ "$RESULT" =~ "curl failed" ]]; then
+        echo "debugging stuff"
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
         $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files

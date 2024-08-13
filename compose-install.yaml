@@ -5,10 +5,16 @@ services:
       dockerfile: Dockerfile.Nextcloud
       args:
         - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-29.0.3}
+        - INSTALL_XDEBUG=${INSTALL_XDEBUG:-1}
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE:-develop}
     ports:
       - "80:80"
+    privileged: true
+    # cap_add:
+    #   - SYS_PTRACE
+    #   - SYS_ADMIN
+    #   - NET_ADMIN
     container_name: nextcloud-container
     hostname: nextcloud-container
     depends_on:

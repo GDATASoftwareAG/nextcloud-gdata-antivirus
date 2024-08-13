@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NEXTCLOUD_VERSION=${1:-29.0.4}
+INSTALL_XDEBUG=${2:-1}
 XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
 source .env-local || echo "No .env-local file found."
@@ -10,6 +11,9 @@ setup_nextcloud () {
   docker compose -f compose-install.yaml kill
   docker compose -f compose-install.yaml rm --force --stop --volumes
   docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
+
+  docker exec -i nextcloud-container ulimit -c unlimited
+  docker exec -i nextcloud-container bash -c 'echo "/tmp/apache2-coredump/core-%e-%s-%u-%g-%p-%t" > /proc/sys/kernel/core_pattern'
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do
@@ -80,3 +84,5 @@ source install.local || echo "No additional install script found."
 
 # Has to be done, to get the dev-requirements installed again
 composer install --quiet &
+
+composer info

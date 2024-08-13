@@ -9,8 +9,9 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "9.0.3",
-		"coduo/php-humanizer": "^5.0"
+		"gdata/vaas": "v9.0.3",
+		"coduo/php-humanizer": "^5.0",
+		"amphp/file": "dev-opcache-bug"
 	},
 	"require-dev": {
 		"nextcloud/ocp": "v29.0.4",
@@ -40,5 +41,6 @@
 		"platform": {
 			"php": "8.1"
 		}
-	}
+	},
+	"minimum-stability": "dev"
 }
