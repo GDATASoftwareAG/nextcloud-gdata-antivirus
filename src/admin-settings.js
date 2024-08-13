@@ -23,6 +23,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return response.json();
 	}
 
+	function hideUnneccessaryFields(selectedFlow) {
+		let style = selectedFlow == "ResourceOwnerPassword" ? "table-row" : "none";
+		document.querySelector('tr.basic_settings:has(#username)').style.display = style;
+		document.querySelector('tr.basic_settings:has(#password)').style.display = style;
+		style = selectedFlow == "ClientCredentials" ? "table-row" : "none";
+		document.querySelector('tr.basic_settings:has(#clientId)').style.display = style;
+		document.querySelector('tr.basic_settings:has(#clientSecret)').style.display = style;
+	}
+
 	const authSubmit = document.querySelector('#auth_submit');
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
 	const resetAllTags = document.querySelector('#reset');
@@ -34,16 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const sendMailOnVirusUpload = document.querySelector('#send_mail_on_virus_upload');
 	const sendMailSummaryOfMaliciousFiles = document.querySelector('#send_summary_mail_for_malicious_files');
 
-	authMethod.addEventListener('change', (e) => {
-		let style = "table-row";
-		document.querySelector('tr.basic_settings:has(#username)').style.display = style;
-		document.querySelector('tr.basic_settings:has(#password)').style.display = style;
-		style = "none";
-		document.querySelector('tr.basic_settings:has(#clientId)').style.display = style;
-		document.querySelector('tr.basic_settings:has(#clientSecret)').style.display = style;
+	hideUnneccessaryFields(authMethod.value);
 
-		document.querySelector('#clientId').value = '';
-		document.querySelector('#clientSecret').value = '';
+	authMethod.addEventListener('change', (e) => {
+		hideUnneccessaryFields(e.target.value);
 	});
 
 	authSubmit.addEventListener('click', async (e) => {
