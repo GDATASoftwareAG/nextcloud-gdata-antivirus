@@ -1,7 +1,7 @@
 ARG NEXTCLOUD_VERSION=29.0.4
 ARG INSTALL_XDEBUG=1
 
-FROM nextcloud:29.0.4
+FROM nextcloud:${NEXTCLOUD_VERSION}
 
 RUN apt update && apt install -y \
     less vim telnet iputils-ping gdb libexpat1-dev libapr1-dev libaprutil1-dev devscripts debmake \
