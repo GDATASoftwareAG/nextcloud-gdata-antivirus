@@ -13,9 +13,9 @@
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "v29.0.4",
+		"nextcloud/ocp": "v29.0.5",
 		"psalm/phar": "5.25.0",
-		"nextcloud/coding-standard": "v1.2.1",
+		"nextcloud/coding-standard": "v1.2.3",
 		"phpunit/phpunit": "^11.2",
 		"symfony/console": "^7.1"
 	},
