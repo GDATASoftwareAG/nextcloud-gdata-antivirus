@@ -157,3 +157,47 @@ The `install.sh` script is used to set up and configure a Nextcloud instance wit
 ## Smtp4Dev
 
 For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
+
+
+### Configuring via the command line
+
+In addition to graphical configuration via the VaaS settings page in Nextcloud Settings, the following settings are exposed via PHP OCC commands:
+
+```
+# The authentication flow to use (depends on available credentials). Default: ResourceOwnerPassword
+php occ config:app:set gdatavaas authMethod <ResourceOwnerPassword|ClientCredentials>
+
+# Username + Password are used only in ResourceOwnerPassword authMethod
+php occ config:app:set gdatavaas username <string>
+php occ config:app:set gdatavaas password <string>
+
+# ClientID + ClientSecret are used only in ClientCredentials authMethod
+php occ config:app:set gdatavaas clientId <string>
+php occ config:app:set gdatavaas clientSecret <string>
+
+# VaaS server address. Default: wss://gateway.staging.vaas.gdatasecurity.de
+php occ config:app:set gdatavaas vaasUrl <URL>
+# Authentication server. Default: https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token
+php occ config:app:set gdatavaas tokenEndpoint <URL>
+
+# Name of quarantine folder. Default: Quarantine
+php occ config:app:set gdatavaas quarantineFolder <string>
+# Whether to enable the automatic file scan. Default: false
+php occ config:app:set gdatavaas autoScanFiles <true|false>
+# Whether to add a prefix to malicious files. Default: true
+php occ config:app:set gdatavaas prefixMalicious <true|false>
+# Whether to disable the unscanned tag. Default: false
+php occ config:app:set gdatavaas disableUnscannedTag <true|false>
+# Comma-separated list of files/folders that should be scanned. Default: Empty string (all files)
+php occ config:app:set gdatavaas scanOnlyThis <string>
+# Comma-separated list of files/folders that should **not** be scanned. Default: Empty string (no files excluded)
+php occ config:app:set gdatavaas doNotScanThis <string>
+# Number of files that should be processed per job (/5 min). Default: 50
+php occ config:app:set gdatavaas scanQueueLength <integer>
+# Email address to send notifications to, when infected files are uploaded. Default: None
+php occ config:app:set gdatavaas notifyMail <email>
+# Whether to send email notifications on upload, when files are infected. Default: false
+php occ config:app:set gdatavaas sendMailOnVirusUpload <true|false>
+# Whether to send a weekly summary of malicious files to an administrator. Default: false
+php occ config:app:set gdatavaas notifyAdminEnabled <true|false>
+```
