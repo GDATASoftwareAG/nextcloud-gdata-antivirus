@@ -161,7 +161,7 @@ For more information about Smtp4Dev, please refer to the [official README](https
 
 ### Configuring via the command line
 
-In addition to graphical configuration via the VaaS settings page in Nextcloud Settings, the following settings are exposed via PHP OCC commands:
+In addition to the graphical configuration via the VaaS settings page in Nextcloud, configuration is possible via PHP OCC commands:
 
 ```
 # The authentication flow to use (depends on available credentials). Default: ResourceOwnerPassword
@@ -200,4 +200,13 @@ php occ config:app:set gdatavaas notifyMail <email>
 php occ config:app:set gdatavaas sendMailOnVirusUpload <true|false>
 # Whether to send a weekly summary of malicious files to an administrator. Default: false
 php occ config:app:set gdatavaas notifyAdminEnabled <true|false>
+```
+
+You can also install and/or update the app via OCC:
+
+```
+# Install
+php occ app:install gdatavaas
+# Upgrade
+php occ app:update gdatavaas
 ```
