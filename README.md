@@ -184,7 +184,7 @@ php occ config:app:set gdatavaas tokenEndpoint <URL>
 php occ config:app:set gdatavaas quarantineFolder <string>
 # Whether to enable the automatic file scan. Default: false
 php occ config:app:set gdatavaas autoScanFiles <true|false>
-# Whether to add a prefix to malicious files. Default: true
+# Whether to add a prefix to malicious files. Default: false
 php occ config:app:set gdatavaas prefixMalicious <true|false>
 # Whether to disable the unscanned tag. Default: false
 php occ config:app:set gdatavaas disableUnscannedTag <true|false>
