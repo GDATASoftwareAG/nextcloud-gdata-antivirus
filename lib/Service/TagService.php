@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\Db\DbFileMapper;
-use OCA\GDataVaas\SystemTag\SystemTagObjectMapperWithoutActivity;
 use OCP\DB\Exception;
 use OCP\SystemTag\ISystemTag;
 use OCP\SystemTag\ISystemTagManager;

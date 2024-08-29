@@ -103,6 +103,7 @@ class TagServiceTest extends TestCase {
 		$loudTagMapper->expects($this->never())->method('assignTags');
 
 		$silentTagMapper = $this->createMock(ISystemTagObjectMapper::class);
+		$silentTagMapper->method('getTagIdsForObjects')->willReturn([self::$OBJECT_ID_1 => ["NoneVaasTag"]]);
 		$silentTagMapper->expects($this->once())->method('assignTags');
 
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
