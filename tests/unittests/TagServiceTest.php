@@ -111,4 +111,22 @@ class TagServiceTest extends TestCase {
 		$tagService = new TagService(new TestLogger(), $tagManager, $loudTagMapper, $silentTagMapper, $dbFileMapper);
 		$tagService->setTag(self::$OBJECT_ID_1, TagService::CLEAN, true);
 	}
+
+	public function testSetClean_SilentFlagIsNotSet_ShouldUseLoudMapper(): void {
+		$tagManager = $this->getTagManager();
+
+		$loudTagMapper = $this->createMock(ISystemTagObjectMapper::class);
+		$loudTagMapper->method('getTagIdsForObjects')->willReturn([self::$OBJECT_ID_1 => ["NoneVaasTag"]]);
+		$loudTagMapper->expects($this->never())->method('unassignTags');
+		$loudTagMapper->expects($this->once())->method('assignTags');
+
+		$silentTagMapper = $this->createMock(ISystemTagObjectMapper::class);
+		$silentTagMapper->method('getTagIdsForObjects')->willReturn([self::$OBJECT_ID_1 => ["NoneVaasTag"]]);
+		$silentTagMapper->expects($this->never())->method('assignTags');
+
+		$dbFileMapper = $this->createMock(DbFileMapper::class);
+
+		$tagService = new TagService(new TestLogger(), $tagManager, $loudTagMapper, $silentTagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::CLEAN, false);
+	}
 }
