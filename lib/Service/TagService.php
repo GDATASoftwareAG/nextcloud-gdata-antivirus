@@ -3,6 +3,7 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\Db\DbFileMapper;
+use OCA\GDataVaas\SystemTag\SystemTagObjectMapperWithoutActivity;
 use OCP\DB\Exception;
 use OCP\SystemTag\ISystemTag;
 use OCP\SystemTag\ISystemTagManager;
@@ -20,14 +21,15 @@ class TagService {
 	public const WONT_SCAN = 'Won\'t scan';
 
 	private ISystemTagManager $tagService;
-	private ISystemTagObjectMapper $tagMapper;
+	private ISystemTagObjectMapper $standardTagMapper;
+	private ISystemTagObjectMapper $silentTagMapper;
 	private DbFileMapper $dbFileMapper;
 	private LoggerInterface $logger;
 
-
-	public function __construct(LoggerInterface $logger, ISystemTagManager $systemTagManager, ISystemTagObjectMapper $objectMapper, DbFileMapper $dbFileMapper) {
+	public function __construct(LoggerInterface $logger, ISystemTagManager $systemTagManager, ISystemTagObjectMapper $standardTagMapper, ISystemTagObjectMapper $silentTagMapper, DbFileMapper $dbFileMapper) {
 		$this->tagService = $systemTagManager;
-		$this->tagMapper = $objectMapper;
+		$this->standardTagMapper = $standardTagMapper;
+		$this->silentTagMapper = $silentTagMapper;
 		$this->dbFileMapper = $dbFileMapper;
 		$this->logger = $logger;
 	}
@@ -72,44 +74,30 @@ class TagService {
 	}
 
 	/**
-	 * @param int $fileId
-	 * @param string $tagName
-	 * @return void
+	 * @param int    $fileId  The file to tag
+	 * @param string $tagName Which tag to set
+	 * @param bool   $silent  If true, suppress events and activities
 	 */
-	public function setTag(int $fileId, string $tagName): void {
+	public function setTag(int $fileId, string $tagName, bool $silent): void {
+		$mapper = $silent ? $this->silentTagMapper : $this->standardTagMapper;
 		$tag = $this->getTag($tagName);
-		$filesTagIds = $this->tagMapper->getTagIdsForObjects($fileId, 'files');
+		$filesTagIds = $mapper->getTagIdsForObjects($fileId, 'files');
 		$vaasTagIds = $this->getVaasTagIds();
 
 		if (isset($filesTagIds[$fileId])) {
 			foreach ($filesTagIds[$fileId] as $tagId) {
 				if ($tagId != $tag->getId() && in_array($tagId, $vaasTagIds)) {
-					$this->tagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
+					// Removal of outdated tags should always be silent
+					$this->silentTagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
 				}
 			}
 			if (in_array($tag->getId(), $filesTagIds[$fileId])) {
 				return;
 			}
 		}
-		$this->tagMapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
+		$mapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
 
 		$this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
-	}
-	
-	/**
-	 * @param string $tagName
-	 * @param int $fileId
-	 * @return bool
-	 */
-	public function removeTagFromFile(string $tagName, int $fileId): bool {
-		try {
-			$tag = $this->getTag($tagName, false);
-			$this->tagMapper->unassignTags(strval($fileId), 'files', [$tag->getId()]);
-			$this->logger->debug("Tag removed: " . $tagName . " for file " . $fileId);
-			return true;
-		} catch (TagNotFoundException) {
-			return false;
-		}
 	}
 
 	/**
@@ -124,7 +112,7 @@ class TagService {
 		$anyButUnscannedTagIds = $this->addTagToArray(self::PUP, $anyButUnscannedTagIds);
 		$anyButUnscannedTagIds = $this->addTagToArray(self::WONT_SCAN, $anyButUnscannedTagIds);
 		foreach ($anyButUnscannedTagIds as $tagId) {
-			if ($this->tagMapper->haveTag([$fileId], 'files', $tagId)) {
+			if ($this->standardTagMapper->haveTag([$fileId], 'files', $tagId)) {
 				return true;
 			}
 		}
@@ -138,7 +126,7 @@ class TagService {
 	 */
 	public function hasUnscannedTag(int $fileId): bool {
 		try {
-			return $this->tagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId());
+			return $this->standardTagMapper->haveTag([$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId());
 		} catch (TagNotFoundException) {
 			return false;
 		}

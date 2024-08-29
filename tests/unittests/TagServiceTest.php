@@ -48,8 +48,8 @@ class TagServiceTest extends TestCase {
 		
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 
-		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $dbFileMapper);
-		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
+		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN, false);
 	}
 
 	public function testSetWontScan_TagAlreadySet_ShouldNotDoAnything(): void {
@@ -62,8 +62,8 @@ class TagServiceTest extends TestCase {
 		
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 
-		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $dbFileMapper);
-		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
+		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN, false);
 	}
 
 	public function testSetWontScan_UnscannedTagDoesNotExist_ShouldTagFileWithWontScan_WithNoException(): void {
@@ -76,8 +76,8 @@ class TagServiceTest extends TestCase {
 		
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 
-		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $dbFileMapper);
-		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
+		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN, false);
 	}
 
 	public function testSetWontScan_NoneVaasTagIsSet_ShouldTagFileWithWontScan_AndNotDeleteTheNoneVaasTag(): void {
@@ -90,7 +90,24 @@ class TagServiceTest extends TestCase {
 		
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 
-		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $dbFileMapper);
-		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN);
+		$tagService = new TagService(new TestLogger(), $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::WONT_SCAN, false);
+	}
+
+	public function testSetClean_SilentFlagIsSet_ShouldUseSilentMapper(): void {
+		$tagManager = $this->getTagManager();
+
+		$loudTagMapper = $this->createMock(ISystemTagObjectMapper::class);
+		$loudTagMapper->method('getTagIdsForObjects')->willReturn([self::$OBJECT_ID_1 => ["NoneVaasTag"]]);
+		$loudTagMapper->expects($this->never())->method('unassignTags');
+		$loudTagMapper->expects($this->never())->method('assignTags');
+
+		$silentTagMapper = $this->createMock(ISystemTagObjectMapper::class);
+		$silentTagMapper->expects($this->once())->method('assignTags');
+
+		$dbFileMapper = $this->createMock(DbFileMapper::class);
+
+		$tagService = new TagService(new TestLogger(), $tagManager, $loudTagMapper, $silentTagMapper, $dbFileMapper);
+		$tagService->setTag(self::$OBJECT_ID_1, TagService::CLEAN, true);
 	}
 }
