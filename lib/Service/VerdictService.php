@@ -72,7 +72,7 @@ class VerdictService {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 		if (self::isFileTooLargeToScan($filePath)) {
-			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
+			$this->tagService->setTag($fileId, TagService::WONT_SCAN, silent: true);
 			throw new EntityTooLargeException("File is too large");
 		}
 
@@ -94,23 +94,26 @@ class VerdictService {
 	private function tagFile(int $fileId, string $tagName): void {
 		switch ($tagName) {
 			case TagService::MALICIOUS:
-				$this->tagService->setTag($fileId, TagService::MALICIOUS);
+				$this->tagService->setTag($fileId, TagService::MALICIOUS, silent: false);
 				try {
 					$this->fileService->setMaliciousPrefixIfActivated($fileId);
 					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
 				} catch (Exception) {
 				}
 				break;
+			case TagService::PUP:
+				$this->tagService->setTag($fileId, TagService::PUP, silent: false);
+				break;
 			case TagService::UNSCANNED:
 				$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
-				if (!$unscannedTagIsDisabled)
-					$this->tagService->setTag($fileId, $tagName);
+				if (!$unscannedTagIsDisabled) {
+					$this->tagService->setTag($fileId, TagService::UNSCANNED, silent: true);
+				}
 				break;
 			case TagService::CLEAN:
-			case TagService::PUP:
 			case TagService::WONT_SCAN:
 			default:
-				$this->tagService->setTag($fileId, $tagName);
+				$this->tagService->setTag($fileId, $tagName, silent: true);
 				break;
 		}
 	}

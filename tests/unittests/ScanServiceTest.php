@@ -97,7 +97,7 @@ class ScanServiceTest extends TestCase {
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
-		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $dbFileMapper);
+		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
 		$verdictService = $this->createMock(VerdictService::class);
 		$fileService = $this->createMock(FileService::class);
 
@@ -189,7 +189,7 @@ class ScanServiceTest extends TestCase {
 
 		$tagMapper = $this->createMock(ISystemTagObjectMapper::class);
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
-		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $dbFileMapper);
+		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
 		$verdictService = $this->createMock(VerdictService::class);
         $fileService = $this->createMock(FileService::class);
 
