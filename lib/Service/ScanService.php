@@ -80,9 +80,9 @@ class ScanService {
 			}
 
 			$elapsed = time() - $startTime;
-            if ($elapsed > self::SCAN_TIME_SECONDS) {
-                break;
-            }
+			if ($elapsed > self::SCAN_TIME_SECONDS) {
+				break;
+			}
 		}
 
 		$this->logger->debug("Successfully scanned " . $scanned . " files");
