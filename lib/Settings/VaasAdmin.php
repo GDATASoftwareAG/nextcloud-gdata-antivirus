@@ -31,7 +31,6 @@ class VaasAdmin implements ISettings {
 			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag'),
 			'scanOnlyThis' => $this->config->getValueString(Application::APP_ID, 'scanOnlyThis'),
 			'doNotScanThis' => $this->config->getValueString(Application::APP_ID, 'doNotScanThis'),
-			'scanQueueLength' => $this->config->getValueInt(Application::APP_ID, 'scanQueueLength', 50),
 			'notifyMail' => $this->config->getValueString(Application::APP_ID, 'notifyMails'),
 			'sendMailOnVirusUpload' => $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload'),
 			'notifyAdminEnabled' => $this->config->getValueBool(Application::APP_ID, 'notifyAdminEnabled')
