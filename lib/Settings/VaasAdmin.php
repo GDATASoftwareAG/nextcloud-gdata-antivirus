@@ -29,12 +29,11 @@ class VaasAdmin implements ISettings {
 			'scanOnlyNewFiles' => $this->config->getAppValue(Application::APP_ID, 'scanOnlyNewFiles', true),
 			'prefixMalicious' => $this->config->getAppValue(Application::APP_ID, 'prefixMalicious', true),
 			'disableUnscannedTag' => $this->config->getAppValue(Application::APP_ID, 'disableUnscannedTag'),
-			'allowlist' => $this->config->getAppValue(Application::APP_ID, 'scanOnlyThis'),
-			'blocklist' => $this->config->getAppValue(Application::APP_ID, 'doNotScanThis'),
-			'scanQueueLength' => $this->config->getAppValue(Application::APP_ID, 'scanQueueLength', 50),
-            'notifyMail' => $this->config->getAppValue(Application::APP_ID, 'notifyMails'),
-            'sendMailOnVirusUpload' => $this->config->getAppValue(Application::APP_ID, 'sendMailOnVirusUpload'),
-            'notifyAdminEnabled' => $this->config->getAppValue(Application::APP_ID, 'notifyAdminEnabled')
+			'scanOnlyThis' => $this->config->getAppValue(Application::APP_ID, 'scanOnlyThis'),
+			'doNotScanThis' => $this->config->getAppValue(Application::APP_ID, 'doNotScanThis'),
+			'notifyMail' => $this->config->getAppValue(Application::APP_ID, 'notifyMails'),
+			'sendMailOnVirusUpload' => $this->config->getAppValue(Application::APP_ID, 'sendMailOnVirusUpload'),
+			'notifyAdminEnabled' => $this->config->getAppValue(Application::APP_ID, 'notifyAdminEnabled')
 		];
 
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);

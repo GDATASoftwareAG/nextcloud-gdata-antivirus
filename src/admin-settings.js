@@ -43,7 +43,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const quarantineFolder = document.querySelector('#quarantine_folder').value;
 		const scanOnlyThis = document.querySelector('#scanOnlyThis').value;
 		const doNotScanThis = document.querySelector('#doNotScanThis').value;
-		const scanQueueLength = document.querySelector('#scan_queue_length').value;
 		const notifyMails = document.querySelector('#notify_mails').value;
 
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
@@ -55,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			quarantineFolder,
 			scanOnlyThis,
 			doNotScanThis,
-			scanQueueLength,
 			notifyMails
 		});
 		const msgElement = document.querySelector('#auth_save_msg');
