@@ -7,7 +7,7 @@
     <id>gdatavaas</id>
     <name>G DATA Antivirus</name>
     <summary>This app provides an additional layer of security to your Nextcloud instance.</summary>
-    <description><![CDATA[The G DATA Antivirus app is an additional layer of security for your Nextcloud server. Easily scan files for malicious content.
+    <description><![CDATA[The [G DATA Antivirus app](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus) is an additional layer of security for your Nextcloud server. Easily scan files for malicious content.
 
 * 🚀 **Integration with the Flow App!** Use the tags to trigger flows
 * ☢️ **Blocks uploads of malicious files!** Prevents the upload of malicious files by scanning them on upload
@@ -22,7 +22,7 @@ If you have any questions about scanning, usage or similar, please feel free to 
 	]]></description>
     <version>0.0.0</version>
     <licence>agpl</licence>
-    <author mail="vaas@gdata.de" homepage="https://www.gdata.de/oem/verdict-as-a-service">Lennart Dohmann</author>
+    <author mail="vaas@gdata.de" homepage="https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus">Lennart Dohmann</author>
     <namespace>GDataVaas</namespace>
     <category>security</category>
     <bugs>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues</bugs>
@@ -31,7 +31,7 @@ If you have any questions about scanning, usage or similar, please feel free to 
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/scanned.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/context.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/settings.png</screenshot>
-    <website>https://www.gdata.de/business/security-services/verdict-as-a-service</website>
+    <website>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus</website>
     <settings>
         <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
         <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>

@@ -22,18 +22,13 @@ class SettingsController extends Controller {
 		$this->mailer = $mailer;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $scanQueueLength, $notifyMails): JSONResponse {
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $notifyMails): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
 			foreach ($mails as $mail) {
 				if ($this->mailer->validateMailAddress($mail) === false) {
 					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
 				}
-			}
-		}
-		if (!empty($scanQueueLength)) {
-			if (!is_numeric($scanQueueLength) || $scanQueueLength < 1) {
-				return new JSONResponse(['status' => 'error', 'message' => 'Invalid scan queue length']);
 			}
 		}
 		$this->config->setValueString($this->appName, 'username', $username);
@@ -44,7 +39,6 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'quarantineFolder', $quarantineFolder);
 		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
 		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
-		$this->config->setValueInt($this->appName, 'scanQueueLength', $scanQueueLength);
 		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
 	}

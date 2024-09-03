@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-29.0.4}
+NEXTCLOUD_VERSION=${1:-29.0.4}
 XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
 source .env-local || echo "No .env-local file found."
@@ -57,7 +57,6 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
-docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas scanQueueLength --value=100
 
 # Configure Nextcloud to send emails
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas notifyMails --value="test@example.com"
