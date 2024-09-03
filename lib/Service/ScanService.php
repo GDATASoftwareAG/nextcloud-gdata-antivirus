@@ -19,6 +19,9 @@ use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 
 class ScanService {
+	
+	private const SCAN_TIME_SECONDS = 120;
+	
 	private TagService $tagService;
 	private VerdictService $verdictService;
 	private FileService $fileService;
@@ -50,10 +53,12 @@ class ScanService {
 	 */
 	public function run(): int {		
 		$startTime = time();
+		$scanned = 0;
 
-		foreach ($this->getFileIdsToScan($quantity) as $fileId) {
+		foreach ($this->getFileIdsToScan() as $fileId) {
 			try {
 				$this->verdictService->scanFileById($fileId);
+				$scanned += 1;
 			} catch (EntityTooLargeException) {
                 $this->logger->error("File $fileId is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
             } catch (FileDoesNotExistException) {
@@ -75,10 +80,13 @@ class ScanService {
 			}
 
 			$elapsed = time() - $startTime;
-            if ($elapsed > 120) {
+            if ($elapsed > self::SCAN_TIME_SECONDS) {
                 break;
             }
 		}
+
+		$this->logger->debug("Successfully scanned " . $scanned . " files");
+		return $scanned;
 	}
 
 	/**
