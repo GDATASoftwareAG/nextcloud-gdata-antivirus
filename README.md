@@ -192,8 +192,6 @@ php occ config:app:set gdatavaas disableUnscannedTag <true|false>
 php occ config:app:set gdatavaas scanOnlyThis <string>
 # Comma-separated list of files/folders that should **not** be scanned. Default: Empty string (no files excluded)
 php occ config:app:set gdatavaas doNotScanThis <string>
-# Number of files that should be processed per job (/5 min). Default: 50
-php occ config:app:set gdatavaas scanQueueLength <integer>
 # Email address to send notifications to, when infected files are uploaded. Default: None
 php occ config:app:set gdatavaas notifyMail <email>
 # Whether to send email notifications on upload, when files are infected. Default: false
