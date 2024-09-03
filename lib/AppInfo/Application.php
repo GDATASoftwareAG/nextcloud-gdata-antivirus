@@ -11,7 +11,7 @@ use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCA\GDataVaas\SystemTag\SystemTagObjectMapperWithoutActivity;
+use OCA\GDataVaas\SystemTag\SystemTagObjectMapperWithoutActivityFactory;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
@@ -23,6 +23,7 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IHomeStorage;
 use OCP\Files\Storage\IStorage;
 use OCP\IAppConfig;
+use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
 use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\Util;
@@ -62,7 +63,8 @@ class Application extends App implements IBootstrap {
 			$logger = $c->get(LoggerInterface::class);
 			$systemTagManager = $c->get(ISystemTagManager::class);
 			$standardTagMapper = $c->get(ISystemTagObjectMapper::class);
-			$silentTagMapper = $c->get(SystemTagObjectMapperWithoutActivity::class);
+			$dbConnection = $c->get(IDBConnection::class);
+			$silentTagMapper = SystemTagObjectMapperWithoutActivityFactory::createSilentSystemTagObjectMapper($dbConnection, $systemTagManager);
 			$dbFileMapper = $c->get(DbFileMapper::class);
 			
 			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
