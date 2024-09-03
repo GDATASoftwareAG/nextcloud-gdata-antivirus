@@ -53,7 +53,7 @@ class TagUnscannedService {
 			if ($this->tagService->hasAnyButUnscannedTag($fileId)) {
 				continue;
 			}
-			$this->tagService->setTag($fileId, TagService::UNSCANNED);
+			$this->tagService->setTag($fileId, TagService::UNSCANNED, silent: true);
 		}
 
 		$this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
