@@ -132,7 +132,7 @@ The `install.sh` script is used to set up and configure a Nextcloud instance wit
    If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
 
 2. **Specify the Nextcloud server version**:
-    - The Nextcloud version defaults to 29.0.4
+    - The Nextcloud version defaults to 29.0.6
     - You can start the `install.sh` script with the desired Nextcloud version as an argument, e.g. `./install.sh 29`
 
 3. **Smtp4Dev**:
