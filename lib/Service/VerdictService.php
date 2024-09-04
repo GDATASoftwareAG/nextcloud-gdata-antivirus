@@ -37,7 +37,7 @@ class VerdictService {
 	private ?Vaas $vaas = null;
 	private LoggerInterface $logger;
 
-	private string $lastLocalPath = "";
+	private string $lastLocalPath = '';
 	private ?VaasVerdict $lastVaasVerdict = null;
 
 	public function __construct(LoggerInterface $logger, IAppConfig $appConfig, FileService $fileService, TagService $tagService) {
@@ -73,7 +73,7 @@ class VerdictService {
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 		if (self::isFileTooLargeToScan($filePath)) {
 			$this->tagService->setTag($fileId, TagService::WONT_SCAN, silent: true);
-			throw new EntityTooLargeException("File is too large");
+			throw new EntityTooLargeException('File is too large');
 		}
 
 		if (!$this->isAllowedToScan($filePath)) {
@@ -82,9 +82,9 @@ class VerdictService {
 
 		$verdict = $this->scan($filePath);
 
-		$this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: "
-			. $verdict->Verdict->value . ", Detection: " . $verdict->Detection . ", SHA256: " . $verdict->Sha256 .
-			", FileType: " . $verdict->FileType . ", MimeType: " . $verdict->MimeType . ", UUID: " . $verdict->Guid);
+		$this->logger->info('VaaS scan result for ' . $node->getName() . ' (' . $fileId . '): Verdict: '
+			. $verdict->Verdict->value . ', Detection: ' . $verdict->Detection . ', SHA256: ' . $verdict->Sha256 .
+			', FileType: ' . $verdict->FileType . ', MimeType: ' . $verdict->MimeType . ', UUID: ' . $verdict->Guid);
 
 		$this->tagFile($fileId, $verdict->Verdict->value);
 
@@ -205,7 +205,7 @@ class VerdictService {
 		if (empty($scanOnlyThis)) {
 			return [];
 		}
-		return explode(",", $scanOnlyThis);
+		return explode(',', $scanOnlyThis);
 	}
 	
 	/**
@@ -218,7 +218,7 @@ class VerdictService {
 		if (empty($doNotScanThis)) {
 			return [];
 		}
-		return explode(",", $doNotScanThis);
+		return explode(',', $doNotScanThis);
 	}
 
 	/**
@@ -238,7 +238,7 @@ class VerdictService {
 	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
 		if ($authMethod === 'ResourceOwnerPassword') {
 			return new ResourceOwnerPasswordGrantAuthenticator(
-				"nextcloud-customer",
+				'nextcloud-customer',
 				$this->username,
 				$this->password,
 				$this->tokenEndpoint
@@ -250,7 +250,7 @@ class VerdictService {
 				$this->tokenEndpoint
 			);
 		} else {
-			throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
+			throw new VaasAuthenticationException('Invalid auth method: ' . $authMethod);
 		}
 	}
 
@@ -260,8 +260,13 @@ class VerdictService {
 	public function createAndConnectVaas(): Vaas {
 		$this->authenticator = $this->getAuthenticator($this->authMethod);
 		$options = new VaasOptions(false, false);
-		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
-		$vaas->Connect($this->authenticator->getToken());
+		$vaas = (new Vaas)
+			->WithUrl($this->vaasUrl)
+			->withLogger($this->logger)
+			->WithOptions($options)
+			->WithAuthenticator($this->authenticator)
+			->build();
+
 		return $vaas;
 	}
 
@@ -272,7 +277,7 @@ class VerdictService {
 	 */
 	public function isAllowedToScan(string $filePath): bool {
 		$doNotScanThis = $this->getDoNotScanThis();
-		$this->logger->debug("doNotScanThis: " . implode(", ", $doNotScanThis));
+		$this->logger->debug('doNotScanThis: ' . implode(', ', $doNotScanThis));
 		foreach ($doNotScanThis as $doNotScanThisItem) {
 			if (str_contains(strtolower($filePath), strtolower($doNotScanThisItem))) {
 				return false;
@@ -282,7 +287,7 @@ class VerdictService {
 		if (count($scanOnlyThis) === 0) {
 			return true;
 		}
-		$this->logger->debug("scanOnlyThis: " . implode(", ", $scanOnlyThis));
+		$this->logger->debug('scanOnlyThis: ' . implode(', ', $scanOnlyThis));
 		foreach ($scanOnlyThis as $scanOnlyThisItem) {
 			if (str_contains(strtolower($filePath), strtolower($scanOnlyThisItem))) {
 				return true;

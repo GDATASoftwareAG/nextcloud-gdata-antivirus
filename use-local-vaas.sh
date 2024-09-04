@@ -23,4 +23,6 @@ rm -rf vendor/
 mv composer.json composer.packagist.vaas.json
 if [ -f composer.local.vaas.json ]; then
     jq -s '.[0] * .[1]' composer.packagist.vaas.json composer.local.vaas.json > composer.json
+    rm -rf composer.lock vendor/
+    composer install
 fi
