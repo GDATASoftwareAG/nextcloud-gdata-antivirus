@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!DOCTYPE <!ENTITY data SYSTEM "file:///README.md" >]>
 <info>
     <!--
     SPDX-FileCopyrightText: Lennart Dohmann <lennart.dohmann@gdata.de>
@@ -17,9 +18,22 @@
 * ❓ **Use the activity app!** See what happened in your Nextcloud instance
 * ✅ **no additional software required!** The app uses the G DATA Verdict as a Service (VaaS) API to scan files
 
-This app is based on the G DATA Verdict as a Service (VaaS) API. For more information, visit the [G DATA website](https://www.gdata.de/business/security-services/verdict-as-a-service).
-If you have any questions about scanning, usage or similar, please feel free to write an e-mail to vaas@gdata.de.
-	]]></description>
+## Getting started
+
+This app is based on the G DATA Verdict as a Service (VaaS) API. To get started with the app, you have to register via our [registration page](https://account-staging.gdata.de/realms/vaas-staging/login-actions/registration?client_id=landing-page&tab_id=VDSGSP4oQL0).
+
+<img style="display: block; margin: auto; height: 500px;" src="https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/vaas-registration.png">
+
+After the registration you can use these credentials within your nextcloud installation. To do this go to your Administration Settings.
+
+<img style="display: block; margin: auto; height: 500px;" src="https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/administration-settings.png">
+
+There you will find the "Verdict-as-a-Service" section under the "Administration" section.
+
+<img style="display: block; margin: auto; height: 500px;" src="https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/verdict-as-a-service-section.png">
+
+Please make sure the "Authentication Method" "Resource Owner Password Flow" is selected. Now you can put your credentials into the 'username' and 'password' field and click save afterwards.
+]]></description>
     <version>0.0.0</version>
     <licence>agpl</licence>
     <author mail="vaas@gdata.de" homepage="https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus">Lennart Dohmann</author>
