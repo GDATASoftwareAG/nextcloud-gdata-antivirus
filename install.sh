@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export NEXTCLOUD_VERSION=${1:-29.0.4}
+export NEXTCLOUD_VERSION=${1:-29.0.6}
+export INSTALL_XDEBUG=${2:-1}
 export XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
 source .env-local || echo "No .env-local file found."
@@ -10,6 +11,15 @@ setup_nextcloud () {
   docker compose -f compose-install.yaml kill
   docker compose -f compose-install.yaml rm --force --stop --volumes
   NEXTCLOUD_VERSION=$NEXTCLOUD_VERSION XDEBUG_MODE=$XDEBUG_MODE docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
+
+  docker exec -i nextcloud-container ulimit -c unlimited
+  docker exec -i nextcloud-container bash -c 'echo "/tmp/apache2-coredump/core-%e-%s-%u-%g-%p-%t" > /proc/sys/kernel/core_pattern'
+
+  until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
+  do
+    echo "waiting for nextcloud to be initialized"
+    sleep 2
+  done
 
   echo "copy config for empty skeleton"
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
@@ -23,6 +33,8 @@ setup_nextcloud () {
 
   docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
   docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
+  docker exec --user www-data -i nextcloud-container php occ app:disable weather_status
+  docker exec --user www-data -i nextcloud-container php occ config:system:set trusted_domains 2 --value=192.168.5.80
 
   echo "setup nextcloud finished"
 }
@@ -72,4 +84,6 @@ docker exec --user www-data -i nextcloud-container php occ user:setting admin se
 source install.local || echo "No additional install script found."
 
 # Has to be done, to get the dev-requirements installed again
-composer install
+composer install --quiet &
+
+composer info

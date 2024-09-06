@@ -1,8 +1,36 @@
-ARG NEXTCLOUD_VERSION=29.0.4
+ARG NEXTCLOUD_VERSION=29.0.6
+ARG INSTALL_XDEBUG=1
 
 FROM nextcloud:${NEXTCLOUD_VERSION}
 
-RUN apt update && apt install -y less vim telnet iputils-ping
+RUN apt update && apt install -y \
+    less vim telnet iputils-ping gdb libexpat1-dev libapr1-dev libaprutil1-dev devscripts debmake \
+    bison jdupes libbrotli-dev liblua5.4-dev libnghttp2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libjansson-dev
+# RUN curl -L -o /tmp/apache2_2.4.61.orig.tar.gz https://launchpad.net/debian/+archive/primary/+sourcefiles/apache2/2.4.61-1/apache2_2.4.61.orig.tar.gz \
+#     && tar -xzf /tmp/apache2_2.4.61.orig.tar.gz -C /tmp \
+#     && mv /tmp/httpd-2.4.61 /tmp/apache2-2.4.61 \
+#     && curl -L -o /tmp/apache2_2.4.61-1.debian.tar.xz https://launchpad.net/debian/+archive/primary/+sourcefiles/apache2/2.4.61-1/apache2_2.4.61-1.debian.tar.xz \
+#     && tar -xf /tmp/apache2_2.4.61-1.debian.tar.xz -C /tmp \
+#     && mv /tmp/debian /tmp/apache2-2.4.61/debian \
+#     && cd /tmp/apache2-2.4.61 \
+#     && debuild || echo "no signature"
+RUN curl -o /root/.gdbinit https://raw.githubusercontent.com/php/php-src/master/.gdbinit
+RUN ulimit -c unlimited
+RUN mkdir -p /tmp/apache2-coredump \
+    && chown -R www-data:www-data /tmp/apache2-coredump \
+    && chmod 777 /tmp/apache2-coredump \
+    && echo "CoreDumpDirectory /tmp/apache2-coredump" >> /etc/apache2/apache2.conf
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-RUN install-php-extensions gd xdebug
-COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
+RUN sed -i 's/max_execution_time = 30/max_execution_time = -1/g' "$PHP_INI_DIR/php.ini"
+RUN sed -i 's/max_input_time = 60/max_input_time = -1/g' "$PHP_INI_DIR/php.ini"
+RUN sed -i 's/memory_limit = 128M/memory_limit = -1/g' "$PHP_INI_DIR/php.ini"
+RUN echo "error_log = /var/www/html/data/php.log" >> "$PHP_INI_DIR/php.ini"
+RUN sed -i 's/#LogLevel info ssl:warn/LogLevel debug/g' /etc/apache2/sites-available/000-default.conf
+
+COPY xdebug.ini /tmp/xdebug.ini
+RUN if [[ "$INSTALL_XDEBUG" == "1" ]]; then \
+    install-php-extensions gd xdebug; \
+    mv /tmp/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini; \
+    fi
+

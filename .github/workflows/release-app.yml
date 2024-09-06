@@ -52,29 +52,41 @@ jobs:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: |
-          composer install --quiet
+          composer install
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
 
       - name: install nextcloud
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: ./install.sh ${{ matrix.nextcloud_version }}
+        run: ./install.sh ${{ matrix.nextcloud_version }} 1
 
       - name: run tests
+        id: bats-tests
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: bats --no-parallelize-across-files --jobs 2 ./tests/bats
+        run: |
+          if bats --verbose-run --timing --trace --no-parallelize-across-files --jobs 2 ./tests/bats; then
+            echo "bats_run=success" | tee -a "$GITHUB_OUTPUT";
+          else
+            echo "bats_run=fail" | tee -a "$GITHUB_OUTPUT";
+          fi
 
       - uses: actions/upload-artifact@master
         with:
-          name: build-dir
-          path: build/
+          overwrite: true
+          name: core-dump
+          path: coredumps/*
+
+      - name: fail if bats tests did fail
+        if: steps.bats-tests.outputs.bats_run == 'fail'
+        run: exit 1
 
   release:
     needs:
       - test
+      - define-matrix
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:

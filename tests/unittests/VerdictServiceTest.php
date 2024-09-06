@@ -2,6 +2,7 @@
 
 namespace unittests;
 
+use League\OAuth2\Client\Token\ResourceOwnerAccessTokenInterface;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
@@ -10,6 +11,7 @@ use OCP\IConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
+use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 
 class VerdictServiceTest extends TestCase {
 	private LoggerInterface $logger;
@@ -170,8 +172,19 @@ class VerdictServiceTest extends TestCase {
 		$this->assertEquals('a,b,c,d', $result3);
 	}
 
-	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IConfig {
-		$appConfig = $this->createMock(IConfig::class);
+	public function testAuthenticator(): void {
+		$verdictService = new VerdictService(
+			$this->logger,
+			$this->createMock(IAppConfig::class),
+			$this->createMock(FileService::class),
+			$this->createMock(TagService::class));
+
+		$authenticator = $verdictService->getAuthenticator("ResourceOwnerPassword");
+		$this->assertInstanceOf(ResourceOwnerPasswordGrantAuthenticator::class, $authenticator);
+	}
+
+	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IAppConfig {
+		$appConfig = $this->createMock(IAppConfig::class);
 		$appConfig
 			->method('getAppValue')
 			->willReturnCallback(function ($appId, $key, $default) use ($doNotScanThis, $scanOnlyThis) {
