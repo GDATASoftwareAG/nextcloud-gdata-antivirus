@@ -31,7 +31,10 @@ class DbFileMapper extends QBMapper {
 			->where($qb->expr()->notIn('o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($qb->expr()->isNull('o.systemtagid'))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+			->andWhere($qb->expr()->orX(
+				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
+				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
+			))
 			->orderBy('f.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
@@ -62,7 +65,10 @@ class DbFileMapper extends QBMapper {
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
 			->where($qb->expr()->in('o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->like('f.path', $qb->createNamedParameter('files/%')))
+			->andWhere($qb->expr()->orX(
+				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
+				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
+			))
 			->orderBy('f.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
@@ -108,7 +114,10 @@ class DbFileMapper extends QBMapper {
 			->leftJoin('f', 'mimetypes', 'm', $fileQuery->expr()->eq('f.mimetype', 'm.id'))
 			->where($fileQuery->expr()->eq('storage', $fileQuery->createParameter('storageId')))
 			->andWhere($fileQuery->expr()->notLike('m.mimetype', $fileQuery->createNamedParameter('%unix-directory%')))
-			->andWhere($fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')));
+			->andWhere($fileQuery->expr()->orX(
+				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')),
+				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('__groupfolders/%'))
+			));
 
 		$storageQuery = $this->db->getQueryBuilder();
 		$storageQuery->selectAlias('numeric_id', 'id')
