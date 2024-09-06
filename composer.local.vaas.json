@@ -1,0 +1,14 @@
+{
+	"repositories": [
+		{
+			"type": "path",
+			"url": "./gdata/php/src/vaas",
+			"options": {
+				"symlink": false
+			}
+		}
+	],
+	"require": {
+		"gdata/vaas": "@dev"
+	}
+}

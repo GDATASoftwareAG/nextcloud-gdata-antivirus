@@ -4,6 +4,7 @@
 .idea
 *.local
 *.iml
+*.local.php
 /build/
 node_modules/
 /.php_cs.cache
@@ -64,5 +65,8 @@ js/
 .uuid
 eicar.com.txt
 tmp/
-
+core.1
 nextcloud-server/
+core-dump.zip
+apache/
+**/vendor/*
