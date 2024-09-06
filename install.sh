@@ -1,7 +1,7 @@
 #!/bin/bash
 
-NEXTCLOUD_VERSION=${1:-29.0.4}
-XDEBUG_MODE=${XDEBUG_MODE:-develop}
+export NEXTCLOUD_VERSION=${1:-29.0.4}
+export XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
 source .env-local || echo "No .env-local file found."
 
