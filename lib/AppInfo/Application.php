@@ -7,8 +7,11 @@ namespace OCA\GDataVaas\AppInfo;
 use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
 use OCA\GDataVaas\CacheEntryListener;
+use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\MailService;
+use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
+use OCA\GDataVaas\SystemTag\SystemTagObjectMapperWithoutActivityFactory;
 use OCP\Activity\IManager;
 use OCP\App\IAppManager;
 use OCP\AppFramework\App;
@@ -20,6 +23,9 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\IHomeStorage;
 use OCP\Files\Storage\IStorage;
 use OCP\IConfig;
+use OCP\IDBConnection;
+use OCP\SystemTag\ISystemTagManager;
+use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\Util;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -51,6 +57,18 @@ class Application extends App implements IBootstrap {
 		if (file_exists($composerAutoloadFile)) {
 			require_once $composerAutoloadFile;
 		}
+		
+		// Manually register TagService so that we can customize the DI used for $silentTagMapper
+		$context->registerService(TagService::class, function ($c) {
+			$logger = $c->get(LoggerInterface::class);
+			$systemTagManager = $c->get(ISystemTagManager::class);
+			$standardTagMapper = $c->get(ISystemTagObjectMapper::class);
+			$dbConnection = $c->get(IDBConnection::class);
+			$silentTagMapper = SystemTagObjectMapperWithoutActivityFactory::createSilentSystemTagObjectMapper($dbConnection, $systemTagManager);
+			$dbFileMapper = $c->get(DbFileMapper::class);
+			
+			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
+		}, true);
 
 		CacheEntryListener::register($context);
 
@@ -74,8 +92,8 @@ class Application extends App implements IBootstrap {
 
 				$container = $this->getContainer();
 				$verdictService = $container->get(VerdictService::class);
-                $mailService = $container->get(MailService::class);
-                $appConfig = $container->get(IConfig::class);
+				$mailService = $container->get(MailService::class);
+				$appConfig = $container->get(IConfig::class);
 				// $l10n = $container->get(IL10N::class);
 				$logger = $container->get(LoggerInterface::class);
 				$activityManager = $container->get(IManager::class);

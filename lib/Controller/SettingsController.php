@@ -23,20 +23,15 @@ class SettingsController extends Controller {
 		$this->mailer = $mailer;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $scanQueueLength, $notifyMails): JSONResponse {
-        if (!empty($notifyMails)) {
-            $mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
-            foreach ($mails as $mail) {
-                if ($this->mailer->validateMailAddress($mail) === false) {
-                    return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
-                }
-            }
-        }
-        if (!empty($scanQueueLength)) {
-            if (!is_numeric($scanQueueLength) || $scanQueueLength < 1) {
-                return new JSONResponse(['status' => 'error', 'message' => 'Invalid scan queue length']);
-            }
-        }
+	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $notifyMails): JSONResponse {
+		if (!empty($notifyMails)) {
+			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
+			foreach ($mails as $mail) {
+				if ($this->mailer->validateMailAddress($mail) === false) {
+					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
+				}
+			}
+		}
 		$this->config->setAppValue($this->appName, 'username', $username);
 		$this->config->setAppValue($this->appName, 'password', $password);
 		$this->config->setAppValue($this->appName, 'clientId', $clientId);
@@ -45,7 +40,6 @@ class SettingsController extends Controller {
 		$this->config->setAppValue($this->appName, 'quarantineFolder', $quarantineFolder);
 		$this->config->setAppValue($this->appName, 'scanOnlyThis', $scanOnlyThis);
 		$this->config->setAppValue($this->appName, 'doNotScanThis', $doNotScanThis);
-		$this->config->setAppValue($this->appName, 'scanQueueLength', $scanQueueLength);
 		$this->config->setAppValue($this->appName, 'notifyMails', $notifyMails);
 		return new JSONResponse(['status' => 'success']);
 	}
@@ -101,38 +95,37 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
-    public function getCounters(): JSONResponse {
-        try {
-            $filesCount = $this->tagService->getScannedFilesCount();
-        }
-        catch (Exception $e) {
-            return new JSONResponse([
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ]);
-        }
-        return new JSONResponse([
-            'status' => 'success',
-            'all' => $filesCount['all'],
-            'scanned' => $filesCount['scanned']
-        ]);
-    }
-    
-    public function getSendMailOnVirusUpload(): JSONResponse{
-        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'sendMailOnVirusUpload')]);
-    }
+	public function getCounters(): JSONResponse {
+		try {
+			$filesCount = $this->tagService->getScannedFilesCount();
+		} catch (Exception $e) {
+			return new JSONResponse([
+				'status' => 'error',
+				'message' => $e->getMessage()
+			]);
+		}
+		return new JSONResponse([
+			'status' => 'success',
+			'all' => $filesCount['all'],
+			'scanned' => $filesCount['scanned']
+		]);
+	}
+	
+	public function getSendMailOnVirusUpload(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'sendMailOnVirusUpload')]);
+	}
 
-    public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
-        $this->config->setAppValue($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
-        return new JSONResponse(['status' => 'success']);
-    }
+	public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
+		$this->config->setAppValue($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
+		return new JSONResponse(['status' => 'success']);
+	}
 
-    public function getSendMailSummaryOfMaliciousFiles(): JSONResponse{
-        return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'notifyAdminEnabled')]);
-    }
+	public function getSendMailSummaryOfMaliciousFiles(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getAppValue($this->appName, 'notifyAdminEnabled')]);
+	}
 
-    public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
-        $this->config->setAppValue($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
-        return new JSONResponse(['status' => 'success']);
-    }
+	public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
+		$this->config->setAppValue($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
+		return new JSONResponse(['status' => 'success']);
+	}
 }

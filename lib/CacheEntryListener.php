@@ -31,6 +31,7 @@ class CacheEntryListener implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
+		$this->logger->debug("CacheEntryListener");
 		if (!$event instanceof AbstractCacheEvent) {
 			return;
 		}
@@ -39,6 +40,7 @@ class CacheEntryListener implements IEventListener {
 		$path = $event->getPath();
 		$fileId = $event->getFileId();
 
+		$this->logger->debug("GotFields");
 		if (self::shouldTag($path) && !$this->tagService->hasAnyVaasTag($fileId)) {
 			$this->logger->debug("Handling " . get_class($event) . " for " . $path);
 

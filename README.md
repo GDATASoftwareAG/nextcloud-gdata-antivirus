@@ -54,6 +54,51 @@ The app offers a variety of settings to customize the behavior of the antivirus.
 
 If you want to self-host the scanning backend, take a look at the [repository of our helm chart](https://github.com/GDATASoftwareAG/vaas-helm).
 
+## Nextcloud Commands
+
+The following commands are available for managing and interacting with the G DATA VaaS app in your Nextcloud instance:
+
+#### `gdatavaas:scan`
+
+- **Description**: Scans files for malware.
+- **Usage**: `php occ gdatavaas:scan`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:scan`
+- **Details**: This command scans all files in the Nextcloud instance for malware and logs the results.
+
+#### `gdatavaas:get-tags-for-file`
+
+- **Description**: Retrieves tags for a specified file.
+- **Usage**: `php occ gdatavaas:get-tags-for-file <file-path>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file <file-path>`
+- **Arguments**:
+   - `<file-path>`: The path to the file (e.g., `username/files/filename`).
+- **Details**: This command fetches and logs all tags associated with the specified file.
+
+#### `gdatavaas:remove-tag`
+
+- **Description**: Deletes a specified tag.
+- **Usage**: `php occ gdatavaas:remove-tag <tag-name>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:remove-tag <tag-name>`
+- **Arguments**:
+   - `<tag-name>`: The name of the tag to delete.
+- **Details**: This command removes the specified tag from the system. If the tag does not exist, an error is logged.
+
+#### `gdatavaas:tag-unscanned`
+
+- **Description**: Tags all files without a tag from this app as unscanned.
+- **Usage**: `php occ gdatavaas:tag-unscanned`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:tag-unscanned`
+- **Details**: This command tags all files that have not been tagged by the G DATA VaaS app as "unscanned" and logs the results.
+
+#### `gdatavaas:get-tag-id`
+
+- **Description**: Gets the ID of a specified tag.
+- **Usage**: `php occ gdatavaas:get-tag-id <tag-name>`
+- **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tag-id <tag-name>`
+- **Arguments**:
+   - `<tag-name>`: The name of the tag to get the ID for.
+- **Details**: This command retrieves and logs the ID of the specified tag. If the tag does not exist, an error is logged.
+
 ## Setting up a development environment
 
 Before you start, make sure you have the following tools installed:
@@ -69,23 +114,34 @@ You always need to do this before you start the development environment or copy 
 If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
 
 ### Windows
-For Windows you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
+For Windows, you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
 
 ### Linux
-* For a quick development environment you can use the provided ```start-dev-environment.sh``` script. Or you use the following steps:
-* Make sure you have docker compose installed
-* Run the following command with bash in the folder where you want your Nextcloud in
-```bash
-git clone https://github.com/juliushaertl/nextcloud-docker-dev
-cd nextcloud-docker-dev
-./bootstrap.sh
-sudo sh -c "echo '127.0.0.1 nextcloud.local' >> /etc/hosts"
-docker-compose up nextcloud proxy
-```
-The command may take a while and starts Nextcloud directly. Nextcloud can then be accessed with your browser at http://nextcloud.local.
+* For a quick lite development environment you can use the provided ```start-dev-environment.sh``` script. Or you use the following steps:
+* Make sure you have the tools mentioned above installed.
+* With the provided ./install.sh script you can install the dependencies and build the node modules.
 
-In the future, Nextcloud can then be started again by changing to the
-folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy```. For more information see the [Nextcloud app development tutorials](https://cloud.nextcloud.com/s/iyNGp8ryWxc7Efa). These steps set up the official Nextcloud Dev Environment. It uses an SQLite databse. If you want to test on a production like instance you can set up a real Nextcloud Server using this [compose file](compose.yaml).
+### `install.sh` Script
+
+The `install.sh` script is used to set up and configure a Nextcloud instance with the G DATA VaaS app and Smtp4Dev. Below is an explanation of the script's features:
+
+1. **Environment Variables in `.env-local`**:
+    - `CLIENT_ID`: Sets the client ID for the G DATA VaaS app.
+    - `CLIENT_SECRET`: Sets the client secret for the G DATA VaaS app.
+   
+   If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
+
+2. **Specify the Nextcloud server version**:
+    - The Nextcloud version defaults to 29.0.6
+    - You can start the `install.sh` script with the desired Nextcloud version as an argument, e.g. `./install.sh 29`
+
+3. **Smtp4Dev**:
+    - Starts a container with the Smtp4Dev tool to capture emails sent by Nextcloud.
+    - The tool is accessible at `http://localhost:8081` and can be used to view emails sent by Nextcloud.
+
+4. **Additional Install Script**:
+    - Sources `install.local` if it exists for any additional installation steps.
+
 
 ### Useful commands
 
@@ -96,3 +152,59 @@ folder "nextcloud-docker-dev" and running ```docker compose up nextcloud proxy``
 | Watch logs                | `docker exec --user www-data nextcloud-container php occ log:watch`                                      |
 | Watch raw logs            | `docker exec --user www-data nextcloud-container php occ log:watch --raw \| jq .message`                 |
 | Set log level to debug    | `docker exec --user www-data nextcloud-container php occ log:manage --level DEBUG`                       |
+
+
+## Smtp4Dev
+
+For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
+
+
+### Configuring via the command line
+
+In addition to the graphical configuration via the VaaS settings page in Nextcloud, configuration is possible via PHP OCC commands:
+
+```
+# The authentication flow to use (depends on available credentials). Default: ResourceOwnerPassword
+php occ config:app:set gdatavaas authMethod <ResourceOwnerPassword|ClientCredentials>
+
+# Username + Password are used only in ResourceOwnerPassword authMethod
+php occ config:app:set gdatavaas username <string>
+php occ config:app:set gdatavaas password <string>
+
+# ClientID + ClientSecret are used only in ClientCredentials authMethod
+php occ config:app:set gdatavaas clientId <string>
+php occ config:app:set gdatavaas clientSecret <string>
+
+# VaaS server address. Default: wss://gateway.staging.vaas.gdatasecurity.de
+php occ config:app:set gdatavaas vaasUrl <URL>
+# Authentication server. Default: https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token
+php occ config:app:set gdatavaas tokenEndpoint <URL>
+
+# Name of quarantine folder. Default: Quarantine
+php occ config:app:set gdatavaas quarantineFolder <string>
+# Whether to enable the automatic file scan. Default: false
+php occ config:app:set gdatavaas autoScanFiles <true|false>
+# Whether to add a prefix to malicious files. Default: false
+php occ config:app:set gdatavaas prefixMalicious <true|false>
+# Whether to disable the unscanned tag. Default: false
+php occ config:app:set gdatavaas disableUnscannedTag <true|false>
+# Comma-separated list of files/folders that should be scanned. Default: Empty string (all files)
+php occ config:app:set gdatavaas scanOnlyThis <string>
+# Comma-separated list of files/folders that should **not** be scanned. Default: Empty string (no files excluded)
+php occ config:app:set gdatavaas doNotScanThis <string>
+# Email address to send notifications to, when infected files are uploaded. Default: None
+php occ config:app:set gdatavaas notifyMail <email>
+# Whether to send email notifications on upload, when files are infected. Default: false
+php occ config:app:set gdatavaas sendMailOnVirusUpload <true|false>
+# Whether to send a weekly summary of malicious files to an administrator. Default: false
+php occ config:app:set gdatavaas notifyAdminEnabled <true|false>
+```
+
+You can also install and/or update the app via OCC:
+
+```
+# Install
+php occ app:install gdatavaas
+# Upgrade
+php occ app:update gdatavaas
+```

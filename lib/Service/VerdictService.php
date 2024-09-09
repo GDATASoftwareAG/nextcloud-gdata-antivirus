@@ -9,14 +9,14 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IConfig;
 use Psr\Log\LoggerInterface;
-use VaasSdk\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
+use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Exceptions\FileDoesNotExistException;
 use VaasSdk\Exceptions\InvalidSha256Exception;
 use VaasSdk\Exceptions\TimeoutException;
 use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Message\VaasVerdict;
-use VaasSdk\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Vaas;
 use VaasSdk\VaasOptions;
 
@@ -72,7 +72,7 @@ class VerdictService {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 		if (self::isFileTooLargeToScan($filePath)) {
-			$this->tagService->setTag($fileId, TagService::WONT_SCAN);
+			$this->tagService->setTag($fileId, TagService::WONT_SCAN, silent: true);
 			throw new EntityTooLargeException("File is too large");
 		}
 
@@ -94,23 +94,26 @@ class VerdictService {
 	private function tagFile(int $fileId, string $tagName): void {
 		switch ($tagName) {
 			case TagService::MALICIOUS:
-				$this->tagService->setTag($fileId, TagService::MALICIOUS);
+				$this->tagService->setTag($fileId, TagService::MALICIOUS, silent: false);
 				try {
 					$this->fileService->setMaliciousPrefixIfActivated($fileId);
 					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
 				} catch (Exception) {
 				}
 				break;
+			case TagService::PUP:
+				$this->tagService->setTag($fileId, TagService::PUP, silent: false);
+				break;
 			case TagService::UNSCANNED:
 				$unscannedTagIsDisabled = $this->appConfig->getAppValue(Application::APP_ID, 'disableUnscannedTag');
-				if (!$unscannedTagIsDisabled)
-					$this->tagService->setTag($fileId, $tagName);
+				if (!$unscannedTagIsDisabled) {
+					$this->tagService->setTag($fileId, TagService::UNSCANNED, silent: true);
+				}
 				break;
 			case TagService::CLEAN:
-			case TagService::PUP:
 			case TagService::WONT_SCAN:
 			default:
-				$this->tagService->setTag($fileId, $tagName);
+				$this->tagService->setTag($fileId, $tagName, silent: true);
 				break;
 		}
 	}
@@ -124,7 +127,6 @@ class VerdictService {
 		$size = filesize($path);
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
-
 
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
@@ -229,24 +231,34 @@ class VerdictService {
 	}
 
 	/**
+	 * @param string $authMethod
+	 * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
 	 * @throws VaasAuthenticationException
 	 */
-	private function createAndConnectVaas(): Vaas {
-		if ($this->authMethod === 'ResourceOwnerPassword') {
-			$this->authenticator = new ResourceOwnerPasswordGrantAuthenticator(
+	public function getAuthenticator(string $authMethod): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
+		if ($authMethod === 'ResourceOwnerPassword') {
+			return new ResourceOwnerPasswordGrantAuthenticator(
 				"nextcloud-customer",
 				$this->username,
 				$this->password,
 				$this->tokenEndpoint
 			);
-		} elseif ($this->authMethod === 'ClientCredentials') {
-			$this->authenticator = new ClientCredentialsGrantAuthenticator(
+		} elseif ($authMethod === 'ClientCredentials') {
+			return new ClientCredentialsGrantAuthenticator(
 				$this->clientId,
 				$this->clientSecret,
 				$this->tokenEndpoint
 			);
+		} else {
+			throw new VaasAuthenticationException("Invalid auth method: " . $authMethod);
 		}
+	}
 
+	/**
+	 * @throws VaasAuthenticationException
+	 */
+	public function createAndConnectVaas(): Vaas {
+		$this->authenticator = $this->getAuthenticator($this->authMethod);
 		$options = new VaasOptions(false, false);
 		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
 		$vaas->Connect($this->authenticator->getToken());
