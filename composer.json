@@ -9,15 +9,15 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "8.0.2",
+		"gdata/vaas": "v9.0.4",
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "v29.0.4",
-		"psalm/phar": "5.25.0",
-		"nextcloud/coding-standard": "v1.2.1",
-		"phpunit/phpunit": "10.5.30",
-		"symfony/console": "6.4.10"
+		"nextcloud/ocp": "v29.0.6",
+		"psalm/phar": "5.26.0",
+		"nextcloud/coding-standard": "v1.2.3",
+		"phpunit/phpunit": "10.5.32",
+		"symfony/console": "6.4.11"
 	},
 	"autoload": {
 		"psr-4": {

@@ -145,27 +145,27 @@ class AvirWrapper extends Wrapper {
 						return;
 					}
 
-                    try {
-                        $verdict = $this->verdictService->scan($localPath);
-                    } catch (EntityTooLargeException) {
-                        $this->logger->error("File $localPath is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
-                    } catch (FileDoesNotExistException) {
-                        $this->logger->error("File $localPath does not exist on upload");
-                    } catch (InvalidSha256Exception) {
-                        $this->logger->error("Invalid SHA256 for file $localPath on upload");
-                    } catch (NotFoundException) {
-                        $this->logger->error("File $localPath not found on upload");
-                    } catch (NotPermittedException) {
-                        $this->logger->error("Current settings do not permit scanning file $localPath on upload");
-                    } catch (TimeoutException) {
-                        $this->logger->error("Scanning timed out for file $localPath on upload");
-                    } catch (UploadFailedException|ServerException) {
-                        $this->logger->error("File $localPath could not be scanned on upload with GData VaaS because there was a temporary upstream server error");
-                    } catch (VaasAuthenticationException) {
-                        $this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
-                    } catch (\Exception $e) {
-                        $this->logger->error("Unexpected error while scanning file " . $localPath . " on upload: " . $e->getMessage());
-                    }
+					try {
+						$verdict = $this->verdictService->scan($localPath);
+					} catch (EntityTooLargeException) {
+						$this->logger->error("File $localPath is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
+					} catch (FileDoesNotExistException) {
+						$this->logger->error("File $localPath does not exist on upload");
+					} catch (InvalidSha256Exception) {
+						$this->logger->error("Invalid SHA256 for file $localPath on upload");
+					} catch (NotFoundException) {
+						$this->logger->error("File $localPath not found on upload");
+					} catch (NotPermittedException) {
+						$this->logger->error("Current settings do not permit scanning file $localPath on upload");
+					} catch (TimeoutException) {
+						$this->logger->error("Scanning timed out for file $localPath on upload");
+					} catch (UploadFailedException|ServerException) {
+						$this->logger->error("File $localPath could not be scanned on upload with GData VaaS because there was a temporary upstream server error");
+					} catch (VaasAuthenticationException) {
+						$this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
+					} catch (\Exception $e) {
+						$this->logger->error("Unexpected error while scanning file " . $localPath . " on upload: " . $e->getMessage());
+					}
 					$logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
 
 					if ($verdict->Verdict == Verdict::MALICIOUS) {
