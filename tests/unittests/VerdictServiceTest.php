@@ -175,7 +175,7 @@ class VerdictServiceTest extends TestCase {
 	public function testAuthenticator(): void {
 		$verdictService = new VerdictService(
 			$this->logger,
-			$this->createMock(IAppConfig::class),
+			$this->createMock(IConfig::class),
 			$this->createMock(FileService::class),
 			$this->createMock(TagService::class));
 
@@ -183,8 +183,8 @@ class VerdictServiceTest extends TestCase {
 		$this->assertInstanceOf(ResourceOwnerPasswordGrantAuthenticator::class, $authenticator);
 	}
 
-	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IAppConfig {
-		$appConfig = $this->createMock(IAppConfig::class);
+	private function getAppConfigMock(array $scanOnlyThis, array $doNotScanThis): IConfig {
+		$appConfig = $this->createMock(IConfig::class);
 		$appConfig
 			->method('getAppValue')
 			->willReturnCallback(function ($appId, $key, $default) use ($doNotScanThis, $scanOnlyThis) {
