@@ -83,6 +83,12 @@ jobs:
         if: steps.bats-tests.outputs.bats_run == 'fail'
         run: exit 1
 
+      - uses: actions/upload-artifact@master
+        with:
+          overwrite: true
+          name: build-dir
+          path: build/
+
   release:
     needs:
       - test
