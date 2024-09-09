@@ -175,7 +175,7 @@ class VerdictServiceTest extends TestCase {
 	public function testAuthenticator(): void {
 		$verdictService = new VerdictService(
 			$this->logger,
-			$this->createMock(IConfig::class),
+			$this->getAppConfigMock([], []),
 			$this->createMock(FileService::class),
 			$this->createMock(TagService::class));
 
