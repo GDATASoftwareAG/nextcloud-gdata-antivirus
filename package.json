@@ -1,7 +1,7 @@
 {
   "name": "gdatavaas",
   "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Lennart Dohmann <lennart.dohmann@gdata.de>",
   "contributors": [],
   "bugs": {
@@ -40,7 +40,7 @@
   },
   "overrides": {
     "@nextcloud/webpack-vue-config": {
-      "webpack-dev-server": "5.0.4",
+      "webpack-dev-server": "5.1.0",
       "vue-loader": "^17"
     }
   }
