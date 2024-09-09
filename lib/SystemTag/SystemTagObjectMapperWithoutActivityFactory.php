@@ -4,10 +4,9 @@ namespace OCA\GDataVaas\SystemTag;
 
 use OC\SystemTag\SystemTagObjectMapper;
 use OCP\EventDispatcher\Event;
+use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class SystemTagObjectMapperWithoutActivityFactory
 {
@@ -19,51 +18,39 @@ class SystemTagObjectMapperWithoutActivityFactory
 		return new SystemTagObjectMapper($connection, $tagManager, self::createFakeEventDispatcher());
 	}
 
-	private static function createFakeEventDispatcher(): EventDispatcherInterface
+	private static function createFakeEventDispatcher(): IEventDispatcher
 	{
-		return new class implements EventDispatcherInterface {
+		return new class implements IEventDispatcher {
+			public function addListener(string $eventName, callable $listener, int $priority = 0): void
+			{
+				// DUMMY
+			}
 
-            public function addListener(string $eventName, callable $listener, int $priority = 0)
-            {
-                // DUMMY
-            }
+			public function removeListener(string $eventName, callable $listener): void
+			{
+				// DUMMY
+			}
 
-            public function addSubscriber(EventSubscriberInterface $subscriber)
-            {
-                // DUMMY
-            }
+			public function addServiceListener(string $eventName, string $className, int $priority = 0): void
+			{
+				// DUMMY
+			}
 
-            public function removeListener(string $eventName, callable $listener)
-            {
-                // DUMMY
-            }
+			public function hasListeners(string $eventName): bool
+			{
+				// DUMMY
+				return false;
+			}
 
-            public function removeSubscriber(EventSubscriberInterface $subscriber)
-            {
-                // DUMMY
-            }
+			public function dispatch(string $eventName, Event $event): void
+			{
+				// DUMMY
+			}
 
-            public function getListeners(?string $eventName = null)
-            {
-                // DUMMY
-            }
-
-            public function dispatch(object $event, ?string $eventName = null): object
-            {
-                // DUMMY
-                return new Event();
-            }
-
-            public function getListenerPriority(string $eventName, callable $listener)
-            {
-                // DUMMY
-            }
-
-            public function hasListeners(?string $eventName = null)
-            {
-                // DUMMY
-                return false;
-            }
-        };
+			public function dispatchTyped(Event $event): void
+			{
+				// DUMMY
+			}
+		};
 	}
 }
