@@ -87,7 +87,7 @@ class DbFileMapper extends QBMapper {
 	 * @throws Exception if the database platform is not supported
 	 */
 	private function getPlatformSpecificCast(): string {
-		$platform = $this->db->getDatabasePlatform()->getName();
+		$platform = $this->db->getDatabaseProvider();
 		if ($platform === 'mysql') {
 			$cast = 'CAST(' . 'o.objectid' . ' AS UNSIGNED)';
 		} elseif ($platform === 'sqlite') {

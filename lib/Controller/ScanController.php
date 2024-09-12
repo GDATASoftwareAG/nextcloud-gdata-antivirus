@@ -7,6 +7,7 @@ use Exception;
 use GuzzleHttp\Exception\ServerException;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
+use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\NotFoundException;
@@ -29,11 +30,11 @@ class ScanController extends Controller {
 
 	/**
 	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
-	 * @NoAdminRequired
 	 * @param int $fileId
 	 * @return JSONResponse
 	 */
-	public function scan(int $fileId): JSONResponse {
+    #[NoAdminRequired]
+    public function scan(int $fileId): JSONResponse {
 		try {
 			$verdict = $this->verdictService->scanFileById($fileId);
 			return new JSONResponse(['verdict' => $verdict->Verdict->value], 200);
