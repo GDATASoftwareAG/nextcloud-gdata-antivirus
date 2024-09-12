@@ -19,7 +19,7 @@
 
 ## Getting started
 
-This app is based on the G DATA Verdict as a Service (VaaS) API. To get started with the app, you have to register via our [registration page](https://account-staging.gdata.de/realms/vaas-staging/login-actions/registration?client_id=landing-page&tab_id=VDSGSP4oQL0).
+This app is based on the G DATA Verdict as a Service (VaaS) API. To get started with the app, you must either register via our [registration page](https://vaas.gdata.de/login) or host the backend yourself. If you have any questions about self-hosting the backend, please contact us by email or take a look at [this](https://github.com/GDATASoftwareAG/vaas-helm) repository containing the Helm charts.
 
 ![Image](https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/vaas-registration.png)
 
