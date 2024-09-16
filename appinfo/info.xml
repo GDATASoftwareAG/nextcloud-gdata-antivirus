@@ -57,7 +57,7 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
         <command>OCA\GDataVaas\Command\GetTagsForFileCommand</command>
 	</commands>
     <dependencies>
-        <nextcloud min-version="29" max-version="29"/>
+        <nextcloud min-version="30" max-version="30"/>
     </dependencies>
 	<background-jobs>
 		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
