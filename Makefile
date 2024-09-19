@@ -107,6 +107,8 @@ clean:
 .PHONY: distclean
 distclean: clean
 	rm -rf vendor
+	rm -rf vendor-bin
+	rm -rf lib/Vendor
 	rm -rf node_modules
 	rm -rf js/vendor
 	rm -rf js/node_modules
@@ -115,7 +117,7 @@ distclean: clean
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release
 .PHONY: appstore
-appstore: build
+appstore:
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	tar czf $(appstore_package_name).tar.gz \

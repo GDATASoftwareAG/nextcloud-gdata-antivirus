@@ -11,7 +11,7 @@ use OCP\Files\NotFoundException;
 use OCP\IAppConfig;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
-use VaasSdk\Message\VaasVerdict;
+use OCA\GDataVaas\Vendor\VaasSdk\Message\VaasVerdict;
 
 class MailService {
 	private IMailer $mailer;

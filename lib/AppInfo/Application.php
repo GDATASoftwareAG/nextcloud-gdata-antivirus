@@ -56,6 +56,8 @@ class Application extends App implements IBootstrap {
 		$composerAutoloadFile = __DIR__ . '/../../vendor/autoload.php';
 		if (file_exists($composerAutoloadFile)) {
 			require_once $composerAutoloadFile;
+            require_once __DIR__ . '/../../lib/Vendor/Amp/Http/Internal/constants.php';
+            require_once __DIR__ . '/../../lib/Vendor/Amp/Http/functions.php';
 		}
 		
 		// Manually register TagService so that we can customize the DI used for $silentTagMapper

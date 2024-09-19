@@ -13,6 +13,8 @@ js/*hot-update.*
 
 /config/app.php
 /vendor/
+/vendor-bin/
+lib/Vendor
 
 /tmp/cache/models/*
 !/tmp/cache/models/empty

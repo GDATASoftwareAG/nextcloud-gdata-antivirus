@@ -9,16 +9,16 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
-use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
-use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
-use VaasSdk\Exceptions\FileDoesNotExistException;
-use VaasSdk\Exceptions\InvalidSha256Exception;
-use VaasSdk\Exceptions\TimeoutException;
-use VaasSdk\Exceptions\UploadFailedException;
-use VaasSdk\Exceptions\VaasAuthenticationException;
-use VaasSdk\Message\VaasVerdict;
-use VaasSdk\Vaas;
-use VaasSdk\VaasOptions;
+use OCA\GDataVaas\Vendor\VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
+use OCA\GDataVaas\Vendor\VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
+use OCA\GDataVaas\Vendor\VaasSdk\Exceptions\FileDoesNotExistException;
+use OCA\GDataVaas\Vendor\VaasSdk\Exceptions\InvalidSha256Exception;
+use OCA\GDataVaas\Vendor\VaasSdk\Exceptions\TimeoutException;
+use OCA\GDataVaas\Vendor\VaasSdk\Exceptions\UploadFailedException;
+use OCA\GDataVaas\Vendor\VaasSdk\Exceptions\VaasAuthenticationException;
+use OCA\GDataVaas\Vendor\VaasSdk\Message\VaasVerdict;
+use OCA\GDataVaas\Vendor\VaasSdk\Vaas;
+use OCA\GDataVaas\Vendor\VaasSdk\VaasOptions;
 
 class VerdictService {
 	public const MAX_FILE_SIZE = 268435456;

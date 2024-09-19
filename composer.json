@@ -10,7 +10,8 @@
 	],
 	"require": {
 		"gdata/vaas": "v9.0.5",
-		"coduo/php-humanizer": "^5.0"
+		"coduo/php-humanizer": "^5.0",
+		"bamarni/composer-bin-plugin": "^1.8"
 	},
 	"require-dev": {
 		"nextcloud/ocp": "v29.0.7",
@@ -31,11 +32,16 @@
 		"cs:fix": "php-cs-fixer fix .",
 		"psalm": "vendor/psalm/phar/psalm.phar --threads=1",
 		"psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache",
-		"psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"
+		"psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType",
+		"post-install-cmd": [
+			"composer bin php-scoper require humbug/php-scoper=0.17.0",
+			"composer bin all install --ignore-platform-reqs"
+		]
 	},
 	"config": {
 		"allow-plugins": {
-			"composer/package-versions-deprecated": true
+			"composer/package-versions-deprecated": true,
+			"bamarni/composer-bin-plugin": true
 		},
 		"platform": {
 			"php": "8.1"
