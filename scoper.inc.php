@@ -98,14 +98,13 @@ return [
         'OCA',
         'OCP',
         'OC',
-        'Symfony'
+        'Symfony',
+        'Icewind'
     ],
     'exclude-classes' => [
         // 'ReflectionClassConstant',
     ],
     'exclude-functions' => [
-        'p',
-        'p()'
     ],
     'exclude-constants' => [
         // 'STDIN',
@@ -114,9 +113,9 @@ return [
     // List of symbols to expose.
     //
     // For more information see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#exposed-symbols
-    'expose-global-constants' => true,
-    'expose-global-classes' => true,
-    'expose-global-functions' => true,
+    'expose-global-constants' => false,
+    'expose-global-classes' => false,
+    'expose-global-functions' => false,
     'expose-namespaces' => [
         // 'Acme\Foo'                     // The Acme\Foo namespace (and sub-namespaces)
         // '~^PHPUnit\\\\Framework$~',    // The whole namespace PHPUnit\Framework (but not sub-namespaces)
