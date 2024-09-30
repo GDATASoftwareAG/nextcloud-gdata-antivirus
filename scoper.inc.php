@@ -85,6 +85,18 @@ return [
     'patchers' => [
         static function (string $filePath, string $prefix, string $contents): string {
             // Change the contents here.
+            
+            if (str_ends_with($filePath, 'vendor/netresearch/jsonmapper/src/JsonMapper.php') === true) {
+                $contents = str_replace("namespace $prefix;", "namespace $prefix\\JsonMapper;", $contents);
+            }
+
+            if (str_ends_with($filePath, 'vendor/netresearch/jsonmapper/src/JsonMapper/Exception.php') === true) {
+                $contents = str_replace("namespace $prefix;", "namespace $prefix\\JsonMapper;", $contents);
+            }
+
+            if (str_ends_with($filePath, 'vendor/gdata/vaas/Vaas.php') === true) {
+                $contents = str_replace('use OCA\GDataVaas\Vendor\JsonMapper', 'use OCA\GDataVaas\Vendor\JsonMapper\JsonMapper', $contents);
+            }
 
             return $contents;
         },
@@ -97,7 +109,8 @@ return [
         'Psr',
         'OCA',
         'OCP',
-        'OC',
+        'OC\Files',
+        'OC\SystemTag',
         'Symfony',
         'Icewind'
     ],
