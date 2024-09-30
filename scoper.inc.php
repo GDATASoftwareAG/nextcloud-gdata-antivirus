@@ -45,6 +45,7 @@ return [
 			->ignoreVCS(true)
 			->ignoreDotFiles(true)
 			->exclude([
+				'build',
 				'.devcontainer',
 				'nextcloud-server',
 				'tests',
