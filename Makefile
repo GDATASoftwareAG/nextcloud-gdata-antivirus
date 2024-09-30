@@ -40,7 +40,7 @@
 app_directory_name=$(notdir $(CURDIR))
 app_real_name=gdatavaas
 build_tools_directory=$(CURDIR)/build/tools
-source_build_directory=$(CURDIR)/build/artifacts/source
+source_build_directory=./build/artifacts/source
 source_package_name=$(source_build_directory)/$(app_directory_name)
 appstore_build_directory=$(CURDIR)/build/artifacts
 appstore_package_name=$(appstore_build_directory)/$(app_real_name)
@@ -118,58 +118,60 @@ distclean: clean
 appstore: build
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
+	php-scoper add-prefix --output-dir=$(source_build_directory) --force
+	composer dump-autoload --working-dir $(source_build_directory) --classmap-authoritative
 	tar czf $(appstore_package_name).tar.gz \
-	--transform s/$(app_directory_name)/$(app_real_name)/ \
+	--transform s%$(source_build_directory)%$(app_real_name)% \
 	--exclude-vcs \
-	--exclude="../$(app_directory_name)/opcache-disabled.ini" \
-	--exclude="../$(app_directory_name)/opcache-blacklist.txt" \
-	--exclude="../$(app_directory_name)/artifacts" \
-	--exclude="../$(app_directory_name)/tmp*" \
-	--exclude="../$(app_directory_name)/Dockerfile*" \
-	--exclude="../$(app_directory_name)/nextcloud-server*" \
-	--exclude="../$(app_directory_name)/compose-install.yaml" \
-	--exclude="../$(app_directory_name)/empty-skeleton.config.php" \
-	--exclude="../$(app_directory_name)/get-matrix.sh" \
-	--exclude="../$(app_directory_name)/xdebug.*" \
-	--exclude="../$(app_directory_name)/build" \
-	--exclude="../$(app_directory_name)/tests" \
-	--exclude="../$(app_directory_name)/Makefile" \
-	--exclude="../$(app_directory_name)/*.log" \
-	--exclude="../$(app_directory_name)/phpunit*xml" \
-	--exclude="../$(app_directory_name)/composer.*" \
-	--exclude="../$(app_directory_name)/node_modules" \
-	--exclude="../$(app_directory_name)/js/node_modules" \
-	--exclude="../$(app_directory_name)/js/tests" \
-	--exclude="../$(app_directory_name)/js/test" \
-	--exclude="../$(app_directory_name)/js/*.log" \
-	--exclude="../$(app_directory_name)/js/package.json" \
-	--exclude="../$(app_directory_name)/js/bower.json" \
-	--exclude="../$(app_directory_name)/js/karma.*" \
-	--exclude="../$(app_directory_name)/js/protractor.*" \
-	--exclude="../$(app_directory_name)/package.json" \
-	--exclude="../$(app_directory_name)/bower.json" \
-	--exclude="../$(app_directory_name)/karma.*" \
-	--exclude="../$(app_directory_name)/protractor\.*" \
-	--exclude="../$(app_directory_name)/.*" \
-	--exclude="../$(app_directory_name)/js/.*" \
-	--exclude="../$(app_directory_name)/webpack.config.js" \
-	--exclude="../$(app_directory_name)/stylelint.config.js" \
-	--exclude="../$(app_directory_name)/CHANGELOG.md" \
-	--exclude="../$(app_directory_name)/README.md" \
-	--exclude="../$(app_directory_name)/package-lock.json" \
-	--exclude="../$(app_directory_name)/LICENSES" \
-	--exclude="../$(app_directory_name)/src" \
-	--exclude="../$(app_directory_name)/babel.config.js" \
-	--exclude="../$(app_directory_name)/devcontainer.yaml" \
-	--exclude="../$(app_directory_name)/psalm.xml" \
-	--exclude="../$(app_directory_name)/start-dev-environment.ps1" \
-	--exclude="../$(app_directory_name)/start-dev-environment.sh" \
-	--exclude="../$(app_directory_name)/dev-environment*" \
-	--exclude="../$(app_directory_name)/install.sh" \
-	--exclude="../$(app_directory_name)/renovate.json" \
-	--exclude="../$(app_directory_name)/get-matrix.sh" \
-	--exclude="../$(app_directory_name)/xdebug.ini" \
-	--exclude="../$(app_directory_name)/compose-install.yaml" \
-	--exclude="../$(app_directory_name)/Dockerfile.Nextcloud" \
-	--exclude="../$(app_directory_name)/empty-skeleton.config.php" \
-	../$(app_directory_name) \
+	--exclude="$(source_build_directory)/opcache-disabled.ini" \
+	--exclude="$(source_build_directory)/opcache-blacklist.txt" \
+	--exclude="$(source_build_directory)/artifacts" \
+	--exclude="$(source_build_directory)/tmp*" \
+	--exclude="$(source_build_directory)/Dockerfile*" \
+	--exclude="$(source_build_directory)/nextcloud-server*" \
+	--exclude="$(source_build_directory)/compose-install.yaml" \
+	--exclude="$(source_build_directory)/empty-skeleton.config.php" \
+	--exclude="$(source_build_directory)/get-matrix.sh" \
+	--exclude="$(source_build_directory)/xdebug.*" \
+	--exclude="$(source_build_directory)/build" \
+	--exclude="$(source_build_directory)/tests" \
+	--exclude="$(source_build_directory)/Makefile" \
+	--exclude="$(source_build_directory)/*.log" \
+	--exclude="$(source_build_directory)/phpunit*xml" \
+	--exclude="$(source_build_directory)/composer.*" \
+	--exclude="$(source_build_directory)/node_modules" \
+	--exclude="$(source_build_directory)/js/node_modules" \
+	--exclude="$(source_build_directory)/js/tests" \
+	--exclude="$(source_build_directory)/js/test" \
+	--exclude="$(source_build_directory)/js/*.log" \
+	--exclude="$(source_build_directory)/js/package.json" \
+	--exclude="$(source_build_directory)/js/bower.json" \
+	--exclude="$(source_build_directory)/js/karma.*" \
+	--exclude="$(source_build_directory)/js/protractor.*" \
+	--exclude="$(source_build_directory)/package.json" \
+	--exclude="$(source_build_directory)/bower.json" \
+	--exclude="$(source_build_directory)/karma.*" \
+	--exclude="$(source_build_directory)/protractor\.*" \
+	--exclude="$(source_build_directory)/.*" \
+	--exclude="$(source_build_directory)/js/.*" \
+	--exclude="$(source_build_directory)/webpack.config.js" \
+	--exclude="$(source_build_directory)/stylelint.config.js" \
+	--exclude="$(source_build_directory)/CHANGELOG.md" \
+	--exclude="$(source_build_directory)/README.md" \
+	--exclude="$(source_build_directory)/package-lock.json" \
+	--exclude="$(source_build_directory)/LICENSES" \
+	--exclude="$(source_build_directory)/src" \
+	--exclude="$(source_build_directory)/babel.config.js" \
+	--exclude="$(source_build_directory)/devcontainer.yaml" \
+	--exclude="$(source_build_directory)/psalm.xml" \
+	--exclude="$(source_build_directory)/start-dev-environment.ps1" \
+	--exclude="$(source_build_directory)/start-dev-environment.sh" \
+	--exclude="$(source_build_directory)/dev-environment*" \
+	--exclude="$(source_build_directory)/install.sh" \
+	--exclude="$(source_build_directory)/renovate.json" \
+	--exclude="$(source_build_directory)/get-matrix.sh" \
+	--exclude="$(source_build_directory)/xdebug.ini" \
+	--exclude="$(source_build_directory)/compose-install.yaml" \
+	--exclude="$(source_build_directory)/Dockerfile.Nextcloud" \
+	--exclude="$(source_build_directory)/empty-skeleton.config.php" \
+	$(source_build_directory) \
