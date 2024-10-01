@@ -38,6 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
+      env:
+        IS_CI: true
     needs: 
       - define-matrix
       - build-devcontainer
