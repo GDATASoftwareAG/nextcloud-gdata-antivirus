@@ -5,6 +5,7 @@ composer global require humbug/php-scoper
 
 $(composer config home)/vendor/bin/php-scoper completion bash >> $HOME.bash_completion
 echo "export PATH=$(composer config home)/vendor/bin/:\$PATH" >> $HOME/.bashrc
+export PATH=$(composer config home)/vendor/bin/:$PATH
 
 if [[ "$IS_CI" == "true" ]]; then
     exit 0
