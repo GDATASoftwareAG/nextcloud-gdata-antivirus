@@ -2,8 +2,9 @@
 
 echo "setup php-scoper"
 composer global require humbug/php-scoper
-/home/vscode/.composer/vendor/bin/php-scoper completion bash >> /home/vscode/.bash_completion
-echo 'export PATH=/home/vscode/.composer/vendor/bin/:$PATH' >>~/.bashrc
+
+$(composer config home)/vendor/bin/php-scoper completion bash >> $HOME.bash_completion
+echo "export PATH=$(composer config home)/vendor/bin/:\$PATH" >> $HOME/.bashrc
 
 if [[ "$IS_CI" == "true" ]]; then
     exit 0
