@@ -51,7 +51,7 @@ jobs:
 
       - name: postStartCommand
         run: |
-          bash .devcontainer/postStartCommands.sh
+          bash .devcontainer/postCreateCommands.sh
 
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
