@@ -19,7 +19,7 @@ use Isolated\Symfony\Component\Finder\Finder;
 //         false,
 //     ),
 // );
-$excludedFiles = [];
+$excludedFiles = ['templates/admin.php'];
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
