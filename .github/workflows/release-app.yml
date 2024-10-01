@@ -49,6 +49,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: postStartCommand
+        run: |
+          bash .devcontainer/postStartCommands.sh
+
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
         id: replace-version-in-info
