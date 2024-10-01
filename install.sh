@@ -53,6 +53,7 @@ if [  -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
 fi
 
 setup_nextcloud &
+setup_nextcloud_pid=$!
 build_app &
 wait %1 %2 || exit 1
 
