@@ -2,7 +2,7 @@ name: Build and Test
 
 defaults:
   run:
-    shell: bash -ieo pipefail {0}
+    shell: bash -iemo pipefail {0}
 on:
   push:
     branches: ["main"]
