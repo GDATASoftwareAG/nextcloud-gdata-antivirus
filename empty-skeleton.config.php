@@ -2,4 +2,5 @@
 
 $CONFIG = [
 	'skeletondirectory' => '',
+    'debug' => true,
 ];
