@@ -53,8 +53,10 @@ if [  -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
 fi
 
 setup_nextcloud &
+setup_nextcloud_pid=$!
 build_app &
-wait
+build_app_pid=$!
+wait -f $setup_nextcloud_pid $build_app_pid || exit 1
 
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -i nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas

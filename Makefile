@@ -106,6 +106,7 @@ clean:
 # npm
 .PHONY: distclean
 distclean: clean
+	something
 	rm -rf vendor
 	rm -rf node_modules
 	rm -rf js/vendor

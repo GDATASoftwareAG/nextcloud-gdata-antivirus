@@ -2,7 +2,6 @@
 
 echo "setup php-scoper"
 composer global require humbug/php-scoper
-
 $(composer config home)/vendor/bin/php-scoper completion bash >> $HOME.bash_completion
 echo "export PATH=$(composer config home)/vendor/bin/:\$PATH" >> $HOME/.bashrc
 export PATH=$(composer config home)/vendor/bin/:$PATH
