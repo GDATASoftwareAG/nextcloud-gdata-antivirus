@@ -11,9 +11,12 @@ sudo curl -sS https://webi.sh/gh | sh
 
 echo ". /usr/share/bash-completion/bash_completion" >> /home/vscode/.bashrc
 
-NEXTCLOUD_VERSION=$(grep -oP "[0-9]+\.[0-9]+\.[0-9]+" install.sh)
+NEXTCLOUD_VERSION=$(grep -oP -m 1 "[0-9]+\.[0-9]+\.[0-9]+" install.sh)
+
 mkdir -p ~/.ssh/
 ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+rm -rf nextcloud-server/
 git clone --depth 1 --recurse-submodules --single-branch --branch v$NEXTCLOUD_VERSION git@github.com:nextcloud/server.git ./nextcloud-server
 cd nextcloud-server
 git submodule update --init
