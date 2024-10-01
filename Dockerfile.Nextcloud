@@ -3,6 +3,8 @@ ARG INSTALL_XDEBUG=1
 
 FROM nextcloud:${NEXTCLOUD_VERSION}
 
+SHELL [ "/bin/bash", "-c" ]
+
 RUN apt update && apt install -y \
     less vim telnet iputils-ping gdb libexpat1-dev libapr1-dev libaprutil1-dev devscripts debmake \
     bison jdupes libbrotli-dev liblua5.4-dev libnghttp2-dev libssl-dev libxml2-dev libcurl4-openssl-dev libjansson-dev

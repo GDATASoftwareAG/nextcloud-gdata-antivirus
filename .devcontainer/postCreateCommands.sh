@@ -1,5 +1,9 @@
 #!/bin/bash
 
+composer global require humbug/php-scoper
+/home/vscode/.composer/vendor/bin/php-scoper completion bash >> /home/vscode/.bash_completion
+echo 'export PATH=/home/vscode/.composer/vendor/bin/:$PATH' >>~/.bashrc
+
 if [[ "$IS_CI" == "true" ]]; then
     exit 0
 fi
@@ -25,7 +29,4 @@ git clone --depth 1 --recurse-submodules --single-branch --branch v$NEXTCLOUD_VE
 cd nextcloud-server
 git submodule update --init
 cd -
-composer global require humbug/php-scoper
-/home/vscode/.composer/vendor/bin/php-scoper completion bash >> /home/vscode/.bash_completion
-echo 'export PATH=/home/vscode/.composer/vendor/bin/:$PATH' >>~/.bashrc
 ./install.sh
