@@ -43,7 +43,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
       env:
         IS_CI: true
-      options: --name $GITHUB_RUN_ID
+      options: --name nextcloud-antivirus-build-container
     needs: 
       - define-matrix
       - build-devcontainer
@@ -81,7 +81,7 @@ jobs:
         run: |
           docker ps
           docker network ls
-          docker network connect nextcloud-gdata-antivirus_nextcloud-network $GITHUB_RUN_ID
+          docker network connect nextcloud-gdata-antivirus_nextcloud-network nextcloud-antivirus-build-container
 
       - name: install nextcloud
         env:
