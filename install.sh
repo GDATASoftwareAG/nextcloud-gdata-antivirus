@@ -41,6 +41,7 @@ setup_nextcloud () {
 
 build_app () {
   echo "build app"
+  make distclean
   make appstore
   tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
   echo "build app finished"
