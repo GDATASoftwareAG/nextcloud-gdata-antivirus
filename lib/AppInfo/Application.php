@@ -53,10 +53,9 @@ class Application extends App implements IBootstrap {
 	 * @return void
 	 */
 	public function register(IRegistrationContext $context): void {
-		$composerAutoloadFile = __DIR__ . '/../../vendor/autoload.php';
-		if (file_exists($composerAutoloadFile)) {
-			require_once $composerAutoloadFile;
-		}
+        require_once file_exists(__DIR__.'/../../vendor/scoper-autoload.php')
+            ? __DIR__.'/../../vendor/scoper-autoload.php'
+            : __DIR__.'/../../vendor/autoload.php';
 		
 		// Manually register TagService so that we can customize the DI used for $silentTagMapper
 		$context->registerService(TagService::class, function ($c) {

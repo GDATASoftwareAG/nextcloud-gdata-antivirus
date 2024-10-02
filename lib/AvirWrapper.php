@@ -111,7 +111,7 @@ class AvirWrapper extends Wrapper {
 	public function rename($source, $target) {
 		if ($this->shouldWrap($source)) {
 			// After the upload apps/dav/lib/Connector/Sabre/File.php calls moveFromStorage which calls rename
-			$this->logger->debug(sprintf("rename(%s, %s)", $source, $target));
+			$this->logger->debug(sprintf('rename(%s, %s)', $source, $target));
 			$this->verdictService->onRename($this->getLocalFile($source), $this->getLocalFile($target));
 		}
 		return parent::rename($source, $target);
@@ -135,7 +135,7 @@ class AvirWrapper extends Wrapper {
 				function () use ($path, $logger) {
 					$localPath = $this->getLocalFile($path);
 					$filesize = $this->filesize($path);
-					$logger->debug("Closing " . $localPath . " with size " . $filesize);
+					$logger->debug('Closing ' . $localPath . ' with size ' . $filesize);
 					
 					if (!$this->verdictService->isAllowedToScan($localPath)) {
 						return;
@@ -162,14 +162,14 @@ class AvirWrapper extends Wrapper {
 					} catch (UploadFailedException|ServerException) {
 						$this->logger->error("File $localPath could not be scanned on upload with GData VaaS because there was a temporary upstream server error");
 					} catch (VaasAuthenticationException) {
-						$this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
+						$this->logger->error('Authentication for VaaS scan failed. Please check your credentials.');
 					} catch (\Exception $e) {
-						$this->logger->error("Unexpected error while scanning file " . $localPath . " on upload: " . $e->getMessage());
+						$this->logger->error('Unexpected error while scanning file ' . $localPath . ' on upload: ' . $e->getMessage());
 					}
-					$logger->debug("Verdict for  " . $localPath . " is " . $verdict->Verdict->value);
+					$logger->debug('Verdict for  ' . $localPath . ' is ' . $verdict->Verdict->value);
 
 					if ($verdict->Verdict == Verdict::MALICIOUS) {
-						$logger->debug("Removing malicious file  " . $localPath);
+						$logger->debug('Removing malicious file  ' . $localPath);
 
 						//prevent from going to trashbin
 						if ($this->trashEnabled) {
@@ -195,7 +195,7 @@ class AvirWrapper extends Wrapper {
 
 						$activity = $this->activityManager->generateEvent();
 						$activity->setApp(Application::APP_ID)
-							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$verdict->Detection ?? "no_detection_name"])
+							->setSubject(Provider::SUBJECT_VIRUS_DETECTED_UPLOAD, [$verdict->Detection ?? 'no_detection_name'])
 							->setMessage(Provider::MESSAGE_FILE_DELETED)
 							->setObject('', 0, $path)
 							->setAffectedUser($owner)
