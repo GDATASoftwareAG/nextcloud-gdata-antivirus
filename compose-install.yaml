@@ -22,8 +22,6 @@ services:
     restart: unless-stopped
     networks:
       nextcloud-network:
-      static-network:
-        ipv4_address: 172.20.128.2
   smtp:
     image: rnwood/smtp4dev:v3
     container_name: smtp
@@ -38,8 +36,3 @@ services:
 
 networks:
   nextcloud-network:
-  static-network:
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
-          ip_range: 172.20.5.0/24
