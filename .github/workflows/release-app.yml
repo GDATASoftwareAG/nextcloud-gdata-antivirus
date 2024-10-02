@@ -82,6 +82,9 @@ jobs:
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: ./install.sh ${{ matrix.nextcloud_version }} 1
 
+      - name: docker ps
+        run: docker ps
+
       - name: run tests
         id: bats-tests
         env:
