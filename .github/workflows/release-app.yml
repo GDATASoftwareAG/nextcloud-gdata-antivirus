@@ -43,6 +43,7 @@ jobs:
       image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
       env:
         IS_CI: true
+      options: --user vscode
     needs: 
       - define-matrix
       - build-devcontainer
