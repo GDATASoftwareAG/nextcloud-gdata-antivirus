@@ -55,8 +55,11 @@ jobs:
       - name: postStartCommand
         run: |
           source .devcontainer/postCreateCommands.sh
-          echo $(composer config home)/vendor/bin/ >> $GITHUB_PATH
-          ls -lha $(composer config home)/vendor/bin/
+      
+      - name: add composer bin to path
+        run: |
+          echo $(composer config home --global)/vendor/bin >> $GITHUB_PATH
+          ls -lha $(composer config home --global)/vendor/bin
 
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
