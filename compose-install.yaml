@@ -22,6 +22,7 @@ services:
     restart: unless-stopped
     networks:
       - nextcloud-network
+      - docker-bridge
   smtp:
     image: rnwood/smtp4dev:v3
     container_name: smtp
@@ -36,3 +37,6 @@ services:
 
 networks:
   nextcloud-network:
+  docker-bridge:
+    name: bridge
+    external: true
