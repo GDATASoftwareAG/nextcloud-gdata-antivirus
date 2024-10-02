@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: postStartCommand
+      - name: postCreateCommands
         run: |
           source .devcontainer/postCreateCommands.sh
       
@@ -75,11 +75,6 @@ jobs:
         run: |
           composer install
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
-
-      - name: install php-scoper
-        run: |
-          composer global require humbug/php-scoper
-          echo $(composer config home --global) >> $GITHUB_PATH
 
       - name: install nextcloud
         env:
