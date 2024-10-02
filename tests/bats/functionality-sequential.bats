@@ -17,9 +17,9 @@ setup_file() {
 
 @test "test upload when vaas does not function" {
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-    RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt)
+    RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt)
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
-    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
     
     echo "Actual: $RESULT"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]]
@@ -27,9 +27,9 @@ setup_file() {
 
 @test "test croned scan for admin files" {
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-    echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
-    curl --silent -w "%{http_code}" -u admin:admin -T $FOLDER_PREFIX/pup.exe http://127.0.0.1/remote.php/dav/files/admin/admin.pup.exe
-    echo $CLEAN_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
+    echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
+    curl --silent -w "%{http_code}" -u admin:admin -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/admin/admin.pup.exe
+    echo $CLEAN_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
 
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
@@ -57,9 +57,9 @@ setup_file() {
 
     LOGS=$($DOCKER_EXEC_WITH_USER -i nextcloud-container tail -5000 data/nextcloud.log | egrep "admin.functionality-sequential.eicar.com.txt|admin.functionality-sequential.clean.txt|admin.pup.exe" )
 
-    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
-    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/admin.pup.exe
-    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.pup.exe
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
 
     [[ $LOGS =~ ^.*admin.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
     [[ $LOGS =~ ^.*admin.pup.exe.*Verdict:.*Pup ]]
@@ -69,9 +69,9 @@ setup_file() {
 @test "test croned scan for testuser files" {
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
     
-    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
-    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
+    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
@@ -99,9 +99,9 @@ setup_file() {
 
     LOGS=$($DOCKER_EXEC_WITH_USER -i nextcloud-container tail -5000 data/nextcloud.log | egrep "$TESTUSER.functionality-sequential.eicar.com.txt|$TESTUSER.functionality-sequential.clean.txt|$TESTUSER.pup.exe")
 
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 
     # check for scans
     [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
@@ -113,8 +113,8 @@ setup_file() {
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="true"
     
-    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
 
@@ -124,20 +124,20 @@ setup_file() {
 
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="false"
 
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://127.0.0.1/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 }
 
 @test "test mailing on eicar upload" {
-    echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
+    echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
     sleep 1
 
-    RESULT=$(curl -X 'GET' 'http://127.0.0.1:8081/api/Messages/new?mailboxName=Default&pageSize=1' -H 'accept: application/json')
+    RESULT=$(curl -X 'GET' 'http://$HOSTNAME:8081/api/Messages/new?mailboxName=Default&pageSize=1' -H 'accept: application/json')
 
     echo $RESULT
     [[ $RESULT =~ "Infected file upload" ]]
     
-    curl --silent -q -u admin:admin -X DELETE http://127.0.0.1/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt  
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt  
 }
 
 tearddown_file() {
