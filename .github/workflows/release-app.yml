@@ -43,7 +43,6 @@ jobs:
       image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
       env:
         IS_CI: true
-      options: --user vscode
     needs: 
       - define-matrix
       - build-devcontainer
@@ -60,7 +59,7 @@ jobs:
       - name: add composer bin to path
         run: |
           echo $(composer config home --global)/vendor/bin >> $GITHUB_PATH
-          ls -lha $(composer config home --global)/vendor/bin
+          echo "/home/vscode/bin/" >> $GITHUB_PATH
 
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
