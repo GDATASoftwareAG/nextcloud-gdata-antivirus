@@ -132,7 +132,7 @@ setup_file() {
     echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
     sleep 1
 
-    RESULT=$(curl -X 'GET' 'http://$HOSTNAME:8081/api/Messages/new?mailboxName=Default&pageSize=1' -H 'accept: application/json')
+    RESULT=$(curl -X 'GET' 'http://$MAIL_HOSTNAME/api/Messages/new?mailboxName=Default&pageSize=1' -H 'accept: application/json')
 
     echo $RESULT
     [[ $RESULT =~ "Infected file upload" ]]
