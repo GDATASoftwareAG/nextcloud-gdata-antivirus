@@ -36,7 +36,8 @@ setup_nextcloud () {
   docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
   docker exec --user www-data -i nextcloud-container php occ app:disable weather_status
   docker exec --user www-data -i nextcloud-container php occ config:system:set trusted_domains 2 --value=192.168.5.80
-
+  docker exec --user www-data -i nextcloud-container php occ config:system:set trusted_domains 3 --value=172.20.128.2
+  
   echo "setup nextcloud finished"
 }
 

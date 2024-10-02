@@ -89,7 +89,7 @@ jobs:
 
       - name: docker ps
         run: |
-          docker ps
+          docker ps --format json
           docker network ls
 
       - name: run tests
