@@ -6,7 +6,7 @@ $(composer config home)/vendor/bin/php-scoper completion bash >> $HOME.bash_comp
 echo "export PATH=$(composer config home)/vendor/bin/:\$PATH" >> $HOME/.bashrc
 export PATH=$(composer config home)/vendor/bin/:$PATH
 
-cp memory.ini /usr/local/etc/php/conf.d/memory.ini
+sudo cp memory.ini /usr/local/etc/php/conf.d/memory.ini
 
 if [[ "$IS_CI" == "true" ]]; then
     exit 0

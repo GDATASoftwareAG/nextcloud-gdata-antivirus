@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 export NEXTCLOUD_VERSION=${1:-30.0.0}
 export INSTALL_XDEBUG=${2:-1}
@@ -12,7 +13,7 @@ setup_nextcloud () {
   docker compose -f compose-install.yaml rm --force --stop --volumes
   docker compose -f compose-install.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
 
-  docker exec -i nextcloud-container ulimit -c unlimited
+  docker exec -i nextcloud-container bash -c 'ulimit -c unlimited'
   docker exec -i nextcloud-container bash -c 'echo "/tmp/apache2-coredump/core-%e-%s-%u-%g-%p-%t" > /proc/sys/kernel/core_pattern'
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
@@ -43,7 +44,7 @@ build_app () {
   echo "build app"
   make distclean
   make appstore
-  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
+  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts 
   echo "build app finished"
 }
 
@@ -55,7 +56,8 @@ fi
 setup_nextcloud &
 setup_nextcloud_pid=$!
 build_app &
-wait %1 %2 || exit 1
+wait %2 || exit 1
+wait %1 || exit 1
 
 docker cp ./build/artifacts/gdatavaas nextcloud-container:/var/www/html/apps/
 docker exec -i nextcloud-container chown -R www-data:www-data /var/www/html/apps/gdatavaas
