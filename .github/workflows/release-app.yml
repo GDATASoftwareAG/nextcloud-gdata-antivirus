@@ -76,6 +76,11 @@ jobs:
           composer install
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
 
+      - name: docker ps
+        run: |
+          docker ps
+          docker network ls
+
       - name: install nextcloud
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
@@ -86,7 +91,6 @@ jobs:
         run: |
           docker ps
           docker network ls
-
 
       - name: run tests
         id: bats-tests
