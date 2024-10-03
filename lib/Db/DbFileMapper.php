@@ -92,7 +92,7 @@ class DbFileMapper extends QBMapper {
 			$cast = 'CAST(' . 'o.objectid' . ' AS UNSIGNED)';
 		} elseif ($platform === 'sqlite') {
 			$cast = 'CAST(' . 'o.objectid' . ' AS INTEGER)';
-		} elseif ($platform === 'postgresql') {
+		} elseif ($platform === 'postgres') {
 			$cast = 'CAST(' . 'o.objectid' . ' AS BIGINT)';
 		} else {
 			throw new Exception('Unsupported database platform: ' . $platform);
