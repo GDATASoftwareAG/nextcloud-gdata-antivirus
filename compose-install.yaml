@@ -21,7 +21,7 @@ services:
       - smtp
     restart: unless-stopped
     networks:
-      - nextcloud-network
+      nextcloud-network:
   smtp:
     image: rnwood/smtp4dev:v3
     container_name: smtp
