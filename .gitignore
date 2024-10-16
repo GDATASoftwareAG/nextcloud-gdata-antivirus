@@ -70,3 +70,4 @@ nextcloud-server/
 core-dump.zip
 apache/
 **/vendor/*
+test.sh
