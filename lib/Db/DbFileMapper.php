@@ -31,7 +31,10 @@ class DbFileMapper extends QBMapper {
 			->where($qb->expr()->notIn('o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($qb->expr()->isNull('o.systemtagid'))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->eq('o.objecttype', $qb->createNamedParameter('files')))
+			->andWhere($qb->expr()->orX(
+				$qb->expr()->eq('o.objecttype', $qb->createNamedParameter('files')),
+				$qb->expr()->isNull('o.objecttype')
+			))
 			->andWhere($qb->expr()->orX(
 				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
 				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
