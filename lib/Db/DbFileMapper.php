@@ -12,7 +12,7 @@ class DbFileMapper extends QBMapper {
 
 	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'filecache');
-		$stringType = $this->getStringTypeDeclarationSQL();
+		$this->stringType = $this->getStringTypeDeclarationSQL();
 	}
 
 	/**
