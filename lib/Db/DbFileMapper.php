@@ -95,8 +95,11 @@ class DbFileMapper extends QBMapper {
 	 * @throws Exception if the database platform is not supported
 	 */
 	private function getStringTypeDeclarationSQL(): string {
-		$platform = $this->db->getDatabasePlatform()->getName();
-		if ($platform === 'mysql' || $platform === 'sqlite' || $platform === 'postgres') {
+		$platform = $this->db->getDatabaseProvider();
+		if ($platform === "mysql") {
+			$stringType = 'CHAR(64)';
+		}
+		else if ($platform === 'sqlite' || $platform === 'postgres') {
 			$stringType = 'VARCHAR(64)';
 		} else {
 			throw new Exception('Unsupported database platform: ' . $platform);
