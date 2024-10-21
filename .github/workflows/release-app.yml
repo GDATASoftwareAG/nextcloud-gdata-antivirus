@@ -77,6 +77,11 @@ jobs:
           composer install
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
 
+      - name: install php-scoper
+        run: |
+          composer global require humbug/php-scoper
+          echo $(composer config home --global) >> $GITHUB_PATH
+
       - name: install nextcloud
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
