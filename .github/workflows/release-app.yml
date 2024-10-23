@@ -1,5 +1,8 @@
 name: Build and Test
 
+defaults:
+  run:
+    shell: bash
 on:
   push:
     branches: ["main"]
@@ -17,23 +20,47 @@ jobs:
       - id: get-matrix
         run: echo "nextcloud_versions=$(./get-matrix.sh)" | tee -a "$GITHUB_OUTPUT"
 
+  build-devcontainer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pre-build dev container image
+        uses: devcontainers/ci@v0.3
+        with:
+          imageName: ghcr.io/gdatasoftwareag/nextcloud/builder
+          cacheFrom: ghcr.io/gdatasoftwareag/nextcloud/builder
+          push: always
+
   test:
     runs-on: ubuntu-latest
-    needs: define-matrix
+    container:
+      image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
+      env:
+        IS_CI: true
+      options: --name nextcloud-antivirus-build-container
+    needs: 
+      - define-matrix
+      - build-devcontainer
     strategy:
       matrix:
         nextcloud_version: ${{fromJson(needs.define-matrix.outputs.nextcloud_versions)}}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        name: setup node
-        with:
-          node-version: 20
 
-      - name: Setup BATS
-        uses: mig4/setup-bats@v1
-        with:
-          bats-version: 1.11.0
+      - name: postCreateCommands
+        run: |
+          source .devcontainer/postCreateCommands.sh
+      
+      - name: add composer bin to path
+        run: |
+          echo $(composer config home --global)/vendor/bin >> $GITHUB_PATH
+          echo "/home/vscode/bin/" >> $GITHUB_PATH
 
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
@@ -41,11 +68,6 @@ jobs:
         run: |
           RELEASE_VERSION=${GITHUB_REF#refs/tags/}
           sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
-
-      - uses: docker-practice/actions-setup-docker@master
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
 
       - name: unittests
         env:
@@ -65,6 +87,10 @@ jobs:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: ./install.sh ${{ matrix.nextcloud_version }} 1
+
+      - name: add builder into nextcloud network
+        run: |
+          docker network connect nextcloud-gdata-antivirus_nextcloud-network nextcloud-antivirus-build-container
 
       - name: run tests
         id: bats-tests
