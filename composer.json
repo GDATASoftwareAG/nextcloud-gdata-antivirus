@@ -13,10 +13,10 @@
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "v30.0.1",
+		"nextcloud/ocp": "v30.0.0",
 		"psalm/phar": "5.26.1",
-		"nextcloud/coding-standard": "v1.3.2",
-		"phpunit/phpunit": "10.5.37",
+		"nextcloud/coding-standard": "v1.3.1",
+		"phpunit/phpunit": "10.5.36",
 		"symfony/console": "6.4.12"
 	},
 	"autoload": {
