@@ -11,7 +11,7 @@
             "port": 9080,
             "pathMappings": {
                 "/var/www/html/": "${workspaceFolder}/nextcloud-server",
-                "/var/www/html/apps/gdatavaas": "${workspaceFolder}/",
+                "/var/www/html/apps/gdatavaas": "${workspaceFolder}/build/artifact/gdatavaas",
             },
             "runtimeArgs": [
                 "-dxdebug.mode=debug",
