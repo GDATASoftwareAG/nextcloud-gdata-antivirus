@@ -38,7 +38,7 @@ class AvirWrapper extends Wrapper {
 	 * Modes that are used for writing
 	 * @var array
 	 */
-	private $writingModes = ['r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
+	private $writingModes = ['r', 'r+', 'w', 'w+', 'a', 'a+', 'x', 'x+', 'c', 'c+'];
 
 	protected VerdictService $verdictService;
 	protected MailService $mailService;
@@ -179,6 +179,11 @@ class AvirWrapper extends Wrapper {
 						}
 
 						$owner = $this->getOwner($path);
+
+						// this will remove the file from the ui and respond to the sync client that the sync failed
+						$cache = $this->getCache($path);
+						$cache->remove($path);
+
 						$this->unlink($path);
 
 						if ($this->trashEnabled) {
