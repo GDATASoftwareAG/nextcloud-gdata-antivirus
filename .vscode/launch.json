@@ -12,15 +12,7 @@
             "pathMappings": {
                 "/var/www/html/": "${workspaceFolder}/nextcloud-server",
                 "/var/www/html/apps/gdatavaas": "${workspaceFolder}/build/artifacts/gdatavaas",
-            },
-            "runtimeArgs": [
-                "-dxdebug.mode=debug",
-                "-dxdebug.start_with_request=yes",
-                "-dxdebug.client_host=nextcloud-server",
-                "-dxdebug.client_port=9080",
-                "-S",
-                "localhost:0"
-            ],
+            }
         },
         {
             "name": "Listen for Xdebug",
