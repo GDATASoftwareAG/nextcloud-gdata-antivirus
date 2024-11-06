@@ -30,7 +30,7 @@ RUN sed -i 's/memory_limit = 128M/memory_limit = -1/g' "$PHP_INI_DIR/php.ini"
 RUN echo "error_log = /var/www/html/data/php.log" >> "$PHP_INI_DIR/php.ini"
 RUN sed -i 's/#LogLevel info ssl:warn/LogLevel debug/g' /etc/apache2/sites-available/000-default.conf
 
-COPY xdebug.ini /tmp/xdebug.ini
-RUN install-php-extensions gd xdebug
-RUN mv /tmp/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN install-php-extensions gd xdebug;
+COPY xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+
 
