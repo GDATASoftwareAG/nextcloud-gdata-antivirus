@@ -8,7 +8,6 @@ use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
 use OCA\GDataVaas\CacheEntryListener;
 use OCA\GDataVaas\Db\DbFileMapper;
-use OCA\GDataVaas\Listener\CacheEntryInsertedListener;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
@@ -21,7 +20,6 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\Files\Cache\CacheEntryInsertedEvent;
 use OCP\Files\IHomeStorage;
 use OCP\Files\Storage\IStorage;
 use OCP\IAppConfig;
@@ -48,8 +46,7 @@ class Application extends App implements IBootstrap {
 		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
 			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
 		});
-        //$eventDispatcher->addServiceListener(CacheEntryInsertedEvent::class, CacheEntryInsertedListener::class);
-    }
+	}
 
 	/**
 	 * Load the composer autoloader if it exists
