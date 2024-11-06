@@ -53,9 +53,9 @@ class Application extends App implements IBootstrap {
 	 * @return void
 	 */
 	public function register(IRegistrationContext $context): void {
-        require_once file_exists(__DIR__.'/../../vendor/scoper-autoload.php')
-            ? __DIR__.'/../../vendor/scoper-autoload.php'
-            : __DIR__.'/../../vendor/autoload.php';
+		require_once file_exists(__DIR__ . '/../../vendor/scoper-autoload.php')
+			? __DIR__ . '/../../vendor/scoper-autoload.php'
+			: __DIR__ . '/../../vendor/autoload.php';
 		
 		// Manually register TagService so that we can customize the DI used for $silentTagMapper
 		$context->registerService(TagService::class, function ($c) {
@@ -96,7 +96,6 @@ class Application extends App implements IBootstrap {
 				// $l10n = $container->get(IL10N::class);
 				$logger = $container->get(LoggerInterface::class);
 				$activityManager = $container->get(IManager::class);
-				$eventDispatcher = $container->get(IEventDispatcher::class);
 				$appManager = $container->get(IAppManager::class);
 				return new AvirWrapper([
 					'storage' => $storage,
@@ -107,7 +106,6 @@ class Application extends App implements IBootstrap {
 					'logger' => $logger,
 					'activityManager' => $activityManager,
 					'isHomeStorage' => $storage->instanceOfStorage(IHomeStorage::class),
-					'eventDispatcher' => $eventDispatcher,
 					'trashEnabled' => $appManager->isEnabledForUser('files_trashbin'),
 				]);
 			},

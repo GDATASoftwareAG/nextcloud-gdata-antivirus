@@ -18,7 +18,6 @@ use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\Activity\IManager as ActivityManager;
-use OCP\EventDispatcher\IEventDispatcher;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\InvalidContentException;
 use OCP\Files\NotFoundException;
@@ -74,9 +73,6 @@ class AvirWrapper extends Wrapper {
 		$this->activityManager = $parameters['activityManager'];
 		$this->isHomeStorage = $parameters['isHomeStorage'];
 		$this->trashEnabled = $parameters['trashEnabled'];
-
-		/** @var IEventDispatcher $eventDispatcher */
-		$eventDispatcher = $parameters['eventDispatcher'];
 	}
 
 	/**
