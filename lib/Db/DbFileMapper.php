@@ -29,7 +29,7 @@ class DbFileMapper extends QBMapper {
 
 		$qb->select('f.fileid')
 			->from($this->getTableName(), 'f')
-			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq('o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
+			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq($qb->createFunction('CAST(o.objectid as unsigned)') , 'f.fileid'))
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
 			->where($qb->expr()->notIn('o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($qb->expr()->isNull('o.systemtagid'))
@@ -68,7 +68,7 @@ class DbFileMapper extends QBMapper {
 
 		$qb->select('f.fileid')
 			->from($this->getTableName(), 'f')
-			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq('o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
+			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq($qb->createFunction('CAST(o.objectid as unsigned)') , 'f.fileid'))
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
 			->where($qb->expr()->in('o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
