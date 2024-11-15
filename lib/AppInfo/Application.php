@@ -49,7 +49,6 @@ class Application extends App implements IBootstrap {
 		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
 			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
 		});
-		$eventDispatcher->addServiceListener('beforeCreateFile', FileEventsListener::class);
 	}
 
 	/**
@@ -73,8 +72,8 @@ class Application extends App implements IBootstrap {
 			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
 		}, true);
 
-		AntivirusSabrePluginAddEventListener::register($context);
-		#FileEventsListener::register($context);
+		#AntivirusSabrePluginAddEventListener::register($context);
+		FileEventsListener::register($context);
 		CacheEntryListener::register($context);
 
 		// Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper
