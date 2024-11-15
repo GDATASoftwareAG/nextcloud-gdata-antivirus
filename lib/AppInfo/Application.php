@@ -8,6 +8,7 @@ use OC\Files\Filesystem;
 use OCA\GDataVaas\AvirWrapper;
 use OCA\GDataVaas\CacheEntryListener;
 use OCA\GDataVaas\Db\DbFileMapper;
+use OCA\GDataVaas\EventListener\AntivirusSabrePluginAddEventListener;
 use OCA\GDataVaas\EventListener\FileEventsListener;
 use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\TagService;
@@ -21,11 +22,6 @@ use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
-use OCP\Files\Events\Node\BeforeNodeCopiedEvent;
-use OCP\Files\Events\Node\BeforeNodeDeletedEvent;
-use OCP\Files\Events\Node\BeforeNodeRenamedEvent;
-use OCP\Files\Events\Node\BeforeNodeTouchedEvent;
-use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\IHomeStorage;
 use OCP\Files\Storage\IStorage;
 use OCP\IAppConfig;
@@ -53,26 +49,7 @@ class Application extends App implements IBootstrap {
 		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
 			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
 		});
-		$eventDispatcher->addListener(BeforeNodeTouchedEvent::class, function (BeforeNodeTouchedEvent $event) {
-			$logger = $this->getContainer()->get(LoggerInterface::class);
-			$logger->debug(BeforeNodeTouchedEvent::class . ':' . $event->getNode()->getPath());
-		});
-		$eventDispatcher->addListener(BeforeNodeWrittenEvent::class, function (BeforeNodeWrittenEvent $event) {
-			$logger = $this->getContainer()->get(LoggerInterface::class);
-			$logger->debug(BeforeNodeWrittenEvent::class . ':' . $event->getNode()->getPath());
-		});
-		$eventDispatcher->addListener(BeforeNodeDeletedEvent::class, function (BeforeNodeDeletedEvent $event) {
-			$logger = $this->getContainer()->get(LoggerInterface::class);
-			$logger->debug(BeforeNodeDeletedEvent::class . ':' . $event->getNode()->getPath());
-		});
-		$eventDispatcher->addListener(BeforeNodeRenamedEvent::class, function (BeforeNodeRenamedEvent $event) {
-			$logger = $this->getContainer()->get(LoggerInterface::class);
-			$logger->debug(BeforeNodeRenamedEvent::class . ':' . $event->getSource()->getPath());
-		});
-		$eventDispatcher->addListener(BeforeNodeCopiedEvent::class, function (BeforeNodeCopiedEvent $event) {
-			$logger = $this->getContainer()->get(LoggerInterface::class);
-			$logger->debug(BeforeNodeCopiedEvent::class . ':' . $event->getSource()->getPath());
-		});
+		$eventDispatcher->addServiceListener('beforeCreateFile', FileEventsListener::class);
 	}
 
 	/**
@@ -96,7 +73,8 @@ class Application extends App implements IBootstrap {
 			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
 		}, true);
 
-		FileEventsListener::register($context);
+		AntivirusSabrePluginAddEventListener::register($context);
+		#FileEventsListener::register($context);
 		CacheEntryListener::register($context);
 
 		// Util::connection is deprecated, but required ATM by FileSystem::addStorageWrapper

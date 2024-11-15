@@ -19,7 +19,11 @@ use Isolated\Symfony\Component\Finder\Finder;
 //         false,
 //     ),
 // );
-$excludedFiles = ['templates/admin.php'];
+$excludedFiles = [
+	'templates/admin.php',
+	'templates/exception.php',
+	'templates/xml_exception.php'
+];
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
@@ -106,10 +110,12 @@ return [
 		'OC\Files',
 		'OC\SystemTag',
 		'Symfony',
-		'Icewind'
+		'Icewind',
+		'Sabre\DAV'
 	],
 	'exclude-classes' => [
 		'OC',
+		'OC_Template'
 	],
 	'exclude-functions' => [
 	],
