@@ -4,6 +4,7 @@ namespace OCA\GDataVaas\EventListener;
 
 use OC_Template;
 use OCA\Files_Versions\Versions\IVersionManager;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
@@ -16,8 +17,8 @@ use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
-use Sabre\DAV\Exception;
 use Sabre\DAV\Server;
+use OCA\GDataVaas\Service\TagService;
 
 /** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
 class FileEventsListener implements IEventListener {
@@ -30,6 +31,7 @@ class FileEventsListener implements IEventListener {
 		private IConfig $config,
 		private Server $server,
 		private IRequest $request,
+		private VerdictService $verdictService,
 	) {
 	}
 
@@ -39,11 +41,18 @@ class FileEventsListener implements IEventListener {
 	}
 
 	public function handle(Event $event): void {
-		if ($event instanceof BeforeNodeCreatedEvent) {
-			$this->server->httpResponse->setBody($this->generateBody());
-			$this->server->httpResponse->setStatus(415);
-			$this->server->sapi->sendResponse($this->server->httpResponse);
-			exit;
+		if ($event instanceof BeforeNodeWrittenEvent) {
+			$node = $event->getNode();
+			$this->logger->info('File scanned');
+			$verdict = $this->verdictService->scan($node->getPath());
+
+			if ($verdict->Verdict->value == TagService::MALICIOUS) {
+				$this->server->httpResponse->setBody($this->generateBody());
+				$this->server->httpResponse->setStatus(415);
+				$this->server->sapi->sendResponse($this->server->httpResponse);
+				$this->rootFolder->delete($node->getId());
+				exit;
+			}			
 		}
 	}
 
