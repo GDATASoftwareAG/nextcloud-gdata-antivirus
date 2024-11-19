@@ -101,4 +101,11 @@ class FileService {
 		$file->move($quarantine->getPath() . '/' . $file->getName());
 		$this->logger->info("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
 	}
+
+	public function deleteFile(int $fileId): void {
+		$file = $this->getNodeFromFileId($fileId);
+		$file->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
+		$file->delete();
+		$this->logger->info("File " . $file->getName() . " (" . $fileId . ") deleted.");
+	}
 }
