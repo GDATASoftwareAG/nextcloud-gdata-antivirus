@@ -3,6 +3,8 @@
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
+use OCP\App\IAppManager;
+use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\InvalidPathException;
 use OCP\Files\IRootFolder;
@@ -19,11 +21,15 @@ class FileService {
 	private IRootFolder $rootFolder;
 	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
+	private IAppManager $appManager;
+	private ITrashManager $trashManager;
 
-	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig) {
+	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig, IAppManager $appManager, ITrashManager $trashManager) {
 		$this->userMountCache = $userMountCache;
 		$this->rootFolder = $rootFolder;
 		$this->appConfig = $appConfig;
+		$this->appManager = $appManager;
+		$this->trashManager = $trashManager;
 		$this->logger = $logger;
 	}
 
@@ -105,7 +111,14 @@ class FileService {
 	public function deleteFile(int $fileId): void {
 		$file = $this->getNodeFromFileId($fileId);
 		$file->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
+		$trashEnabled = $this->appManager->isEnabledForUser('files_trashbin');
+		if ($trashEnabled) {
+			$this->trashManager->pauseTrash();
+		}
 		$file->delete();
+		if ($trashEnabled) {
+			$this->trashManager->resumeTrash();
+		}
 		$this->logger->info("File " . $file->getName() . " (" . $fileId . ") deleted.");
 	}
 }
