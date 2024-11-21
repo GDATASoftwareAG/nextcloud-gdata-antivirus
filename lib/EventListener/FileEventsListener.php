@@ -35,6 +35,7 @@ class FileEventsListener implements IEventListener {
 		private IRequest $request,
 		private VerdictService $verdictService,
 		private FileService $fileService,
+		private TagService $tagService
 	) {
 	}
 
@@ -48,7 +49,8 @@ class FileEventsListener implements IEventListener {
 			try {
 				$verdict = $this->verdictService->scanFileById($node->getId());
 			} catch (\Exception $e) {
-				$this->sendErrorResponse($e);
+				$this->tagService->setTag($node->getId(), TagService::UNSCANNED, silent: true);
+				$this->logger->error("Failed to scan uploaded file '{$node->getName()}' with ID '{$node->getId()}': {$e->getMessage()}");
 				return;
 			}
 
