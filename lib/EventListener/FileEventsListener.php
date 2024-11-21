@@ -8,6 +8,7 @@ use OCA\Files_Versions\Versions\IVersionManager;
 use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
+use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
@@ -15,7 +16,6 @@ use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\Files\IMimeTypeLoader;
 use OCP\Files\IRootFolder;
-use OCP\HintException;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
@@ -53,7 +53,7 @@ class FileEventsListener implements IEventListener {
 			}
 
 			if ($verdict->Verdict->value == TagService::MALICIOUS) {
-				$this->sendErrorResponse(new HintException('Virus found', 'Virus found', 415));
+				$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
 				$this->fileService->deleteFile($node->getId());
 				exit;
 			}
