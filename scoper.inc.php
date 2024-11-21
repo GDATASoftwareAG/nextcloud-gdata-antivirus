@@ -19,11 +19,26 @@ use Isolated\Symfony\Component\Finder\Finder;
 //         false,
 //     ),
 // );
-$excludedFiles = [
-	'templates/admin.php',
-	'templates/exception.php',
-	'templates/xml_exception.php'
-];
+$excludedFiles =[];
+$excludedFiles = array_map(
+	static fn (SplFileInfo $fileInfo) => $fileInfo->getPathName(),
+	iterator_to_array(
+		Finder::create()->files()->in(__DIR__.'/src'),
+		false,
+	),
+	iterator_to_array(
+		Finder::create()->files()->in(__DIR__.'/templates'),
+		false,
+	),
+	iterator_to_array(
+		Finder::create()->files()->in(__DIR__.'/css'),
+		false,
+	),
+	iterator_to_array(
+		Finder::create()->files()->in(__DIR__.'/LICENSES'),
+		false,
+	)
+);
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
@@ -46,11 +61,27 @@ return [
 	'finders' => [
 		Finder::create()
 			->files()
+			->notName('babel.config.js')
+			->notName('compose-install.yaml')
+			->notName('composer.local.*')
+			->notName('devcontainer.yaml')
+			->notName('Dockerfile.Nextcloud')
+			->notName('empty-skeleton.config.php')
+			->notName('*.sh')
+			->notName('Makefile')
+			->notName('*.ini')
+			->notName('psalm.xml')
+			->notName('start-dev-environment*')
+			->notName('scoper.inc.php')
+			->notName('stylelint.config.js')
+			->notName('use-*-vaas.sh')
+			->notName('webpack.config.js')
+			->notName('xdebug.*')
+			->notName('babel.config.js')
 			->ignoreVCS(true)
 			->ignoreDotFiles(true)
 			->exclude([
 				'build',
-				'.devcontainer',
 				'nextcloud-server',
 				'tests',
 				'tmp',
@@ -65,7 +96,6 @@ return [
 	//
 	// For more see: https://github.com/humbug/php-scoper/blob/master/docs/configuration.md#patchers
 	'exclude-files' => [
-		// 'src/an-excluded-file.php',
 		...$excludedFiles,
 	],
 

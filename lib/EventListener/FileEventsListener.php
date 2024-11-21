@@ -6,11 +6,13 @@ use Exception;
 use OC_Template;
 use OCA\Files_Versions\Versions\IVersionManager;
 use OCA\GDataVaas\Service\FileService;
+use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
+use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\Files\IMimeTypeLoader;
 use OCP\Files\IRootFolder;
 use OCP\HintException;
@@ -19,8 +21,6 @@ use OCP\IRequest;
 use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Server;
-use OCA\GDataVaas\Service\TagService;
-use OCP\Files\Events\Node\NodeWrittenEvent;
 
 /** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
 class FileEventsListener implements IEventListener {
