@@ -4,6 +4,8 @@ namespace OCA\GDataVaas\EventListener;
 
 use Exception;
 use OC_Template;
+use OCP\IAppConfig;
+use OCA\GDataVaas\AppInfo\Application;
 use OCA\Files_Versions\Versions\IVersionManager;
 use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
@@ -35,7 +37,8 @@ class FileEventsListener implements IEventListener {
 		private IRequest $request,
 		private VerdictService $verdictService,
 		private FileService $fileService,
-		private TagService $tagService
+		private TagService $tagService,
+		private IAppConfig $appConfig
 	) {
 	}
 
@@ -49,7 +52,10 @@ class FileEventsListener implements IEventListener {
 			try {
 				$verdict = $this->verdictService->scanFileById($node->getId());
 			} catch (\Exception $e) {
-				$this->tagService->setTag($node->getId(), TagService::UNSCANNED, silent: true);
+				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				if (!$unscannedTagIsDisabled) {
+					$this->tagService->setTag($node->getId(), TagService::UNSCANNED, silent: true);
+				}
 				$this->logger->error("Failed to scan uploaded file '{$node->getName()}' with ID '{$node->getId()}': {$e->getMessage()}");
 				return;
 			}
