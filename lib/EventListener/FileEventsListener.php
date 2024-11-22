@@ -51,6 +51,9 @@ class FileEventsListener implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
+			if ($node->getType() !== \OCP\Files\FileInfo::TYPE_FILE) {
+				return;
+			}
 			try {
 				$verdict = $this->verdictService->scanFileById($node->getId());
 			} catch (\Exception $e) {
