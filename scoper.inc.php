@@ -19,26 +19,16 @@ use Isolated\Symfony\Component\Finder\Finder;
 //         false,
 //     ),
 // );
-$excludedFiles =[];
-$excludedFiles = array_map(
-	static fn (SplFileInfo $fileInfo) => $fileInfo->getPathName(),
-	iterator_to_array(
-		Finder::create()->files()->in(__DIR__.'/src'),
-		false,
-	),
-	iterator_to_array(
-		Finder::create()->files()->in(__DIR__.'/templates'),
-		false,
-	),
-	iterator_to_array(
-		Finder::create()->files()->in(__DIR__.'/css'),
-		false,
-	),
-	iterator_to_array(
-		Finder::create()->files()->in(__DIR__.'/LICENSES'),
-		false,
-	)
-);
+$excludedFiles = [
+	'templates/admin.php',
+	'templates/exception.php',
+	'templates/xml_exception.php',
+	'src/admin-settings.js',
+	'src/files-action.js',
+	'src/main.js',
+	'css/style.css',
+	'LICENSES/AGPL-3.0-or-later.txt'
+];
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
