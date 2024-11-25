@@ -1,5 +1,8 @@
 #!/bin/bash
 
+bash -i -c 'nvm install 20'
+bash -i -c 'nvm use 20'
+
 echo "setup php-scoper"
 composer global require humbug/php-scoper
 $(composer config home)/vendor/bin/php-scoper completion bash >> $HOME.bash_completion
@@ -22,10 +25,9 @@ echo ". /usr/share/bash-completion/bash_completion" >> /home/vscode/.bashrc
 NEXTCLOUD_VERSION=$(grep -oP -m 1 "[0-9]+\.[0-9]+\.[0-9]+" install.sh)
 
 mkdir -p ~/.ssh/
-ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
 rm -rf nextcloud-server/
-git clone --depth 1 --recurse-submodules --single-branch --branch v$NEXTCLOUD_VERSION git@github.com:nextcloud/server.git ./nextcloud-server
+git clone --depth 1 --recurse-submodules --single-branch --branch v$NEXTCLOUD_VERSION https://github.com/nextcloud/server.git ./nextcloud-server
 cd nextcloud-server
 git submodule update --init
 cd -
