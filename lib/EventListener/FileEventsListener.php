@@ -80,7 +80,7 @@ class FileEventsListener implements IEventListener {
 		if ($this->acceptHtml()) {
 			$templateName = 'exception';
 			$renderAs = 'guest';
-			$templateName = '425';
+			$templateName = 'exception';
 		} else {
 			$templateName = 'xml_exception';
 			$renderAs = null;
