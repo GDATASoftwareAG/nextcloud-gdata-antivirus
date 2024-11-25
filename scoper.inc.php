@@ -20,15 +20,30 @@ use Isolated\Symfony\Component\Finder\Finder;
 //     ),
 // );
 $excludedFiles = [
-	'templates/admin.php',
-	'templates/exception.php',
-	'templates/xml_exception.php',
-	'src/admin-settings.js',
-	'src/files-action.js',
-	'src/main.js',
 	'css/style.css',
 	'LICENSES/AGPL-3.0-or-later.txt'
 ];
+$excludedFolders = array_merge(
+	array_map(
+		static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+		iterator_to_array(
+			Finder::create()
+				->in('templates')
+				->files(),
+			false,
+		),
+	),
+	array_map(
+		static fn (SplFileInfo $fileInfo) => $fileInfo->getPathname(),
+		iterator_to_array(
+			Finder::create()
+				->in('src')
+				->files(),
+			false,
+		),
+));
+
+$excludedFiles = array_merge($excludedFiles, $excludedFolders); 
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
