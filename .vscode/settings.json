@@ -6,4 +6,5 @@
     "[php]": {
         "editor.defaultFormatter": "junstyle.php-cs-fixer"
     },
+    "php.suggest.basic": false
 }

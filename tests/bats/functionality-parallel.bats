@@ -39,7 +39,7 @@ setup_file() {
 
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
-    [[ "$RESULT" =~ "Upload cannot be completed." ]]
+    [[ "$RESULT" =~ "Virus found" ]]
 }
 
 @test "test admin clean upload" {
@@ -77,7 +77,7 @@ setup_file() {
     echo "Actual: $RESULT"
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:get gdatavaas clientSecret
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.eicar.com.txt || echo "file not found"
-    [[ "$RESULT" =~ "Upload cannot be completed." ]]
+    [[ "$RESULT" =~ "Virus found" ]]
 }
 
 @test "test testuser clean Upload" {
@@ -100,7 +100,7 @@ setup_file() {
     docker cp $FOLDER_PREFIX/too-large.dat nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
     docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
-    $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:tag-unscanned
+    $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:scan
 
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.too-large.dat
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.too-large.dat | grep "Won't scan") ]]
