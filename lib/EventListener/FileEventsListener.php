@@ -4,33 +4,27 @@ namespace OCA\GDataVaas\EventListener;
 
 use Exception;
 use OC_Template;
-use OCP\IAppConfig;
 use OCA\GDataVaas\AppInfo\Application;
-use OCA\Files_Versions\Versions\IVersionManager;
+use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCA\GDataVaas\Service\FileService;
+use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
-use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeWrittenEvent;
-use OCP\Files\IMimeTypeLoader;
-use OCP\Files\IRootFolder;
+use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Server;
-use OCA\GDataVaas\Service\MailService;
 
 /** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
 class FileEventsListener implements IEventListener {
 	public function __construct(
-		private IRootFolder $rootFolder,
-		private IVersionManager $versionManager,
-		private IMimeTypeLoader $mimeTypeLoader,
 		private IUserSession $userSession,
 		private LoggerInterface $logger,
 		private IConfig $config,
@@ -40,7 +34,7 @@ class FileEventsListener implements IEventListener {
 		private FileService $fileService,
 		private TagService $tagService,
 		private IAppConfig $appConfig,
-		private MailService $mailService
+		private MailService $mailService,
 	) {
 	}
 
@@ -51,6 +45,8 @@ class FileEventsListener implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
+			$filesCache = $node->getStorage()->getCache();
+			$filesCache->remove($node->getId());
 			if ($node->getType() !== \OCP\Files\FileInfo::TYPE_FILE) {
 				return;
 			}
