@@ -45,8 +45,6 @@ class FileEventsListener implements IEventListener {
 	public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
-			$filesCache = $node->getStorage()->getCache();
-			$filesCache->remove($node->getId());
 			if ($node->getType() !== \OCP\Files\FileInfo::TYPE_FILE) {
 				return;
 			}
