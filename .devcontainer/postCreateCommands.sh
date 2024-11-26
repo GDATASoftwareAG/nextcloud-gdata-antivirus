@@ -1,7 +1,7 @@
 #!/bin/bash
 
-bash -i -c 'nvm install v20.18.1'
-bash -i -c 'nvm use v20.18.1'
+bash -i -c 'nvm install 20'
+bash -i -c 'nvm use 20'
 
 echo "setup php-scoper"
 composer global require humbug/php-scoper
