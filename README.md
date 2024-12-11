@@ -46,8 +46,7 @@ The app offers a variety of settings to customize the behavior of the antivirus.
 
 - **Authentication Method:** If you have created your own account on https://vaas.gdata.de/login, select 'Resource Owner Password Flow' here. If you have received access data from your provider (Client ID and Secret), select 'Client Credentials Flow'. You can simply leave the other fields empty.
 - **Scan only this:** Equivalent to an allowlist. If the values here are separated by commas, e.g. "Documents, .exe, Scan", only those containing the corresponding values in the path are scanned. In this example, *.exe files and the contents of the Documents/ and Scan/ folders would be scanned.
-- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.
-- **Scan queue length:** Determines the number of files to be scanned per background job of the Nextcloud instance, see Basic settings. Helps to balance the server load and the time until all files are scanned. Recommended are values between 10 and 100.
+- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.time until all files are scanned. Recommended are values between 10 and 100.
 - **Advanced Settings:** The token endpoint and the VaaS URL determine the scan backend. By default, the public G DATA Cloud is used for scanning. If the VaaS backend is self-hosted, the corresponding values for the self-hosted instance must be entered here.
 
 ## Self-hosting the scanning backend (VaaS)
