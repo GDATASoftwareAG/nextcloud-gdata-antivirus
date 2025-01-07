@@ -11,14 +11,11 @@ use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
 use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
-use VaasSdk\Exceptions\FileDoesNotExistException;
-use VaasSdk\Exceptions\InvalidSha256Exception;
-use VaasSdk\Exceptions\TimeoutException;
-use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
-use VaasSdk\Message\VaasVerdict;
+use VaasSdk\Exceptions\VaasClientException;
+use VaasSdk\Options\VaasOptions;
+use VaasSdk\VaasVerdict;
 use VaasSdk\Vaas;
-use VaasSdk\VaasOptions;
 
 class VerdictService {
 	public const MAX_FILE_SIZE = 268435456;
@@ -30,7 +27,6 @@ class VerdictService {
 	private string $authMethod;
 	private string $tokenEndpoint;
 	private string $vaasUrl;
-	private ResourceOwnerPasswordGrantAuthenticator|ClientCredentialsGrantAuthenticator $authenticator;
 	private IAppConfig $appConfig;
 	private FileService $fileService;
 	private TagService $tagService;
@@ -56,18 +52,15 @@ class VerdictService {
 	}
 
 
-	/** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
-	 * @param int $fileId
-	 * @return VaasVerdict
-	 * @throws EntityTooLargeException
-	 * @throws FileDoesNotExistException
-	 * @throws InvalidSha256Exception
-	 * @throws NotFoundException
-	 * @throws NotPermittedException
-	 * @throws TimeoutException
-	 * @throws UploadFailedException
-	 * @throws VaasAuthenticationException
-	 */
+    /** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
+     * @param int $fileId
+     * @return VaasVerdict
+     * @throws EntityTooLargeException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     * @throws VaasAuthenticationException
+     * @throws VaasClientException
+     */
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
@@ -88,11 +81,11 @@ class VerdictService {
 
 		$verdict = $this->scan($filePath);
 
-		$this->logger->info('VaaS scan result for ' . $node->getName() . ' (' . $fileId . '): Verdict: '
-			. $verdict->Verdict->value . ', Detection: ' . $verdict->Detection . ', SHA256: ' . $verdict->Sha256 .
-			', FileType: ' . $verdict->FileType . ', MimeType: ' . $verdict->MimeType . ', UUID: ' . $verdict->Guid);
+		$this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: "
+			. $verdict->verdict->value . ", Detection: " . $verdict->detection . ", SHA256: " . $verdict->sha256 .
+			", FileType: " . $verdict->fileType . ", MimeType: " . $verdict->mimeType);
 
-		$this->tagFile($fileId, $verdict->Verdict->value);
+		$this->tagFile($fileId, $verdict->verdict->value);
 
 		return $verdict;
 	}
@@ -134,16 +127,13 @@ class VerdictService {
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
 
-	/**
-	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
-	 * @param string $filePath The local path to the file to scan.
-	 * @return VaasVerdict
-	 * @throws FileDoesNotExistException
-	 * @throws InvalidSha256Exception
-	 * @throws TimeoutException
-	 * @throws UploadFailedException
-	 * @throws VaasAuthenticationException
-	 */
+    /**
+     * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
+     * @param string $filePath The local path to the file to scan.
+     * @return VaasVerdict
+     * @throws VaasAuthenticationException
+     * @throws VaasClientException
+     */
 	public function scan(string $filePath): VaasVerdict {
 		$this->lastLocalPath = $filePath;
 		$this->lastVaasVerdict = null;
@@ -153,7 +143,7 @@ class VerdictService {
 		}
 
 		try {
-			$verdict = $this->vaas->ForFile($filePath);
+			$verdict = $this->vaas->forFileAsync($filePath)->await();
 
 			$this->lastVaasVerdict = $verdict;
 
@@ -194,7 +184,7 @@ class VerdictService {
 		}
 		if ($localPath === $this->lastLocalPath) {
 			if ($this->lastVaasVerdict !== null) {
-				$this->tagFile($fileId, $this->lastVaasVerdict->Verdict->value);
+				$this->tagFile($fileId, $this->lastVaasVerdict->verdict->value);
 			} else {
 				$this->tagFile($fileId, TagService::UNSCANNED);
 			}
@@ -260,15 +250,18 @@ class VerdictService {
 		}
 	}
 
-	/**
-	 * @throws VaasAuthenticationException
-	 */
+    /**
+     * @return Vaas
+     * @throws VaasAuthenticationException
+     * @throws VaasClientException
+     */
 	public function createAndConnectVaas(): Vaas {
-		$this->authenticator = $this->getAuthenticator($this->authMethod);
-		$options = new VaasOptions(false, false);
-		$vaas = new Vaas($this->vaasUrl, $this->logger, $options);
-		$vaas->Connect($this->authenticator->getToken());
-		return $vaas;
+		$options = new VaasOptions(false, true, $this->vaasUrl);
+		return Vaas::builder()
+            ->withAuthenticator($this->getAuthenticator($this->authMethod))
+            ->withOptions($options)
+            ->withLogger($this->logger)
+            ->build();
 	}
 
 	/**
