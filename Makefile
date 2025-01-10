@@ -119,8 +119,6 @@ appstore: build
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	php-scoper add-prefix --output-dir=$(source_build_directory) --force
-	mv $(source_build_directory)/vendor/netresearch/jsonmapper/src/JsonMapper/Exception.php $(source_build_directory)/vendor/netresearch/jsonmapper/src/JsonMapper/JsonMapper_Exception.php
-	mv $(source_build_directory)/vendor/netresearch/jsonmapper/src/JsonMapper.php $(source_build_directory)/vendor/netresearch/jsonmapper/src/JsonMapper/JsonMapper.php
 	composer dump-autoload --working-dir $(source_build_directory) --classmap-authoritative
 	tar czf $(appstore_package_name).tar.gz \
 	--transform s%$(source_build_directory)%$(app_real_name)% \

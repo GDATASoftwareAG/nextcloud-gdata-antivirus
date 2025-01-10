@@ -11,7 +11,7 @@ use OCP\Files\NotFoundException;
 use OCP\IAppConfig;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
-use VaasSdk\Message\VaasVerdict;
+use VaasSdk\VaasVerdict;
 
 class MailService {
 	private IMailer $mailer;
@@ -34,19 +34,19 @@ class MailService {
 	 */
 	public function notifyMaliciousUpload(VaasVerdict $verdict, string $path, string $owner, int $size): void {
 		$htmlMessage = "<p>User <strong>$owner</strong> tried to upload an infected file to <strong>$path</strong>:</p><br>";
-		$htmlMessage .= "<p>Verdict: <strong>" . $verdict->Verdict->value . "</strong></p>";
-		$htmlMessage .= "<p>Detection: <strong>" . $verdict->Detection . "</strong></p>";
-		$htmlMessage .= "<p>Filetype: <strong>" . $verdict->FileType . "</strong></p>";
-		$htmlMessage .= "<p>Mimetype: <strong>" . $verdict->MimeType . "</strong></p>";
-		$htmlMessage .= "<p>SHA256: <strong>" . $verdict->Sha256 . "</strong></p>";
+		$htmlMessage .= "<p>Verdict: <strong>" . $verdict->verdict->value . "</strong></p>";
+		$htmlMessage .= "<p>Detection: <strong>" . $verdict->detection . "</strong></p>";
+		$htmlMessage .= "<p>Filetype: <strong>" . $verdict->fileType . "</strong></p>";
+		$htmlMessage .= "<p>Mimetype: <strong>" . $verdict->mimeType . "</strong></p>";
+		$htmlMessage .= "<p>SHA256: <strong>" . $verdict->sha256 . "</strong></p>";
 		$htmlMessage .= "<p>Size: <strong>" . NumberHumanizer::binarySuffix($size, 'de') . "</strong></p>";
 		
 		$plainMessage = "User $owner tried to upload an infected file to $path:\n";
-		$plainMessage .= "Verdict: " . $verdict->Verdict->value . "\n";
-		$plainMessage .= "Detection: " . $verdict->Detection . "\n";
-		$plainMessage .= "Filetype: " . $verdict->FileType . "\n";
-		$plainMessage .= "Mimetype: " . $verdict->MimeType . "\n";
-		$plainMessage .= "SHA256: " . $verdict->Sha256 . "\n";
+		$plainMessage .= "Verdict: " . $verdict->verdict->value . "\n";
+		$plainMessage .= "Detection: " . $verdict->detection . "\n";
+		$plainMessage .= "Filetype: " . $verdict->fileType . "\n";
+		$plainMessage .= "Mimetype: " . $verdict->mimeType . "\n";
+		$plainMessage .= "SHA256: " . $verdict->sha256 . "\n";
 		$plainMessage .= "Size: " . NumberHumanizer::binarySuffix($size, 'de') . "\n";
 
 		$msg = $this->mailer->createMessage();
