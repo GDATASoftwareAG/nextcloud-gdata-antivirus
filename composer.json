@@ -14,7 +14,7 @@
 	},
 	"require-dev": {
 		"nextcloud/ocp": "v30.0.5",
-		"psalm/phar": "5.26.1",
+		"psalm/phar": "6.0.0",
 		"nextcloud/coding-standard": "v1.3.2",
 		"colinodell/psr-testlogger": "1.3.0",
 		"phpunit/phpunit": "11.5.3",
