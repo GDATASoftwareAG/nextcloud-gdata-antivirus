@@ -1,7 +1,7 @@
 {
   "name": "gdatavaas",
   "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
-  "version": "0.0.2",
+  "version": "0.0.5",
   "author": "Lennart Dohmann <lennart.dohmann@gdata.de>",
   "contributors": [],
   "bugs": {
@@ -28,8 +28,8 @@
     "extends @nextcloud/browserslist-config"
   ],
   "engines": {
-    "node": "^20.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0"
+    "node": "^22.0.0",
+    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
   },
   "devDependencies": {
     "@nextcloud/babel-config": "^1.2.0",
