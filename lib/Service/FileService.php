@@ -2,9 +2,12 @@
 
 namespace OCA\GDataVaas\Service;
 
+use OC;
+use OC\User\NoUserException;
+use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\App\IAppManager;
-use OCA\Files_Trashbin\Trash\ITrashManager;
+use OCP\Files\Config\ICachedMountFileInfo;
 use OCP\Files\Config\IUserMountCache;
 use OCP\Files\InvalidPathException;
 use OCP\Files\IRootFolder;
@@ -12,6 +15,7 @@ use OCP\Files\Node;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
+use OCP\Lock\ILockingProvider;
 use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 
@@ -21,27 +25,26 @@ class FileService {
 	private IRootFolder $rootFolder;
 	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
-	private IAppManager $appManager;
-	private ITrashManager $trashManager;
+    private IAppManager $appManager;
 
-	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig, IAppManager $appManager, ITrashManager $trashManager) {
+	public function __construct(LoggerInterface $logger, IUserMountCache $userMountCache, IRootFolder $rootFolder, IAppConfig $appConfig, IAppManager $appManager) {
 		$this->userMountCache = $userMountCache;
 		$this->rootFolder = $rootFolder;
 		$this->appConfig = $appConfig;
-		$this->appManager = $appManager;
-		$this->trashManager = $trashManager;
 		$this->logger = $logger;
+        $this->appManager = $appManager;
 	}
 
-	/**
-	 * Checks if the 'Set prefix for malicious files' setting is activated and sets the prefix if it is.
-	 * @param int $fileId
-	 * @return void
-	 * @throws NotFoundException
-	 * @throws InvalidPathException
-	 * @throws NotPermittedException
-	 * @throws LockedException
-	 */
+    /**
+     * Checks if the 'Set prefix for malicious files' setting is activated and sets the prefix if it is.
+     * @param int $fileId
+     * @return void
+     * @throws InvalidPathException
+     * @throws LockedException
+     * @throws NoUserException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
 	public function setMaliciousPrefixIfActivated(int $fileId): void {
 		if ($this->appConfig->getValueBool(Application::APP_ID, 'prefixMalicious')) {
 			$file = $this->getNodeFromFileId($fileId);
@@ -53,12 +56,13 @@ class FileService {
 		}
 	}
 
-	/**
-	 * @param int $fileId
-	 * @return Node
-	 * @throws NotFoundException
-	 * @throws NotPermittedException
-	 */
+    /**
+     * @param int $fileId
+     * @return Node
+     * @throws NoUserException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
 	public function getNodeFromFileId(int $fileId): Node {
 		$mounts = $this->userMountCache->getMountsForFileId($fileId);
 		foreach ($mounts as $mount) {
@@ -69,27 +73,29 @@ class FileService {
 		throw new NotFoundException();
 	}
 
-	/**
-	 * @param $mount
-	 * @param int $fileId
-	 * @return Node|null
-	 * @throws NotPermittedException
-	 */
-	private function findNodeInMount(\OCP\Files\Config\ICachedMountFileInfo $mount, int $fileId): ?Node {
+    /**
+     * @param ICachedMountFileInfo $mount
+     * @param int $fileId
+     * @return Node|null
+     * @throws NoUserException
+     * @throws NotPermittedException
+     */
+	private function findNodeInMount(ICachedMountFileInfo $mount, int $fileId): ?Node {
 		$mountUserFolder = $this->rootFolder->getUserFolder($mount->getUser()->getUID());
 		$nodes = $mountUserFolder->getById($fileId);
 		return $nodes[0] ?? null;
 	}
 
-	/**
-	 * Moves a file to the quarantine folder if it is defined in the app settings.
-	 * @param int $fileId
-	 * @return void
-	 * @throws InvalidPathException
-	 * @throws LockedException
-	 * @throws NotFoundException
-	 * @throws NotPermittedException
-	 */
+    /**
+     * Moves a file to the quarantine folder if it is defined in the app settings.
+     * @param int $fileId
+     * @return void
+     * @throws InvalidPathException
+     * @throws LockedException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     * @throws NoUserException
+     */
 	public function moveFileToQuarantineFolderIfDefined(int $fileId): void {
 		$quarantineFolderPath = $this->appConfig->getValueString(Application::APP_ID, 'quarantineFolder');
 		if (empty($quarantineFolderPath)) {
@@ -108,17 +114,25 @@ class FileService {
 		$this->logger->info("File " . $file->getName() . " (" . $fileId . ") moved to quarantine folder.");
 	}
 
-	public function deleteFile(int $fileId): void {
+    /**
+     * @param int $fileId
+     * @throws InvalidPathException
+     * @throws LockedException
+     * @throws NoUserException
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
+    public function deleteFile(int $fileId): void {
 		$file = $this->getNodeFromFileId($fileId);
-		$file->unlock(\OCP\Lock\ILockingProvider::LOCK_SHARED);
-		$trashEnabled = $this->appManager->isEnabledForUser('files_trashbin');
-		if ($trashEnabled) {
-			$this->trashManager->pauseTrash();
-		}
-		$file->delete();
-		if ($trashEnabled) {
-			$this->trashManager->resumeTrash();
-		}
+		$file->unlock(ILockingProvider::LOCK_SHARED);
+        if ($this->appManager->isEnabledForUser('files_trashbin')){
+            $trashManager = OC::$server->get(ITrashManager::class);
+            $trashManager->pauseTrash();
+            $file->delete();
+            $trashManager->resumeTrash();
+        } else {
+            $file->delete();
+        }
 		$this->logger->info("File " . $file->getName() . " (" . $fileId . ") deleted.");
 	}
 }
