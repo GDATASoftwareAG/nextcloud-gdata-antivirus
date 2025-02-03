@@ -10,7 +10,7 @@ use OCA\GDataVaas\Service\VerdictService;
 use OCP\IAppConfig;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
+use ColinODell\PsrTestLogger\TestLogger;
 use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 
 class VerdictServiceTest extends TestCase {
