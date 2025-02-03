@@ -44,7 +44,7 @@ class VerdictService {
 
 		$this->authMethod = $this->appConfig->getValueString(Application::APP_ID, 'authMethod', 'ClientCredentials');
 		$this->tokenEndpoint = $this->appConfig->getValueString(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token');
-		$this->vaasUrl = $this->appConfig->getValueString(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de');
+		$this->vaasUrl = $this->appConfig->getValueString(Application::APP_ID, 'vaasUrl', 'https://gateway.staging.vaas.gdatasecurity.de');
 		$this->clientId = $this->appConfig->getValueString(Application::APP_ID, 'clientId');
 		$this->clientSecret = $this->appConfig->getValueString(Application::APP_ID, 'clientSecret');
 		$this->username = $this->appConfig->getValueString(Application::APP_ID, 'username');
