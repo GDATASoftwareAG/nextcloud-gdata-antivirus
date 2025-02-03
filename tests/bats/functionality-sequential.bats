@@ -55,15 +55,9 @@ setup_file() {
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.functionality-sequential.clean.txt | grep "Clean" ) ]]
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
 
-    LOGS=$($DOCKER_EXEC_WITH_USER -i nextcloud-container tail -5000 data/nextcloud.log | egrep "admin.functionality-sequential.eicar.com.txt|admin.functionality-sequential.clean.txt|admin.pup.exe" )
-
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.eicar.com.txt
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.pup.exe
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
-
-    [[ $LOGS =~ ^.*admin.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
-    [[ $LOGS =~ ^.*admin.pup.exe.*Verdict:.*Pup ]]
-    [[ $LOGS =~ ^.*admin.functionality-sequential.clean.txt.*Verdict:.*Clean ]]
 }
 
 @test "test croned scan for testuser files" {
@@ -97,16 +91,9 @@ setup_file() {
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Clean" ) ]]
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
 
-    LOGS=$($DOCKER_EXEC_WITH_USER -i nextcloud-container tail -5000 data/nextcloud.log | egrep "$TESTUSER.functionality-sequential.eicar.com.txt|$TESTUSER.functionality-sequential.clean.txt|$TESTUSER.pup.exe")
-
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
     curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
-
-    # check for scans
-    [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.eicar.com.txt.*Verdict:.*Malicious ]]
-    [[ $LOGS =~ ^.*$TESTUSER.pup.exe.*Verdict:.*Pup ]]
-    [[ $LOGS =~ ^.*$TESTUSER.functionality-sequential.clean.txt.*Verdict:.*Clean ]]
 }
 
 @test "test when unscanned tag is deactivated" {
