@@ -59,7 +59,7 @@ class FileEventsListener implements IEventListener {
 				return;
 			}
 
-			if ($verdict->Verdict->value == TagService::MALICIOUS) {
+			if ($verdict->verdict->value == TagService::MALICIOUS) {
 				$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
 				$this->fileService->deleteFile($node->getId());
 				if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {

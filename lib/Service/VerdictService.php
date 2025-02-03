@@ -144,9 +144,7 @@ class VerdictService {
 
 		try {
 			$verdict = $this->vaas->forFileAsync($filePath)->await();
-
 			$this->lastVaasVerdict = $verdict;
-
 			return $verdict;
 		} catch (Exception $e) {
 			$this->vaas = null;
@@ -256,7 +254,7 @@ class VerdictService {
      * @throws VaasClientException
      */
 	public function createAndConnectVaas(): Vaas {
-		$options = new VaasOptions(false, true, $this->vaasUrl);
+		$options = new VaasOptions(true, true, $this->vaasUrl);
 		return Vaas::builder()
             ->withAuthenticator($this->getAuthenticator($this->authMethod))
             ->withOptions($options)
