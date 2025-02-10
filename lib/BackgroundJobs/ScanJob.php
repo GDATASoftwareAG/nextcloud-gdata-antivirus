@@ -23,11 +23,13 @@ class ScanJob extends TimedJob {
 		$this->setTimeSensitivity(self::TIME_SENSITIVE);
 	}
 
-	/**
-	 * @param $argument
-	 * @return void
-	 * @throws \OCP\DB\Exception if the database platform is not supported
-	 */
+    /**
+     * @param $argument
+     * @return void
+     * @throws \OCP\DB\Exception if the database platform is not supported
+     * @throws \OCP\Files\NotFoundException
+     * @throws \OCP\Files\NotPermittedException
+     */
 	protected function run($argument): void {
 		$autoScan = $this->appConfig->getValueBool(Application::APP_ID, 'autoScanFiles');
 		if (!$autoScan) {
