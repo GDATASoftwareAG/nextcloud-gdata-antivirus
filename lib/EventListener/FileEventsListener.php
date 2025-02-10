@@ -15,6 +15,7 @@ use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeWrittenEvent;
+use OCP\Files\FileInfo;
 use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\IRequest;
@@ -23,18 +24,18 @@ use Psr\Log\LoggerInterface;
 use Sabre\DAV\Server;
 
 /** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
-class FileEventsListener implements IEventListener {
+readonly class FileEventsListener implements IEventListener {
 	public function __construct(
-		private IUserSession $userSession,
+		private IUserSession    $userSession,
 		private LoggerInterface $logger,
-		private IConfig $config,
-		private Server $server,
-		private IRequest $request,
-		private VerdictService $verdictService,
-		private FileService $fileService,
-		private TagService $tagService,
-		private IAppConfig $appConfig,
-		private MailService $mailService,
+		private IConfig         $config,
+		private Server          $server,
+		private IRequest        $request,
+		private VerdictService  $verdictService,
+		private FileService     $fileService,
+		private TagService      $tagService,
+		private IAppConfig      $appConfig,
+		private MailService     $mailService,
 	) {
 	}
 
@@ -42,15 +43,22 @@ class FileEventsListener implements IEventListener {
 		$context->registerEventListener(NodeWrittenEvent::class, self::class);
 	}
 
-	public function handle(Event $event): void {
+    /**
+     * @throws \OCP\Files\InvalidPathException
+     * @throws \OCP\Files\NotFoundException
+     * @throws \OCP\Files\NotPermittedException
+     * @throws \OCP\Lock\LockedException
+     * @throws \Exception
+     */
+    public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
-			if ($node->getType() !== \OCP\Files\FileInfo::TYPE_FILE) {
+			if ($node->getType() !== FileInfo::TYPE_FILE) {
 				return;
 			}
 			try {
 				$verdict = $this->verdictService->scanFileById($node->getId());
-			} catch (\Exception $e) {
+			} catch (Exception $e) {
 				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 				if (!$unscannedTagIsDisabled) {
 					$this->tagService->setTag($node->getId(), TagService::UNSCANNED, silent: true);
@@ -59,7 +67,7 @@ class FileEventsListener implements IEventListener {
 				return;
 			}
 
-			if ($verdict->Verdict->value == TagService::MALICIOUS) {
+			if ($verdict->verdict->value == TagService::MALICIOUS) {
 				$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
 				$this->fileService->deleteFile($node->getId());
 				if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
@@ -72,7 +80,6 @@ class FileEventsListener implements IEventListener {
 
 	public function generateBody(Exception $ex): mixed {
 		if ($this->acceptHtml()) {
-			$templateName = 'exception';
 			$renderAs = 'guest';
 			$templateName = 'exception';
 		} else {
@@ -81,7 +88,7 @@ class FileEventsListener implements IEventListener {
 			$this->server->httpResponse->setHeader('Content-Type', 'application/xml; charset=utf-8');
 		}
 
-		$debug = $this->config->getSystemValueBool('debug', false);
+		$debug = $this->config->getSystemValueBool('debug');
 
 		$content = new OC_Template('gdatavaas', $templateName, $renderAs);
 		$content->assign('title', 'Error');
@@ -95,8 +102,7 @@ class FileEventsListener implements IEventListener {
 		$content->assign('file', $ex->getFile());
 		$content->assign('line', $ex->getLine());
 		$content->assign('exception', $ex);
-		$contentString = $content->fetchPage();
-		return $contentString;
+        return $content->fetchPage();
 	}
 
 	private function acceptHtml(): bool {

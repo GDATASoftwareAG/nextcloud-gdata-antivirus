@@ -9,7 +9,7 @@
 		}
 	],
 	"require": {
-		"gdata/vaas": "v9.0.5",
+		"gdata/vaas": ">=11.0.0",
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {

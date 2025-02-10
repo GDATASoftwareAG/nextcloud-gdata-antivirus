@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
-use GuzzleHttp\Exception\ServerException;
 use Generator;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
@@ -12,10 +11,6 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
-use VaasSdk\Exceptions\FileDoesNotExistException;
-use VaasSdk\Exceptions\InvalidSha256Exception;
-use VaasSdk\Exceptions\TimeoutException;
-use VaasSdk\Exceptions\UploadFailedException;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 
 class ScanService {
@@ -61,18 +56,10 @@ class ScanService {
 				$scanned += 1;
 			} catch (EntityTooLargeException) {
                 $this->logger->error("File $fileId is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
-            } catch (FileDoesNotExistException) {
-                $this->logger->error("File $fileId does not exist.");
-            } catch (InvalidSha256Exception) {
-                $this->logger->error("Invalid SHA256 for file with ID $fileId");
             } catch (NotFoundException) {
                 $this->logger->error("File $fileId not found");
             } catch (NotPermittedException) {
                 $this->logger->error("Current settings do not permit scanning file wit ID $fileId.");
-            } catch (TimeoutException) {
-                $this->logger->error("Scanning timed out for file $fileId");
-            } catch (UploadFailedException|ServerException) {
-                $this->logger->error("File $fileId could not be scanned with GData VaaS because there was a temporary upstream server error");
             } catch (VaasAuthenticationException) {
                 $this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
             } catch (\Exception $e) {
@@ -89,13 +76,12 @@ class ScanService {
 		return $scanned;
 	}
 
-	/**
-	 * @param int $quantity
-	 * @return array
-	 * @throws Exception
-	 * @throws NotFoundException
-	 * @throws NotPermittedException
-	 */
+    /**
+     * @return Generator
+     * @throws Exception
+     * @throws NotFoundException
+     * @throws NotPermittedException
+     */
 	private function getFileIdsToScan(): Generator {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 		
