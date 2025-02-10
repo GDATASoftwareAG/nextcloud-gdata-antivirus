@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
-use GuzzleHttp\Exception\ServerException;
 use Generator;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;

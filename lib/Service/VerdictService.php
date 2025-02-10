@@ -13,6 +13,7 @@ use VaasSdk\Authentication\ClientCredentialsGrantAuthenticator;
 use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Exceptions\VaasClientException;
+use VaasSdk\Exceptions\VaasServerException;
 use VaasSdk\Options\VaasOptions;
 use VaasSdk\VaasVerdict;
 use VaasSdk\Vaas;
@@ -60,6 +61,7 @@ class VerdictService {
      * @throws NotPermittedException
      * @throws VaasAuthenticationException
      * @throws VaasClientException
+     * @throws VaasServerException
      */
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
@@ -133,6 +135,7 @@ class VerdictService {
      * @return VaasVerdict
      * @throws VaasAuthenticationException
      * @throws VaasClientException
+     * @throws VaasServerException
      */
 	public function scan(string $filePath): VaasVerdict {
 		$this->lastLocalPath = $filePath;
@@ -142,14 +145,9 @@ class VerdictService {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
-		try {
-			$verdict = $this->vaas->forFileAsync($filePath)->await();
-			$this->lastVaasVerdict = $verdict;
-			return $verdict;
-		} catch (Exception $e) {
-			$this->vaas = null;
-			throw $e;
-		}
+        $verdict = $this->vaas->forFileAsync($filePath)->await();
+        $this->lastVaasVerdict = $verdict;
+        return $verdict;
 	}
 
 	/**

@@ -40,10 +40,11 @@ class Application extends App implements IBootstrap {
 		});
 	}
 
-	/**
-	 * Load the composer autoloader if it exists
-	 * @return void
-	 */
+    /**
+     * Load the composer autoloader if it exists
+     * @param \OCP\AppFramework\Bootstrap\IRegistrationContext $context
+     * @return void
+     */
 	public function register(IRegistrationContext $context): void {
 		require_once file_exists(__DIR__ . '/../../vendor/scoper-autoload.php')
 			? __DIR__ . '/../../vendor/scoper-autoload.php'
@@ -59,7 +60,7 @@ class Application extends App implements IBootstrap {
 			$dbFileMapper = $c->get(DbFileMapper::class);
 			
 			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
-		}, true);
+		});
 
 		FileEventsListener::register($context);
 	}
