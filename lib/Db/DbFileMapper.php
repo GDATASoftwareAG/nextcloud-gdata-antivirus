@@ -10,7 +10,10 @@ use OCP\IDBConnection;
 class DbFileMapper extends QBMapper {
 	private string $stringType;
 
-	public function __construct(IDBConnection $db) {
+    /**
+     * @throws \OCP\DB\Exception
+     */
+    public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'filecache');
 		$this->stringType = $this->getStringTypeDeclarationSQL();
 	}

@@ -55,7 +55,7 @@ class TagService {
 
 	private function addTagToArray(string $tagName, array &$tagIds): array {
 		try {
-			array_push($tagIds, $this->getTag($tagName, false)->getId());
+			$tagIds[] = $this->getTag($tagName, false)->getId();
 		} catch (TagNotFoundException) {
 			$this->logger->debug("Tag not found: " . $tagName);
 		}
@@ -68,8 +68,7 @@ class TagService {
 		$vaasTagIds = $this->addTagToArray(self::MALICIOUS, $vaasTagIds);
 		$vaasTagIds = $this->addTagToArray(self::PUP, $vaasTagIds);
 		$vaasTagIds = $this->addTagToArray(self::UNSCANNED, $vaasTagIds);
-		$vaasTagIds = $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
-		return $vaasTagIds;
+        return $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
 	}
 
 	/**

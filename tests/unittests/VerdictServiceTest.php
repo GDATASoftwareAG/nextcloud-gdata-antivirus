@@ -195,7 +195,7 @@ class VerdictServiceTest extends TestCase {
 						case 'tokenEndpoint':
 							return 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token';
 						case 'vaasUrl':
-							return 'wss://gateway.staging.vaas.gdatasecurity.de';
+							return 'https://gateway.staging.vaas.gdatasecurity.de';
 						case 'clientSecret':
 						case 'username':
 						case 'password':
