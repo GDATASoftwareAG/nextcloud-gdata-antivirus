@@ -174,7 +174,7 @@ php occ config:app:set gdatavaas password <string>
 php occ config:app:set gdatavaas clientId <string>
 php occ config:app:set gdatavaas clientSecret <string>
 
-# VaaS server address. Default: wss://gateway.staging.vaas.gdatasecurity.de
+# VaaS server address. Default: https://gateway.staging.vaas.gdatasecurity.de
 php occ config:app:set gdatavaas vaasUrl <URL>
 # Authentication server. Default: https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token
 php occ config:app:set gdatavaas tokenEndpoint <URL>

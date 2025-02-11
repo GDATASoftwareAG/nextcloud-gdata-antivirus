@@ -23,7 +23,7 @@ class VaasAdmin implements ISettings {
 			'clientSecret' => $this->config->getValueString(Application::APP_ID, 'clientSecret'),
 			'authMethod' => $this->config->getValueString(Application::APP_ID, 'authMethod', 'ResourceOwnerPassword'),
 			'tokenEndpoint' => $this->config->getValueString(Application::APP_ID, 'tokenEndpoint', 'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token'),
-			'vaasUrl' => $this->config->getValueString(Application::APP_ID, 'vaasUrl', 'wss://gateway.staging.vaas.gdatasecurity.de'),
+			'vaasUrl' => $this->config->getValueString(Application::APP_ID, 'vaasUrl', 'https://gateway.staging.vaas.gdatasecurity.de'),
 			'quarantineFolder' => $this->config->getValueString(Application::APP_ID, 'quarantineFolder', 'Quarantine'),
 			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles'),
 			'scanOnlyNewFiles' => $this->config->getValueBool(Application::APP_ID, 'scanOnlyNewFiles', true),

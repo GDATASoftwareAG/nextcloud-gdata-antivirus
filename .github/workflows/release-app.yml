@@ -93,7 +93,7 @@ jobs:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: |
-          if bats --verbose-run --timing --trace --no-parallelize-across-files --jobs 2 ./tests/bats; then
+          if bats --verbose-run --timing --trace ./tests/bats; then
             echo "bats_run=success" | tee -a "$GITHUB_OUTPUT";
           else
             echo "bats_run=fail" | tee -a "$GITHUB_OUTPUT";
