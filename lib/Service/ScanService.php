@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
-use Generator;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
 use OCP\Files\EntityTooLargeException;
@@ -50,39 +49,47 @@ class ScanService {
 		$startTime = time();
 		$scanned = 0;
 
-		foreach ($this->getFileIdsToScan() as $fileId) {
-			try {
-				$this->verdictService->scanFileById($fileId);
-				$scanned += 1;
-			} catch (EntityTooLargeException) {
-                $this->logger->error("File $fileId is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
-            } catch (NotFoundException) {
-                $this->logger->error("File $fileId not found");
-            } catch (NotPermittedException) {
-                $this->logger->error("Current settings do not permit scanning file wit ID $fileId.");
-            } catch (VaasAuthenticationException) {
-                $this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
-            } catch (\Exception $e) {
-				$this->logger->error("Unexpected error while scanning file with id " . $fileId . ": " . $e->getMessage());
-			}
+        while (true) {
+            $filesToScan = $this->getFileIdsToScan();
+            if (empty($filesToScan)) {
+                break;
+            }
+            foreach ($filesToScan as $fileId) {
+                try {
+                    $this->verdictService->scanFileById($fileId);
+                    $scanned += 1;
+                } catch (EntityTooLargeException) {
+                    $this->logger->error("File $fileId is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
+                } catch (NotFoundException) {
+                    $this->logger->error("File $fileId not found");
+                } catch (NotPermittedException) {
+                    $this->logger->error("Current settings do not permit scanning file wit ID $fileId.");
+                } catch (VaasAuthenticationException) {
+                    $this->logger->error("Authentication for VaaS scan failed. Please check your credentials.");
+                } catch (\Exception $e) {
+                    $this->logger->error("Unexpected error while scanning file with id " . $fileId . ": " . $e->getMessage());
+                }
+            }
 
-			$elapsed = time() - $startTime;
-			if ($elapsed > self::SCAN_TIME_SECONDS) {
-				break;
-			}
-		}
+            $elapsed = time() - $startTime;
+            if ($elapsed > self::SCAN_TIME_SECONDS) {
+                break;
+            }
+        }
 
 		$this->logger->debug("Successfully scanned " . $scanned . " files");
 		return $scanned;
 	}
 
     /**
-     * @return Generator
+     * @param int $fileLimit
+     * @return array
      * @throws Exception
      * @throws NotFoundException
      * @throws NotPermittedException
      */
-	private function getFileIdsToScan(): Generator {
+	private function getFileIdsToScan(int $fileLimit = 200): array
+    {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 		
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
@@ -90,21 +97,25 @@ class ScanService {
 		$cleanTag = $this->tagService->getTag(TagService::CLEAN);
 		$wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
 
-		$limit = 50;
+		$limit = 200;
 		$offset = 0;
 		$tagParam = $unscannedTagIsDisabled ? [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()] : TagService::UNSCANNED;
+        $fileIdsToScan = [];
 		while (true) {
 			$fileIds = $unscannedTagIsDisabled ? $this->tagService->getFileIdsWithoutTags($tagParam, $limit, $offset) : $this->tagService->getFileIdsWithTag($tagParam, $limit, $offset);
-			if (empty($fileIds)) {
-				break;
-			}
+            if (empty($fileIds)) {
+                return $fileIdsToScan;
+            }
 			foreach ($fileIds as $fileId) {
 				$node = $this->fileService->getNodeFromFileId($fileId);
 				$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
 				if ($this->verdictService->isAllowedToScan($filePath)) {
-					yield $fileId;
+                    $fileIdsToScan[] = $fileId;
 				}
 			}
+            if (count($fileIdsToScan) >= $fileLimit) {
+                return $fileIdsToScan;
+            }
 			$offset += $limit;
 		}
 	}
