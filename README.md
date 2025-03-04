@@ -21,6 +21,10 @@ This project is licensed under the GNU Affero General Public License. For more d
 
 Please read on for information about setting up a development environment and contributing to the project.
 
+## Maintenance and Release Schedule
+
+The support and maintenance of the versions of this app is based on the official Nextcloud [Maintenance and Release Schedule](https://github.com/nextcloud/server/wiki/Maintenance-and-Release-Schedule).
+
 ## Features
 
 - **Automatic file scanning:** Files from users are automatically scanned 24/7 in the background.
@@ -112,13 +116,9 @@ Also, you need to make an ```npm install```, ```npm run build``` and ```composer
 You always need to do this before you start the development environment or copy the app to your Nextcloud instance manually.
 If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
 
-### Windows
-For Windows, you can also just start the docker-compose.yaml or the powershell script ```start-dev-environment.ps1```
-
 ### Linux
-* For a quick lite development environment you can use the provided ```start-dev-environment.sh``` script. Or you use the following steps:
 * Make sure you have the tools mentioned above installed.
-* With the provided ./install.sh script you can install the dependencies and build the node modules.
+* With the provided `./install.sh` script you can install the dependencies and build the node modules.
 
 ### `install.sh` Script
 
@@ -153,7 +153,7 @@ The `install.sh` script is used to set up and configure a Nextcloud instance wit
 | Set log level to debug    | `docker exec --user www-data nextcloud-container php occ log:manage --level DEBUG`                       |
 
 
-## Smtp4Dev
+### Smtp4Dev
 
 For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
 
