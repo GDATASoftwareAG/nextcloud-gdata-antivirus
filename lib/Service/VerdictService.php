@@ -252,6 +252,13 @@ class VerdictService {
      * @throws VaasClientException
      */
 	public function createAndConnectVaas(): Vaas {
+        if (str_starts_with($this->vaasUrl, 'ws')) {
+            if (str_starts_with($this->vaasUrl, 'ws://')) {
+                $this->vaasUrl = 'http://' . substr($this->vaasUrl, 5);
+            } elseif (str_starts_with($this->vaasUrl, 'wss://')) {
+                $this->vaasUrl = 'https://' . substr($this->vaasUrl, 6);
+            }
+        }
 		$options = new VaasOptions(true, true, $this->vaasUrl);
 		return Vaas::builder()
             ->withAuthenticator($this->getAuthenticator($this->authMethod))
