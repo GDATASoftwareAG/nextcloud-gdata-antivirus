@@ -174,4 +174,5 @@ appstore: build
 	--exclude="$(source_build_directory)/compose-install.yaml" \
 	--exclude="$(source_build_directory)/Dockerfile.Nextcloud" \
 	--exclude="$(source_build_directory)/empty-skeleton.config.php" \
+	--exclude="$(source_build_directory)/install.local" \
 	$(source_build_directory) \
