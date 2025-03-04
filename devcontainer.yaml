@@ -15,7 +15,7 @@ services:
       - .:/var/www/html/apps-extra/gdatavaas:ro,cached
       - .:/workspaces/nextcloud-gdata-antivirus:cached
     environment:
-      SERVER_BRANCH: v29.0.0
+      SERVER_BRANCH: v31.0.0
 
 volumes:
   nextcloud:
