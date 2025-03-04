@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.Nextcloud
       args:
-        - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-30.0.0}
+        - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-31.0.0}
         - INSTALL_XDEBUG=${INSTALL_XDEBUG:-1}
     environment:
       XDEBUG_MODE: ${XDEBUG_MODE:-develop}
