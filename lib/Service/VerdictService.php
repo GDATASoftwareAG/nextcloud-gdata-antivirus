@@ -263,7 +263,6 @@ class VerdictService {
 		return Vaas::builder()
             ->withAuthenticator($this->getAuthenticator($this->authMethod))
             ->withOptions($options)
-            ->withLogger($this->logger)
             ->build();
 	}
 
