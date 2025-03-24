@@ -19,7 +19,7 @@ use VaasSdk\VaasVerdict;
 use VaasSdk\Vaas;
 
 class VerdictService {
-	public const MAX_FILE_SIZE = 268435456;
+	public const MAX_FILE_SIZE = 1073741824;
 
 	private string $username;
 	private string $password;
