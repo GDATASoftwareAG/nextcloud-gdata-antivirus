@@ -14,10 +14,10 @@
 	},
 	"require-dev": {
 		"nextcloud/ocp": "v31.0.2",
-		"psalm/phar": "6.9.6",
+		"psalm/phar": "6.10.0",
 		"nextcloud/coding-standard": "v1.3.2",
 		"colinodell/psr-testlogger": "1.3.0",
-		"phpunit/phpunit": "12.0.10",
+		"phpunit/phpunit": "12.1.0",
 		"symfony/console": "7.2.5"
 	},
 	"autoload": {
