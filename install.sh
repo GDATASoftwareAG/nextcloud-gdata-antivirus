@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export NEXTCLOUD_VERSION=${1:-30.0.5}
+export NEXTCLOUD_VERSION=${1:-30.0.9}
 export INSTALL_XDEBUG=${2:-1}
 export XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
