@@ -40,10 +40,12 @@ class ScanService {
 		return $this;
 	}
 
-    /**
-     * @return int
-     * @throws Exception
-     */
+	/**
+	 * @return int
+	 * @throws Exception
+	 * @throws NotFoundException
+	 * @throws NotPermittedException
+	 */
 	public function run(): int {		
 		$startTime = time();
 		$scanned = 0;
@@ -76,7 +78,9 @@ class ScanService {
 
     /**
      * @return Generator
-     * @throws Exception if the database platform is not supported
+     * @throws Exception
+     * @throws NotFoundException
+     * @throws NotPermittedException
      */
 	private function getFileIdsToScan(): Generator {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
@@ -95,13 +99,11 @@ class ScanService {
 				break;
 			}
 			foreach ($fileIds as $fileId) {
-                try {
-                    $node = $this->fileService->getNodeFromFileId($fileId);
-                    $filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-                    if ($this->verdictService->isAllowedToScan($filePath)) {
-                        yield $fileId;
-                    }
-                } catch (\Exception) {}
+				$node = $this->fileService->getNodeFromFileId($fileId);
+				$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
+				if ($this->verdictService->isAllowedToScan($filePath)) {
+					yield $fileId;
+				}
 			}
 			$offset += $limit;
 		}
