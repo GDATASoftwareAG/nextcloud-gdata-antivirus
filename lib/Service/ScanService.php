@@ -3,7 +3,6 @@
 namespace OCA\GDataVaas\Service;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
-use Generator;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
 use OCP\Files\EntityTooLargeException;
@@ -15,7 +14,7 @@ use VaasSdk\Exceptions\VaasAuthenticationException;
 
 class ScanService {
 	
-	private const SCAN_TIME_SECONDS = 120;
+	private const int SCAN_TIME_SECONDS = 120;
 	
 	private TagService $tagService;
 	private VerdictService $verdictService;
@@ -40,17 +39,17 @@ class ScanService {
 		return $this;
 	}
 
-	/**
-	 * @return int
-	 * @throws Exception
-	 * @throws NotFoundException
-	 * @throws NotPermittedException
-	 */
+    /**
+     * Run the scan service to scan files.
+     * @return int
+     * @throws Exception
+     */
 	public function run(): int {		
 		$startTime = time();
 		$scanned = 0;
 
-		foreach ($this->getFileIdsToScan() as $fileId) {
+        $fileIds = $this->getFileIdsToScan();
+		foreach ($fileIds as $fileId) {
 			try {
 				$this->verdictService->scanFileById($fileId);
 				$scanned += 1;
@@ -77,12 +76,11 @@ class ScanService {
 	}
 
     /**
-     * @return Generator
+     * Get file IDs that need to be scanned.
+     * @return array
      * @throws Exception
-     * @throws NotFoundException
-     * @throws NotPermittedException
      */
-	private function getFileIdsToScan(): Generator {
+	private function getFileIdsToScan(): array {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
 		
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
@@ -93,19 +91,38 @@ class ScanService {
 		$limit = 50;
 		$offset = 0;
 		$tagParam = $unscannedTagIsDisabled ? [$maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()] : TagService::UNSCANNED;
+        $startTime = time();
+        $fileIdsToScan = [];
 		while (true) {
 			$fileIds = $unscannedTagIsDisabled ? $this->tagService->getFileIdsWithoutTags($tagParam, $limit, $offset) : $this->tagService->getFileIdsWithTag($tagParam, $limit, $offset);
 			if (empty($fileIds)) {
 				break;
 			}
 			foreach ($fileIds as $fileId) {
-				$node = $this->fileService->getNodeFromFileId($fileId);
-				$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-				if ($this->verdictService->isAllowedToScan($filePath)) {
-					yield $fileId;
-				}
+                try {
+                    $node = $this->fileService->getNodeFromFileId($fileId);
+                    $filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
+                    if (is_readable($filePath) && $this->verdictService->isAllowedToScan($filePath)) {
+                        $fileIdsToScan[] = $fileId;
+                    } else {
+                        $this->logger->debug("File with ID $fileId is not readable or not allowed to scan, skipping.");
+                    }
+                } catch (NotFoundException $e) {
+                    $this->logger->error("File with ID $fileId not found, skipping: " . $e->getMessage());
+                } catch (NotPermittedException $e) {
+                    $this->logger->error("Current settings do not permit scanning file with ID $fileId, skipping: " . $e->getMessage());
+                } catch (\Exception $e) {
+                    $this->logger->error("Unexpected error while processing file with ID $fileId: " . $e->getMessage());
+                }
 			}
 			$offset += $limit;
+            $elapsed = time() - $startTime;
+            if (($elapsed > (self::SCAN_TIME_SECONDS / 2)) && count($fileIdsToScan) > 0) {
+                break;
+            }
 		}
+        
+        $this->logger->debug("Found " . count($fileIdsToScan) . " files to scan");
+        return $fileIdsToScan;
 	}
 }
