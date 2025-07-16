@@ -13,12 +13,12 @@
 		"coduo/php-humanizer": "^5.0"
 	},
 	"require-dev": {
-		"nextcloud/ocp": "v31.0.5",
-		"psalm/phar": "6.10.3",
-		"nextcloud/coding-standard": "v1.3.2",
+		"nextcloud/ocp": "v31.0.7",
+		"psalm/phar": "6.12.1",
+		"nextcloud/coding-standard": "v1.4.0",
 		"colinodell/psr-testlogger": "1.3.0",
-		"phpunit/phpunit": "12.1.2",
-		"symfony/console": "7.2.5"
+		"phpunit/phpunit": "12.2.7",
+		"symfony/console": "7.3.1"
 	},
 	"autoload": {
 		"psr-4": {
