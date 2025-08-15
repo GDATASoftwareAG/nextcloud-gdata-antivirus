@@ -32,7 +32,7 @@
         "lint": "find . -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
         "cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff .",
         "cs:fix": "./vendor/bin/php-cs-fixer fix .",
-        "psalm": "vendor/psalm/phar/psalm.phar",
+        "psalm": "vendor/psalm/phar/psalm.phar --threads=1",
         "psalm:check": "composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github",
         "psalm:fix": "composer run psalm -- --alter --issues=MissingOverrideAttribute,ClassMustBeFinal,PossiblyUnusedMethod,MissingParamType"
     },
