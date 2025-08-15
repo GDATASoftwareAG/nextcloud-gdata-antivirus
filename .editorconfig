@@ -12,3 +12,10 @@ max_line_length = 80
 
 [*.{js,ts,jsx,tsx,html,css,scss,sass,php}]
 indent_style = tab
+
+[*.{yml,yaml,json,txt}]
+trim_trailing_whitespace = false
+indent_size = 2
+
+[Makefile]
+indent_style = tab
