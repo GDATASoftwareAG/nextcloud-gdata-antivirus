@@ -74,7 +74,7 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:get-tags-for-file <file-path>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file <file-path>`
 - **Arguments**:
-   - `<file-path>`: The path to the file (e.g., `username/files/filename`).
+    - `<file-path>`: The path to the file (e.g., `username/files/filename`).
 - **Details**: This command fetches and logs all tags associated with the specified file.
 
 #### `gdatavaas:remove-tag`
@@ -83,7 +83,7 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:remove-tag <tag-name>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:remove-tag <tag-name>`
 - **Arguments**:
-   - `<tag-name>`: The name of the tag to delete.
+    - `<tag-name>`: The name of the tag to delete.
 - **Details**: This command removes the specified tag from the system. If the tag does not exist, an error is logged.
 
 #### `gdatavaas:tag-unscanned`
@@ -99,7 +99,7 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:get-tag-id <tag-name>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tag-id <tag-name>`
 - **Arguments**:
-   - `<tag-name>`: The name of the tag to get the ID for.
+    - `<tag-name>`: The name of the tag to get the ID for.
 - **Details**: This command retrieves and logs the ID of the specified tag. If the tag does not exist, an error is logged.
 
 ## Setting up a development environment
@@ -114,7 +114,7 @@ Before you start, make sure you have the following tools installed:
 
 Also, you need to make an ```npm install```, ```npm run build``` and ```composer install``` to install dependencies and build the node modules.
 You always need to do this before you start the development environment or copy the app to your Nextcloud instance manually.
-If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
+If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```.
 
 ### Linux
 * Make sure you have the tools mentioned above installed.
@@ -127,8 +127,8 @@ The `install.sh` script is used to set up and configure a Nextcloud instance wit
 1. **Environment Variables in `.env-local`**:
     - `CLIENT_ID`: Sets the client ID for the G DATA VaaS app.
     - `CLIENT_SECRET`: Sets the client secret for the G DATA VaaS app.
-   
-   If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
+
+    If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
 
 2. **Specify the Nextcloud server version**:
     - The Nextcloud version defaults to 30.0.0

@@ -1,47 +1,47 @@
 {
-	"name": "nextcloud/gdatavaas",
-	"description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
-	"type": "project",
-	"license": "AGPL-3.0-or-later",
-	"authors": [
-		{
-			"name": "Lennart Dohmann"
-		}
-	],
-	"require": {
-		"gdata/vaas": ">=11.0.0",
-		"coduo/php-humanizer": "^5.0"
-	},
-	"require-dev": {
-		"nextcloud/ocp": "v31.0.7",
-		"psalm/phar": "6.13.0",
-		"nextcloud/coding-standard": "v1.4.0",
-		"colinodell/psr-testlogger": "1.3.0",
-		"phpunit/phpunit": "12.3.0",
-		"symfony/console": "7.3.2",
-		"friendsofphp/php-cs-fixer": "v3.86.0"
-	},
-	"autoload": {
-		"psr-4": {
-			"OCP\\": "vendor/nextcloud/ocp/OCP",
-			"OCA\\Files_Trashbin\\": "nextcloud-server/apps/files_trashbin",
-			"OCA\\GDataVaas\\": "lib"
-		}
-	},
-	"scripts": {
-		"lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-		"cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff .",
-		"cs:fix": "./vendor/bin/php-cs-fixer fix .",
-		"psalm": "vendor/psalm/phar/psalm.phar --threads=1",
-		"psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache",
-		"psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"
-	},
-	"config": {
-		"allow-plugins": {
-			"composer/package-versions-deprecated": true
-		},
-		"platform": {
-			"php": "8.3"
-		}
-	}
+    "name": "nextcloud/gdatavaas",
+    "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Lennart Dohmann"
+        }
+    ],
+    "require": {
+        "gdata/vaas": ">=11.0.0",
+        "coduo/php-humanizer": "^5.0"
+    },
+    "require-dev": {
+        "nextcloud/ocp": "v31.0.7",
+        "psalm/phar": "6.13.0",
+        "nextcloud/coding-standard": "v1.4.0",
+        "colinodell/psr-testlogger": "1.3.0",
+        "phpunit/phpunit": "12.3.0",
+        "symfony/console": "7.3.2",
+        "friendsofphp/php-cs-fixer": "v3.86.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "OCP\\": "vendor/nextcloud/ocp/OCP",
+            "OCA\\Files_Trashbin\\": "nextcloud-server/apps/files_trashbin",
+            "OCA\\GDataVaas\\": "lib"
+        }
+    },
+    "scripts": {
+        "lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
+        "cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff .",
+        "cs:fix": "./vendor/bin/php-cs-fixer fix .",
+        "psalm": "vendor/psalm/phar/psalm.phar --threads=1",
+        "psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache",
+        "psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        },
+        "platform": {
+            "php": "8.3"
+        }
+    }
 }
