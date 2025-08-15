@@ -73,7 +73,7 @@ ifeq (, $(composer))
 	mkdir -p $(build_tools_directory)
 	curl -sS https://getcomposer.org/installer | php
 	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev 
+	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev
 else
 	composer install --prefer-dist --no-dev
 endif
@@ -115,7 +115,7 @@ distclean: clean
 # Builds the app in a Docker container with PHP 8.3 and Nextcloud 31.0.7 and serves it on localhost:8080
 .PHONY: local
 local: build
-	 docker run --rm -d -p 8080:80 --name nextcloud-local -e SERVER_BRANCH="31.0.7" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php83:latest
+	docker run --rm -d -p 8080:80 --name nextcloud-local -e SERVER_BRANCH="31.0.7" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php83:latest
 
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release

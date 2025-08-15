@@ -5,8 +5,8 @@ const webpackConfig = require('@nextcloud/webpack-vue-config')
 const webpackRules = require('@nextcloud/webpack-vue-config/rules')
 
 webpackRules.RULE_SVG = {
-    resourceQuery: /raw/,
-    type: 'asset/source',
+	resourceQuery: /raw/,
+	type: 'asset/source',
 }
 
 webpackConfig.module.rules = Object.values(webpackRules)

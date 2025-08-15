@@ -11,4 +11,3 @@ MAX_VERSION=${MAX_VERSION:-$MIN_VERSION}
 [ "$MIN_VERSION" -gt "$MAX_VERSION" ] && echo 'Min version should be less or equal to max version' && exit 1
 
 echo "[$(echo "\"$(seq -s '","' $MIN_VERSION $MAX_VERSION)\"")]"
-

@@ -26,16 +26,16 @@ use Sabre\DAV\Server;
 /** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
 readonly class FileEventsListener implements IEventListener {
 	public function __construct(
-		private IUserSession    $userSession,
+		private IUserSession $userSession,
 		private LoggerInterface $logger,
-		private IConfig         $config,
-		private Server          $server,
-		private IRequest        $request,
-		private VerdictService  $verdictService,
-		private FileService     $fileService,
-		private TagService      $tagService,
-		private IAppConfig      $appConfig,
-		private MailService     $mailService,
+		private IConfig $config,
+		private Server $server,
+		private IRequest $request,
+		private VerdictService $verdictService,
+		private FileService $fileService,
+		private TagService $tagService,
+		private IAppConfig $appConfig,
+		private MailService $mailService,
 	) {
 	}
 
@@ -43,14 +43,14 @@ readonly class FileEventsListener implements IEventListener {
 		$context->registerEventListener(NodeWrittenEvent::class, self::class);
 	}
 
-    /**
-     * @throws \OCP\Files\InvalidPathException
-     * @throws \OCP\Files\NotFoundException
-     * @throws \OCP\Files\NotPermittedException
-     * @throws \OCP\Lock\LockedException
-     * @throws \Exception
-     */
-    public function handle(Event $event): void {
+	/**
+	 * @throws \OCP\Files\InvalidPathException
+	 * @throws \OCP\Files\NotFoundException
+	 * @throws \OCP\Files\NotPermittedException
+	 * @throws \OCP\Lock\LockedException
+	 * @throws \Exception
+	 */
+	public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
 			if ($node->getType() !== FileInfo::TYPE_FILE) {
@@ -102,7 +102,7 @@ readonly class FileEventsListener implements IEventListener {
 		$content->assign('file', $ex->getFile());
 		$content->assign('line', $ex->getLine());
 		$content->assign('exception', $ex);
-        return $content->fetchPage();
+		return $content->fetchPage();
 	}
 
 	private function acceptHtml(): bool {

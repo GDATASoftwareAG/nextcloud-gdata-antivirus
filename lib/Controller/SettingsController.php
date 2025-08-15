@@ -109,7 +109,7 @@ class SettingsController extends Controller {
 			'scanned' => $filesCount['scanned']
 		]);
 	}
-	
+
 	public function getSendMailOnVirusUpload(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
 	}

@@ -41,9 +41,9 @@ $excludedFolders = array_merge(
 				->files(),
 			false,
 		),
-));
+	));
 
-$excludedFiles = array_merge($excludedFiles, $excludedFolders); 
+$excludedFiles = array_merge($excludedFiles, $excludedFolders);
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
@@ -118,7 +118,7 @@ return [
 	'patchers' => [
 		static function (string $filePath, string $prefix, string $contents): string {
 			// Change the contents here.
-			
+
 			if (str_ends_with($filePath, 'vendor/netresearch/jsonmapper/src/JsonMapper.php') === true) {
 				$contents = str_replace("namespace $prefix;", "namespace $prefix\\JsonMapper;", $contents);
 			}

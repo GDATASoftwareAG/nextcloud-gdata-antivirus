@@ -48,7 +48,7 @@ class TagService {
 				throw new TagNotFoundException();
 			}
 			$tag = $this->tagService->createTag($name, true, false);
-			$this->logger->debug("Tag created: " . $name);
+			$this->logger->debug('Tag created: ' . $name);
 		}
 		return $tag;
 	}
@@ -57,7 +57,7 @@ class TagService {
 		try {
 			$tagIds[] = $this->getTag($tagName, false)->getId();
 		} catch (TagNotFoundException) {
-			$this->logger->debug("Tag not found: " . $tagName);
+			$this->logger->debug('Tag not found: ' . $tagName);
 		}
 		return $tagIds;
 	}
@@ -68,13 +68,13 @@ class TagService {
 		$vaasTagIds = $this->addTagToArray(self::MALICIOUS, $vaasTagIds);
 		$vaasTagIds = $this->addTagToArray(self::PUP, $vaasTagIds);
 		$vaasTagIds = $this->addTagToArray(self::UNSCANNED, $vaasTagIds);
-        return $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
+		return $this->addTagToArray(self::WONT_SCAN, $vaasTagIds);
 	}
 
 	/**
-	 * @param int    $fileId  The file to tag
+	 * @param int $fileId The file to tag
 	 * @param string $tagName Which tag to set
-	 * @param bool   $silent  If true, suppress events and activities
+	 * @param bool $silent If true, suppress events and activities
 	 */
 	public function setTag(int $fileId, string $tagName, bool $silent): void {
 		$mapper = $silent ? $this->silentTagMapper : $this->standardTagMapper;
@@ -95,7 +95,7 @@ class TagService {
 		}
 		$mapper->assignTags(strval($fileId), 'files', [$tag->getId()]);
 
-		$this->logger->debug("Tag set: " . $tagName . " for file " . $fileId);
+		$this->logger->debug('Tag set: ' . $tagName . ' for file ' . $fileId);
 	}
 
 	/**
@@ -201,7 +201,7 @@ class TagService {
 			return;
 		}
 		$this->tagService->deleteTags([$tag->getId()]);
-		$this->logger->debug("Tag removed: " . $tagName);
+		$this->logger->debug('Tag removed: ' . $tagName);
 	}
 
 	/**
@@ -214,7 +214,7 @@ class TagService {
 		$this->removeTag(self::UNSCANNED);
 		$this->removeTag(self::PUP);
 		$this->removeTag(self::WONT_SCAN);
-		$this->logger->info("All tags removed");
+		$this->logger->info('All tags removed');
 	}
 
 	/**

@@ -8,47 +8,38 @@ use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
 
-class SystemTagObjectMapperWithoutActivityFactory
-{
+class SystemTagObjectMapperWithoutActivityFactory {
 	/**
 	 * Variant of Nextcloud's ISystemTagObjectMapper, but does not generate events or activities for tag changes.
 	 */
-	public static function createSilentSystemTagObjectMapper(IDBConnection $connection, ISystemTagManager $tagManager): SystemTagObjectMapper
-	{
+	public static function createSilentSystemTagObjectMapper(IDBConnection $connection, ISystemTagManager $tagManager): SystemTagObjectMapper {
 		return new SystemTagObjectMapper($connection, $tagManager, self::createFakeEventDispatcher());
 	}
 
-	private static function createFakeEventDispatcher(): IEventDispatcher
-	{
+	private static function createFakeEventDispatcher(): IEventDispatcher {
 		return new class implements IEventDispatcher {
-			public function addListener(string $eventName, callable $listener, int $priority = 0): void
-			{
+			public function addListener(string $eventName, callable $listener, int $priority = 0): void {
 				// DUMMY
 			}
 
-			public function removeListener(string $eventName, callable $listener): void
-			{
+			public function removeListener(string $eventName, callable $listener): void {
 				// DUMMY
 			}
 
-			public function addServiceListener(string $eventName, string $className, int $priority = 0): void
-			{
+			public function addServiceListener(string $eventName, string $className, int $priority = 0): void {
 				// DUMMY
 			}
 
-			public function hasListeners(string $eventName): bool
-			{
+			public function hasListeners(string $eventName): bool {
 				// DUMMY
 				return false;
 			}
 
-			public function dispatch(string $eventName, Event $event): void
-			{
+			public function dispatch(string $eventName, Event $event): void {
 				// DUMMY
 			}
 
-			public function dispatchTyped(Event $event): void
-			{
+			public function dispatchTyped(Event $event): void {
 				// DUMMY
 			}
 		};

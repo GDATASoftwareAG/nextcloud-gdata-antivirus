@@ -6,7 +6,9 @@ use OCP\IURLGenerator;
 use OCP\Settings\IIconSection;
 
 class VaasAdminSection implements IIconSection {
-	public function __construct(private IURLGenerator $urlGenerator) {
+	public function __construct(
+		private IURLGenerator $urlGenerator,
+	) {
 	}
 
 	public function getName(): string {

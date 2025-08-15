@@ -29,7 +29,7 @@ class GetTagIdCommand extends Command {
 	protected function configure(): void {
 		$this->setName('gdatavaas:get-tag-id');
 		$this->setDescription('Gets the ID of a tag');
-		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name you want to get the id for.");
+		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, 'Tag name you want to get the id for.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -38,10 +38,10 @@ class GetTagIdCommand extends Command {
 		try {
 			$tag = $this->tagService->getTag($tagName, false);
 		} catch (TagNotFoundException $e) {
-			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
+			$logger->error('Tag not found: ' . $tagName . ' ' . $e->getMessage());
 			return 1;
 		}
-		$logger->info("tag: ".$tag->getId());
+		$logger->info('tag: ' . $tag->getId());
 		return 0;
 	}
 }
