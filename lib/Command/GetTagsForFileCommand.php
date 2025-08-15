@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class GetTagsForFileCommand extends Command {
 	public const FILE_PATH = 'file-path';
-	
+
 	private LoggerInterface $logger;
 	private IRootFolder $rootFolder;
 	private ISystemTagObjectMapper $systemTagObjectMapper;
@@ -37,18 +37,18 @@ class GetTagsForFileCommand extends Command {
 	protected function configure(): void {
 		$this->setName('gdatavaas:get-tags-for-file');
 		$this->setDescription('get tags for file');
-		
-		$this->addArgument(self::FILE_PATH, InputArgument::REQUIRED, "path to file (username/files/filename)");
+
+		$this->addArgument(self::FILE_PATH, InputArgument::REQUIRED, 'path to file (username/files/filename)');
 	}
 
-    /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return int
-     * @throws InvalidPathException
-     * @throws NotFoundException
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+	/**
+	 * @param InputInterface $input
+	 * @param OutputInterface $output
+	 * @return int
+	 * @throws InvalidPathException
+	 * @throws NotFoundException
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 
 		$filePath = $input->getArgument('file-path');
@@ -58,7 +58,7 @@ class GetTagsForFileCommand extends Command {
 		foreach ($tagIds[$node->getId()] as $tagId) {
 			$tags = $this->tagManager->getTagsByIds([$tagId]);
 			foreach ($tags as $tag) {
-				$logger->info("tag: ".$tag->getName());
+				$logger->info('tag: ' . $tag->getName());
 			}
 		}
 

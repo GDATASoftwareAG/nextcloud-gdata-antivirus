@@ -4,7 +4,6 @@ namespace OCA\GDataVaas\Controller;
 
 use Coduo\PHPHumanizer\NumberHumanizer;
 use Exception;
-use GuzzleHttp\Exception\ServerException;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -29,8 +28,8 @@ class ScanController extends Controller {
 	 * @param int $fileId
 	 * @return JSONResponse
 	 */
-    #[NoAdminRequired]
-    public function scan(int $fileId): JSONResponse {
+	#[NoAdminRequired]
+	public function scan(int $fileId): JSONResponse {
 		try {
 			$verdict = $this->verdictService->scanFileById($fileId);
 			return new JSONResponse(['verdict' => $verdict->verdict->value], 200);
@@ -43,7 +42,7 @@ class ScanController extends Controller {
 		} catch (VaasAuthenticationException) {
 			return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
 		} catch (Exception) {
-            return new JSONResponse(['error' => "An unexpected error occurred while scanning file $fileId with GData VaaS. Please check the logs for more information and contact your administrator."], 500);
-        }
+			return new JSONResponse(['error' => "An unexpected error occurred while scanning file $fileId with GData VaaS. Please check the logs for more information and contact your administrator."], 500);
+		}
 	}
 }

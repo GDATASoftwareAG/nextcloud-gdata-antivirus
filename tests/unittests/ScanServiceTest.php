@@ -2,6 +2,7 @@
 
 namespace unittests;
 
+use ColinODell\PsrTestLogger\TestLogger;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\FileService;
@@ -15,7 +16,6 @@ use OCP\SystemTag\ISystemTagObjectMapper;
 use OCP\SystemTag\TagNotFoundException;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use ColinODell\PsrTestLogger\TestLogger;
 
 class ScanServiceTest extends TestCase {
 	private LoggerInterface $logger;
@@ -35,7 +35,7 @@ class ScanServiceTest extends TestCase {
 			->expects($getTagMatcher)
 			->method('getTag')
 			->willReturnCallback(function ($tagName, $userVisible, $userAssignable) use ($getTagMatcher) {
-				switch($getTagMatcher->numberOfInvocations()) {
+				switch ($getTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
 						$this->assertTrue($userVisible);
@@ -61,7 +61,7 @@ class ScanServiceTest extends TestCase {
 						$this->assertTrue($userVisible);
 						$this->assertFalse($userAssignable);
 						throw new TagNotFoundException();
-					default: $this->fail("Unexpected number of calls to unassignTags");
+					default: $this->fail('Unexpected number of calls to unassignTags');
 				}
 
 			});
@@ -70,7 +70,7 @@ class ScanServiceTest extends TestCase {
 			->expects($createTagMatcher)
 			->method('createTag')
 			->willReturnCallback(function ($tagName, $userVisible, $userAssignable) use ($createTagMatcher) {
-				switch($createTagMatcher->numberOfInvocations()) {
+				switch ($createTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
 						$this->assertTrue($userVisible);
@@ -91,7 +91,7 @@ class ScanServiceTest extends TestCase {
 						$this->assertTrue($userVisible);
 						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
-					default: $this->fail("Unexpected number of calls to unassignTags");
+					default: $this->fail('Unexpected number of calls to unassignTags');
 				}
 			});
 
@@ -105,7 +105,7 @@ class ScanServiceTest extends TestCase {
 			$this->logger,
 			$tagService,
 			$verdictService,
-            $fileService,
+			$fileService,
 			$appConfig
 		);
 
@@ -122,7 +122,7 @@ class ScanServiceTest extends TestCase {
 			->expects($getTagMatcher)
 			->method('getTag')
 			->willReturnCallback(function ($tagName, $userVisible, $userAssignable) use ($getTagMatcher) {
-				switch($getTagMatcher->numberOfInvocations()) {
+				switch ($getTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
 						$this->assertTrue($userVisible);
@@ -148,7 +148,7 @@ class ScanServiceTest extends TestCase {
 						$this->assertTrue($userVisible);
 						$this->assertFalse($userAssignable);
 						throw new TagNotFoundException();
-					default: $this->fail("Unexpected number of calls to unassignTags");
+					default: $this->fail('Unexpected number of calls to unassignTags');
 				}
 
 			});
@@ -157,7 +157,7 @@ class ScanServiceTest extends TestCase {
 			->expects($createTagMatcher)
 			->method('createTag')
 			->willReturnCallback(function ($tagName, $userVisible, $userAssignable) use ($createTagMatcher) {
-				switch($createTagMatcher->numberOfInvocations()) {
+				switch ($createTagMatcher->numberOfInvocations()) {
 					case 1:
 						$this->assertEquals(TagService::MALICIOUS, $tagName);
 						$this->assertTrue($userVisible);
@@ -183,7 +183,7 @@ class ScanServiceTest extends TestCase {
 						$this->assertTrue($userVisible);
 						$this->assertFalse($userAssignable);
 						return $this->createMock(ISystemTag::class);
-					default: $this->fail("Unexpected number of calls to unassignTags");
+					default: $this->fail('Unexpected number of calls to unassignTags');
 				}
 			});
 
@@ -191,13 +191,13 @@ class ScanServiceTest extends TestCase {
 		$dbFileMapper = $this->createMock(DbFileMapper::class);
 		$tagService = new TagService($this->logger, $tagManager, $tagMapper, $tagMapper, $dbFileMapper);
 		$verdictService = $this->createMock(VerdictService::class);
-        $fileService = $this->createMock(FileService::class);
+		$fileService = $this->createMock(FileService::class);
 
 		$scanService = new ScanService(
 			$this->logger,
 			$tagService,
 			$verdictService,
-            $fileService,
+			$fileService,
 			$appConfig
 		);
 

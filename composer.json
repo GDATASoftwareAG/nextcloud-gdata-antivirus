@@ -18,7 +18,8 @@
 		"nextcloud/coding-standard": "v1.4.0",
 		"colinodell/psr-testlogger": "1.3.0",
 		"phpunit/phpunit": "12.3.0",
-		"symfony/console": "7.3.2"
+		"symfony/console": "7.3.2",
+		"friendsofphp/php-cs-fixer": "v3.86.0"
 	},
 	"autoload": {
 		"psr-4": {
@@ -29,8 +30,8 @@
 	},
 	"scripts": {
 		"lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-		"cs:check": "php-cs-fixer fix --dry-run --diff .",
-		"cs:fix": "php-cs-fixer fix .",
+		"cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff .",
+		"cs:fix": "./vendor/bin/php-cs-fixer fix .",
 		"psalm": "vendor/psalm/phar/psalm.phar --threads=1",
 		"psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache",
 		"psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"

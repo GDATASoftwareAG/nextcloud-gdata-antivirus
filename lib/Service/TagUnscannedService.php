@@ -25,7 +25,7 @@ class TagUnscannedService {
 		$this->logger = $logger;
 		return $this;
 	}
-	
+
 	/**
 	 * @return int how many files where actually processed
 	 * @throws \OCP\DB\Exception if the database platform is not supported
@@ -37,7 +37,7 @@ class TagUnscannedService {
 			return 0;
 		}
 
-		$this->logger->debug("Tagging unscanned files");
+		$this->logger->debug('Tagging unscanned files');
 
 		$unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
@@ -56,7 +56,7 @@ class TagUnscannedService {
 			$this->tagService->setTag($fileId, TagService::UNSCANNED, silent: true);
 		}
 
-		$this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
+		$this->logger->debug('Tagged ' . count($fileIds) . ' unscanned files');
 		return count($fileIds);
 	}
 

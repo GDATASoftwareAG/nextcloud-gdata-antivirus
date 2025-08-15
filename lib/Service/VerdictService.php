@@ -15,8 +15,8 @@ use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Exceptions\VaasClientException;
 use VaasSdk\Exceptions\VaasServerException;
 use VaasSdk\Options\VaasOptions;
-use VaasSdk\VaasVerdict;
 use VaasSdk\Vaas;
+use VaasSdk\VaasVerdict;
 
 class VerdictService {
 	public const MAX_FILE_SIZE = 1073741824;
@@ -53,16 +53,16 @@ class VerdictService {
 	}
 
 
-    /** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
-     * @param int $fileId
-     * @return VaasVerdict
-     * @throws EntityTooLargeException
-     * @throws NotFoundException
-     * @throws NotPermittedException
-     * @throws VaasAuthenticationException
-     * @throws VaasClientException
-     * @throws VaasServerException
-     */
+	/** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
+	 * @param int $fileId
+	 * @return VaasVerdict
+	 * @throws EntityTooLargeException
+	 * @throws NotFoundException
+	 * @throws NotPermittedException
+	 * @throws VaasAuthenticationException
+	 * @throws VaasClientException
+	 * @throws VaasServerException
+	 */
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
@@ -83,9 +83,9 @@ class VerdictService {
 
 		$verdict = $this->scan($filePath);
 
-		$this->logger->info("VaaS scan result for " . $node->getName() . " (" . $fileId . "): Verdict: "
-			. $verdict->verdict->value . ", Detection: " . $verdict->detection . ", SHA256: " . $verdict->sha256 .
-			", FileType: " . $verdict->fileType . ", MimeType: " . $verdict->mimeType);
+		$this->logger->info('VaaS scan result for ' . $node->getName() . ' (' . $fileId . '): Verdict: '
+			. $verdict->verdict->value . ', Detection: ' . $verdict->detection . ', SHA256: ' . $verdict->sha256
+			. ', FileType: ' . $verdict->fileType . ', MimeType: ' . $verdict->mimeType);
 
 		$this->tagFile($fileId, $verdict->verdict->value);
 
@@ -129,14 +129,14 @@ class VerdictService {
 		return ($size === false) || $size > self::MAX_FILE_SIZE;
 	}
 
-    /**
-     * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
-     * @param string $filePath The local path to the file to scan.
-     * @return VaasVerdict
-     * @throws VaasAuthenticationException
-     * @throws VaasClientException
-     * @throws VaasServerException
-     */
+	/**
+	 * Scans a file for malicious content with G DATA Verdict-as-a-Service and returns the verdict.
+	 * @param string $filePath The local path to the file to scan.
+	 * @return VaasVerdict
+	 * @throws VaasAuthenticationException
+	 * @throws VaasClientException
+	 * @throws VaasServerException
+	 */
 	public function scan(string $filePath): VaasVerdict {
 		$this->lastLocalPath = $filePath;
 		$this->lastVaasVerdict = null;
@@ -145,9 +145,9 @@ class VerdictService {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
-        $verdict = $this->vaas->forFileAsync($filePath)->await();
-        $this->lastVaasVerdict = $verdict;
-        return $verdict;
+		$verdict = $this->vaas->forFileAsync($filePath)->await();
+		$this->lastVaasVerdict = $verdict;
+		return $verdict;
 	}
 
 	/**
@@ -199,7 +199,7 @@ class VerdictService {
 		}
 		return explode(',', $scanOnlyThis);
 	}
-	
+
 	/**
 	 * Parses the doNotScanThis from the app settings and returns it as an array.
 	 * @return array
@@ -246,24 +246,24 @@ class VerdictService {
 		}
 	}
 
-    /**
-     * @return Vaas
-     * @throws VaasAuthenticationException
-     * @throws VaasClientException
-     */
+	/**
+	 * @return Vaas
+	 * @throws VaasAuthenticationException
+	 * @throws VaasClientException
+	 */
 	public function createAndConnectVaas(): Vaas {
-        if (str_starts_with($this->vaasUrl, 'ws')) {
-            if (str_starts_with($this->vaasUrl, 'ws://')) {
-                $this->vaasUrl = 'http://' . substr($this->vaasUrl, 5);
-            } elseif (str_starts_with($this->vaasUrl, 'wss://')) {
-                $this->vaasUrl = 'https://' . substr($this->vaasUrl, 6);
-            }
-        }
+		if (str_starts_with($this->vaasUrl, 'ws')) {
+			if (str_starts_with($this->vaasUrl, 'ws://')) {
+				$this->vaasUrl = 'http://' . substr($this->vaasUrl, 5);
+			} elseif (str_starts_with($this->vaasUrl, 'wss://')) {
+				$this->vaasUrl = 'https://' . substr($this->vaasUrl, 6);
+			}
+		}
 		$options = new VaasOptions(true, true, $this->vaasUrl);
 		return Vaas::builder()
-            ->withAuthenticator($this->getAuthenticator($this->authMethod))
-            ->withOptions($options)
-            ->build();
+			->withAuthenticator($this->getAuthenticator($this->authMethod))
+			->withOptions($options)
+			->build();
 	}
 
 	/**

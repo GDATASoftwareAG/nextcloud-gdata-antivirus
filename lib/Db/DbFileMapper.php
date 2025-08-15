@@ -10,10 +10,10 @@ use OCP\IDBConnection;
 class DbFileMapper extends QBMapper {
 	private string $stringType;
 
-    /**
-     * @throws \OCP\DB\Exception
-     */
-    public function __construct(IDBConnection $db) {
+	/**
+	 * @throws \OCP\DB\Exception
+	 */
+	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'filecache');
 		$this->stringType = $this->getStringTypeDeclarationSQL();
 	}
@@ -99,10 +99,9 @@ class DbFileMapper extends QBMapper {
 	 */
 	private function getStringTypeDeclarationSQL(): string {
 		$platform = $this->db->getDatabaseProvider();
-		if ($platform === "mysql") {
+		if ($platform === 'mysql') {
 			$stringType = 'CHAR(64)';
-		}
-		else if ($platform === 'sqlite' || $platform === 'postgres') {
+		} elseif ($platform === 'sqlite' || $platform === 'postgres') {
 			$stringType = 'VARCHAR(64)';
 		} else {
 			throw new Exception('Unsupported database platform: ' . $platform);
@@ -117,7 +116,7 @@ class DbFileMapper extends QBMapper {
 	 */
 	public function getFilesCount(): int {
 		$fileCount = 0;
-		
+
 		$fileQuery = $this->db->getQueryBuilder();
 		$fileQuery->select($fileQuery->func()->count())
 			->from('filecache', 'f')
@@ -140,7 +139,7 @@ class DbFileMapper extends QBMapper {
 			$fileResult->closeCursor();
 		}
 		$storageResult->closeCursor();
-		
+
 		return $fileCount;
 	}
 }

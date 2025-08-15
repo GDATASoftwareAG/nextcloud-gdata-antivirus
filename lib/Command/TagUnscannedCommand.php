@@ -30,12 +30,12 @@ class TagUnscannedCommand extends Command {
 		$this->setDescription('tags all files without tag from this app as unscanned');
 	}
 
-    /**
-     * @throws \OCP\DB\Exception
-     */
-    protected function execute(InputInterface $input, OutputInterface $output): int {
+	/**
+	 * @throws \OCP\DB\Exception
+	 */
+	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
-		$logger->info("taggings files as unscanned");
+		$logger->info('taggings files as unscanned');
 		$start = microtime(true);
 		$taggedFilesCount = $this->tagUnscannedService
 			->withLogger($logger)

@@ -29,7 +29,7 @@ class RemoveTagCommand extends Command {
 	protected function configure(): void {
 		$this->setName('gdatavaas:remove-tag');
 		$this->setDescription('deletes a tag');
-		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name want to delete.");
+		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, 'Tag name want to delete.');
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output): int {
@@ -38,7 +38,7 @@ class RemoveTagCommand extends Command {
 		try {
 			$this->tagService->removeTag($tagName);
 		} catch (TagNotFoundException $e) {
-			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
+			$logger->error('Tag not found: ' . $tagName . ' ' . $e->getMessage());
 			return 1;
 		}
 		return 0;
