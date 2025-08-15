@@ -112,6 +112,11 @@ distclean: clean
 	rm -rf js/node_modules
 	rm -f composer.lock package-lock.json
 
+# Builds the app in a Docker container with PHP 8.3 and Nextcloud 31.0.7 and serves it on localhost:8080
+.PHONY: local
+local: build
+	 docker run --rm -d -p 8080:80 --name nextcloud-local -e SERVER_BRANCH="31.0.7" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php83:latest
+
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release
 .PHONY: appstore
