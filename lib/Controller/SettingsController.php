@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Controller;
 
 use OCA\GDataVaas\Service\TagService;
@@ -15,14 +19,30 @@ class SettingsController extends Controller {
 	private TagService $tagService;
 	private IMailer $mailer;
 
-	public function __construct($appName, IRequest $request, IAppConfig $config, TagService $tagService, IMailer $mailer) {
+	public function __construct(
+		$appName,
+		IRequest $request,
+		IAppConfig $config,
+		TagService $tagService,
+		IMailer $mailer,
+	) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
 		$this->mailer = $mailer;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $notifyMails): JSONResponse {
+	public function setconfig(
+		$username,
+		$password,
+		$clientId,
+		$clientSecret,
+		$authMethod,
+		$quarantineFolder,
+		$scanOnlyThis,
+		$doNotScanThis,
+		$notifyMails,
+	): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
 			foreach ($mails as $mail) {
@@ -109,9 +129,11 @@ class SettingsController extends Controller {
 			'scanned' => $filesCount['scanned']
 		]);
 	}
-	
+
 	public function getSendMailOnVirusUpload(): JSONResponse {
-		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
+		return new JSONResponse(
+			['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]
+		);
 	}
 
 	public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {

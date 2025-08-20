@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 bash -i -c 'nvm install 20'
 bash -i -c 'nvm use 20'
 
@@ -26,9 +30,5 @@ NEXTCLOUD_VERSION=$(grep -oP -m 1 "[0-9]+\.[0-9]+\.[0-9]+" install.sh)
 
 mkdir -p ~/.ssh/
 
-rm -rf nextcloud-server/
-git clone --depth 1 --recurse-submodules --single-branch --branch v$NEXTCLOUD_VERSION https://github.com/nextcloud/server.git ./nextcloud-server
-cd nextcloud-server
-git submodule update --init
-cd -
+./get-nc-server.sh "$NEXTCLOUD_VERSION"
 ./install.sh

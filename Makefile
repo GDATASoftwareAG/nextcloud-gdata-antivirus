@@ -53,7 +53,7 @@ all: build
 # is present, the composer step is skipped, if no package.json or js/package.json
 # is present, the npm step is skipped
 .PHONY: build
-build:
+build: oc
 ifneq (,$(wildcard $(CURDIR)/composer.json))
 	make composer
 endif
@@ -62,6 +62,13 @@ ifneq (,$(wildcard $(CURDIR)/package.json))
 endif
 ifneq (,$(wildcard $(CURDIR)/js/package.json))
 	make npm
+endif
+
+# Clone Nextcloud server to know private OC namespace
+.PHONY: oc
+oc:
+ifeq (,$(wildcard nextcloud-server))
+	./get-nc-server.sh
 endif
 
 # Installs and updates the composer dependencies. If composer is not installed
@@ -73,7 +80,7 @@ ifeq (, $(composer))
 	mkdir -p $(build_tools_directory)
 	curl -sS https://getcomposer.org/installer | php
 	mv composer.phar $(build_tools_directory)
-	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev 
+	php $(build_tools_directory)/composer.phar install --prefer-dist --no-dev
 else
 	composer install --prefer-dist --no-dev
 endif
@@ -112,10 +119,10 @@ distclean: clean
 	rm -rf js/node_modules
 	rm -f composer.lock package-lock.json
 
-# Builds the app in a Docker container with PHP 8.3 and Nextcloud 31.0.7 and serves it on localhost:8080
+# Builds the app in a Docker container and serves it on localhost:8080
 .PHONY: local
 local: build
-	 docker run --rm -d -p 8080:80 --name nextcloud-local -e SERVER_BRANCH="31.0.7" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php83:latest
+	docker run --rm -d -p 8080:80 --name nextcloud-local -e SERVER_BRANCH="v31.0.8" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php83:latest
 
 # Builds the source package for the app store, ignores php tests, js tests
 # and build related folders that are unnecessary for an appstore release
@@ -154,6 +161,7 @@ appstore: build
 	--exclude="$(source_build_directory)/js/karma.*" \
 	--exclude="$(source_build_directory)/js/protractor.*" \
 	--exclude="$(source_build_directory)/package.json" \
+	--exclude="$(source_build_directory)/package.json.license" \
 	--exclude="$(source_build_directory)/bower.json" \
 	--exclude="$(source_build_directory)/karma.*" \
 	--exclude="$(source_build_directory)/protractor\.*" \
@@ -164,6 +172,7 @@ appstore: build
 	--exclude="$(source_build_directory)/CHANGELOG.md" \
 	--exclude="$(source_build_directory)/README.md" \
 	--exclude="$(source_build_directory)/package-lock.json" \
+	--exclude="$(source_build_directory)/package-lock.json.license" \
 	--exclude="$(source_build_directory)/LICENSES" \
 	--exclude="$(source_build_directory)/src" \
 	--exclude="$(source_build_directory)/babel.config.js" \
@@ -174,6 +183,7 @@ appstore: build
 	--exclude="$(source_build_directory)/dev-environment*" \
 	--exclude="$(source_build_directory)/install.sh" \
 	--exclude="$(source_build_directory)/renovate.json" \
+	--exclude="$(source_build_directory)/renovate.json.license" \
 	--exclude="$(source_build_directory)/get-matrix.sh" \
 	--exclude="$(source_build_directory)/xdebug.ini" \
 	--exclude="$(source_build_directory)/compose-install.yaml" \

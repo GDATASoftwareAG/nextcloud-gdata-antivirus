@@ -1,7 +1,12 @@
 #!/bin/bash
+
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 set -e
 
-export NEXTCLOUD_VERSION=${1:-31.0.5}
+export NEXTCLOUD_VERSION=${1:-31.0.8}
 export INSTALL_XDEBUG=${2:-1}
 export XDEBUG_MODE=${XDEBUG_MODE:-develop}
 
@@ -45,7 +50,7 @@ build_app () {
   echo "build app"
   make distclean
   make appstore
-  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts 
+  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
   echo "build app finished"
 }
 

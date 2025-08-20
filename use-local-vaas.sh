@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 BRANCH_NAME=${1:-php-connection-gets-lost-when-idle-after-connectasdfs}
 GIT_REPO=${2:-git@github.com:GDATASoftwareAG/vaas.git}
 

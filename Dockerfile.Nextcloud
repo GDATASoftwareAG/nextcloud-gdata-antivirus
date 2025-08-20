@@ -1,4 +1,8 @@
-ARG NEXTCLOUD_VERSION=31.0.7
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+ARG NEXTCLOUD_VERSION=31.0.8
 ARG INSTALL_XDEBUG=1
 
 FROM nextcloud:${NEXTCLOUD_VERSION}
@@ -33,4 +37,3 @@ RUN sed -i 's/#LogLevel info ssl:warn/LogLevel debug/g' /etc/apache2/sites-avail
 COPY xdebug.ini /tmp/xdebug.ini
 RUN install-php-extensions gd xdebug;
 RUN mv /tmp/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini;
-

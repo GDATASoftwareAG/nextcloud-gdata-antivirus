@@ -1,7 +1,12 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\BackgroundJobs;
 
+use OC\User\NoUserException;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\Service\FileService;
@@ -24,16 +29,16 @@ class NotifyAdminJob extends TimedJob {
 	private MailService $mailService;
 	private LoggerInterface $logger;
 	private FileService $fileService;
-	
-	public function __construct(ITimeFactory    $time,
-		IAppConfig      $appConfig,
-		TagService      $tagService,
-		DbFileMapper    $dbFileMapper,
+
+	public function __construct(ITimeFactory $time,
+		IAppConfig $appConfig,
+		TagService $tagService,
+		DbFileMapper $dbFileMapper,
 		LoggerInterface $logger,
-		MailService     $mailService,
-		FileService     $fileService) {
+		MailService $mailService,
+		FileService $fileService) {
 		parent::__construct($time);
-		
+
 		$this->appConfig = $appConfig;
 		$this->tagService = $tagService;
 		$this->dbFileMapper = $dbFileMapper;
@@ -54,12 +59,13 @@ class NotifyAdminJob extends TimedJob {
 	 * @throws NotPermittedException
 	 * @throws \Exception
 	 */
+	#[\Override]
 	protected function run($argument): void {
-		$notifyAdminEnabled = $this->appConfig->getValueBool(Application::APP_ID, "notifyAdminEnabled");
+		$notifyAdminEnabled = $this->appConfig->getValueBool(Application::APP_ID, 'notifyAdminEnabled');
 		if (!$notifyAdminEnabled) {
 			return;
 		}
-		
+
 		try {
 			$maliciousTagId = $this->tagService->getTag(TagService::MALICIOUS, false)->getId();
 		} catch (TagNotFoundException) {
@@ -67,14 +73,16 @@ class NotifyAdminJob extends TimedJob {
 		}
 		$allFiles = $this->dbFileMapper->getFilesCount();
 		$maliciousFiles = $this->dbFileMapper->getFileIdsWithTags([$maliciousTagId], $allFiles);
-		
-		$this->logger->info("Found " . count($maliciousFiles) . " malicious files out of " . $allFiles . " total files");
-		
+
+		$this->logger->info(
+			'Found ' . count($maliciousFiles) . ' malicious files out of ' . $allFiles . ' total files'
+		);
+
 		if (count($maliciousFiles) > 0) {
-			$this->logger->debug("Sending notification to admin");
+			$this->logger->debug('Sending notification to admin');
 			$this->mailService->notifyWeeklySummary($this->getFilesFromFileIds($maliciousFiles));
 		} else {
-			$this->logger->info("No malicious files found, no weekly summary sent");
+			$this->logger->info('No malicious files found, no weekly summary sent');
 		}
 	}
 
@@ -83,6 +91,7 @@ class NotifyAdminJob extends TimedJob {
 	 * @return array
 	 * @throws NotFoundException
 	 * @throws NotPermittedException
+	 * @throws NoUserException
 	 */
 	private function getFilesFromFileIds(array $fileIds): array {
 		$files = [];
