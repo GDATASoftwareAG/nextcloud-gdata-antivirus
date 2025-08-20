@@ -1,46 +1,48 @@
 {
-	"name": "nextcloud/gdatavaas",
-	"description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
-	"type": "project",
-	"license": "AGPL-3.0-or-later",
-	"authors": [
-		{
-			"name": "Lennart Dohmann"
-		}
-	],
-	"require": {
-		"gdata/vaas": ">=11.0.0",
-		"coduo/php-humanizer": "^5.0"
-	},
-	"require-dev": {
-		"nextcloud/ocp": "v31.0.7",
-		"psalm/phar": "6.13.0",
-		"nextcloud/coding-standard": "v1.4.0",
-		"colinodell/psr-testlogger": "1.3.0",
-		"phpunit/phpunit": "12.3.0",
-		"symfony/console": "7.3.2"
-	},
-	"autoload": {
-		"psr-4": {
-			"OCP\\": "vendor/nextcloud/ocp/OCP",
-			"OCA\\Files_Trashbin\\": "nextcloud-server/apps/files_trashbin",
-			"OCA\\GDataVaas\\": "lib"
-		}
-	},
-	"scripts": {
-		"lint": "find lib -name \\*.php -not -path './vendor/*' -print0 | xargs -0 -n1 php -l",
-		"cs:check": "php-cs-fixer fix --dry-run --diff .",
-		"cs:fix": "php-cs-fixer fix .",
-		"psalm": "vendor/psalm/phar/psalm.phar --threads=1",
-		"psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache",
-		"psalm:fix": "vendor/psalm/phar/psalm.phar --alter --issues=InvalidReturnType,InvalidNullableReturnType,MissingParamType,InvalidFalsableReturnType"
-	},
-	"config": {
-		"allow-plugins": {
-			"composer/package-versions-deprecated": true
-		},
-		"platform": {
-			"php": "8.3"
-		}
-	}
+    "name": "nextcloud/gdatavaas",
+    "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
+    "type": "project",
+    "license": "AGPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Lennart Dohmann"
+        }
+    ],
+    "require": {
+        "gdata/vaas": "11.0.1",
+        "coduo/php-humanizer": "5.0.0"
+    },
+    "require-dev": {
+        "nextcloud/ocp": "v31.0.8",
+        "psalm/phar": "6.8.2",
+        "nextcloud/coding-standard": "v1.4.0",
+        "colinodell/psr-testlogger": "1.3.0",
+        "phpunit/phpunit": "10.5.52",
+        "symfony/console": "v6.4.24"
+    },
+    "autoload": {
+        "psr-4": {
+            "OC\\": "nextcloud-server/lib/private",
+            "OCP\\": "vendor/nextcloud/ocp/OCP",
+            "OCA\\Files_Trashbin\\": "nextcloud-server/apps/files_trashbin",
+            "OCA\\GDataVaas\\": "lib"
+        }
+    },
+    "scripts": {
+        "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './nextcloud-server/*' -not -path './node_modules/*'  -print0 | xargs -0 -n1 php -l",
+        "cs:check": "rm -rf node_modules/ nextcloud-server/ || true && ./vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php .",
+        "cs:fix": "rm -rf node_modules/ nextcloud-server/ || true && ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php .",
+        "psalm": "rm -rf node_modules/ || true && vendor/psalm/phar/psalm.phar",
+        "psalm:check": "rm -rf node_modules/ || true && composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github --show-info=true",
+        "psalm:fix": "rm -rf node_modules/ || true && composer run psalm -- --alter --issues=MissingOverrideAttribute,ClassMustBeFinal,PossiblyUnusedMethod,MissingParamType",
+        "psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache"
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        },
+        "platform": {
+            "php": "8.1"
+        }
+    }
 }

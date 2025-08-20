@@ -1,5 +1,9 @@
 #!/usr/bin/env bats
 
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 setup_file() {
     source tests/bats/.env-test || return 1
     source .env-local || echo "No .env-local file found."
@@ -8,7 +12,7 @@ setup_file() {
     $DOCKER_EXEC_WITH_USER --env OC_PASS=$TESTUSER_PASSWORD nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
     $DOCKER_EXEC_WITH_USER nextcloud-container mkdir -p /var/www/html/data/$TESTUSER/files
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
-    
+
     # this is cache busting
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
     sleep 2
@@ -69,7 +73,7 @@ setup_file() {
     RESULT=$(curl --silent -w "%{http_code}" -u admin:admin -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe)
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe || echo "file not found"
-    [[ $RESULT -ge 200 && $RESULT -lt 300 ]] 
+    [[ $RESULT -ge 200 && $RESULT -lt 300 ]]
 }
 
 @test "test testuser eicar Upload" {
@@ -117,7 +121,7 @@ setup_file() {
 
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.unscanned.pup.exe | grep "Unscanned") ]]
     [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file admin/files/admin.unscanned.pup.exe | wc -l ) -eq "1" ]]
-    
+
     $DOCKER_EXEC_WITH_USER nextcloud-container rm /var/www/html/data/admin/files/admin.unscanned.pup.exe
 }
 
@@ -137,4 +141,3 @@ setup_file() {
 @tearddown_file() {
     rm -rf $FOLDER_PREFIX/
 }
- 

@@ -1,4 +1,8 @@
-import { showError, showSuccess, showWarning } from '@nextcloud/dialogs'
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
+import {showError, showSuccess, showWarning} from '@nextcloud/dialogs'
 import {FileAction, Permission, registerFileAction} from '@nextcloud/files'
 import Magnifier from '@mdi/svg/svg/magnify.svg?raw'
 
@@ -32,7 +36,8 @@ registerFileAction(new FileAction({
 					showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
 					break;
 				case 'Pup':
-					showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict PUP (Potentially unwanted program)'));
+					showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as ' +
+						'verdict PUP (Potentially unwanted program)'));
 					break;
 			}
 		} else {

@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Db;
 
 use OCP\AppFramework\Db\QBMapper;
@@ -10,12 +14,29 @@ use OCP\IDBConnection;
 class DbFileMapper extends QBMapper {
 	private string $stringType;
 
-    /**
-     * @throws \OCP\DB\Exception
-     */
-    public function __construct(IDBConnection $db) {
+	/**
+	 * @throws Exception
+	 */
+	public function __construct(IDBConnection $db) {
 		parent::__construct($db, 'filecache');
 		$this->stringType = $this->getStringTypeDeclarationSQL();
+	}
+
+	/**
+	 * Get the DB type for a string
+	 * @return string the database string type
+	 * @throws Exception if the database platform is not supported
+	 */
+	private function getStringTypeDeclarationSQL(): string {
+		$platform = $this->db->getDatabaseProvider();
+		if ($platform === 'mysql') {
+			$stringType = 'CHAR(64)';
+		} elseif ($platform === 'sqlite' || $platform === 'postgres') {
+			$stringType = 'VARCHAR(64)';
+		} else {
+			throw new Exception('Unsupported database platform: ' . $platform);
+		}
+		return $stringType;
 	}
 
 	/**
@@ -32,9 +53,12 @@ class DbFileMapper extends QBMapper {
 
 		$qb->select('f.fileid')
 			->from($this->getTableName(), 'f')
-			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq('o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
+			->leftJoin(
+				'f', 'systemtag_object_mapping', 'o', $qb->expr()->eq(
+					'o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
-			->where($qb->expr()->notIn('o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->where($qb->expr()->notIn(
+				'o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($qb->expr()->isNull('o.systemtagid'))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
 			->andWhere($qb->expr()->orX(
@@ -71,9 +95,12 @@ class DbFileMapper extends QBMapper {
 
 		$qb->select('f.fileid')
 			->from($this->getTableName(), 'f')
-			->leftJoin('f', 'systemtag_object_mapping', 'o', $qb->expr()->eq('o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
+			->leftJoin(
+				'f', 'systemtag_object_mapping', 'o', $qb->expr()->eq(
+					'o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
 			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
-			->where($qb->expr()->in('o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->where($qb->expr()->in(
+				'o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
 			->andWhere($qb->expr()->eq('o.objecttype', $qb->createNamedParameter('files')))
 			->andWhere($qb->expr()->orX(
@@ -93,37 +120,21 @@ class DbFileMapper extends QBMapper {
 	}
 
 	/**
-	 * Get the DB type for a string
-	 * @return string the database string type
-	 * @throws Exception if the database platform is not supported
-	 */
-	private function getStringTypeDeclarationSQL(): string {
-		$platform = $this->db->getDatabaseProvider();
-		if ($platform === "mysql") {
-			$stringType = 'CHAR(64)';
-		}
-		else if ($platform === 'sqlite' || $platform === 'postgres') {
-			$stringType = 'VARCHAR(64)';
-		} else {
-			throw new Exception('Unsupported database platform: ' . $platform);
-		}
-		return $stringType;
-	}
-
-	/**
 	 * Get the number of files in the nextcloud instance
 	 * @return int
 	 * @throws Exception
 	 */
 	public function getFilesCount(): int {
 		$fileCount = 0;
-		
+
 		$fileQuery = $this->db->getQueryBuilder();
 		$fileQuery->select($fileQuery->func()->count())
 			->from('filecache', 'f')
 			->leftJoin('f', 'mimetypes', 'm', $fileQuery->expr()->eq('f.mimetype', 'm.id'))
 			->where($fileQuery->expr()->eq('storage', $fileQuery->createParameter('storageId')))
-			->andWhere($fileQuery->expr()->notLike('m.mimetype', $fileQuery->createNamedParameter('%unix-directory%')))
+			->andWhere($fileQuery->expr()->notLike(
+				'm.mimetype', $fileQuery->createNamedParameter('%unix-directory%'))
+			)
 			->andWhere($fileQuery->expr()->orX(
 				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')),
 				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('__groupfolders/%'))
@@ -140,7 +151,7 @@ class DbFileMapper extends QBMapper {
 			$fileResult->closeCursor();
 		}
 		$storageResult->closeCursor();
-		
+
 		return $fileCount;
 	}
 }

@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\EventListener;
 
 use Exception;
@@ -13,29 +17,31 @@ use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
-use OCP\Files\Events\Node\BeforeNodeWrittenEvent;
 use OCP\Files\Events\Node\NodeWrittenEvent;
 use OCP\Files\FileInfo;
+use OCP\Files\InvalidPathException;
+use OCP\Files\NotFoundException;
+use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
+use OCP\Lock\LockedException;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Server;
 
-/** @template-implements IEventListener<BeforeNodeCopiedEvent|BeforeNodeDeletedEvent|BeforeNodeRenamedEvent|BeforeNodeTouchedEvent|BeforeNodeWrittenEvent|NodeCopiedEvent|NodeCreatedEvent|NodeDeletedEvent|NodeRenamedEvent|NodeTouchedEvent|NodeWrittenEvent> */
-readonly class FileEventsListener implements IEventListener {
+class FileEventsListener implements IEventListener {
 	public function __construct(
-		private IUserSession    $userSession,
-		private LoggerInterface $logger,
-		private IConfig         $config,
-		private Server          $server,
-		private IRequest        $request,
-		private VerdictService  $verdictService,
-		private FileService     $fileService,
-		private TagService      $tagService,
-		private IAppConfig      $appConfig,
-		private MailService     $mailService,
+		private readonly IUserSession $userSession,
+		private readonly LoggerInterface $logger,
+		private readonly IConfig $config,
+		private readonly Server $server,
+		private readonly IRequest $request,
+		private readonly VerdictService $verdictService,
+		private readonly FileService $fileService,
+		private readonly TagService $tagService,
+		private readonly IAppConfig $appConfig,
+		private readonly MailService $mailService,
 	) {
 	}
 
@@ -43,14 +49,15 @@ readonly class FileEventsListener implements IEventListener {
 		$context->registerEventListener(NodeWrittenEvent::class, self::class);
 	}
 
-    /**
-     * @throws \OCP\Files\InvalidPathException
-     * @throws \OCP\Files\NotFoundException
-     * @throws \OCP\Files\NotPermittedException
-     * @throws \OCP\Lock\LockedException
-     * @throws \Exception
-     */
-    public function handle(Event $event): void {
+	/**
+	 * @throws InvalidPathException
+	 * @throws NotFoundException
+	 * @throws NotPermittedException
+	 * @throws LockedException
+	 * @throws Exception
+	 */
+	#[\Override]
+	public function handle(Event $event): void {
 		if ($event instanceof NodeWrittenEvent) {
 			$node = $event->getNode();
 			if ($node->getType() !== FileInfo::TYPE_FILE) {
@@ -59,11 +66,16 @@ readonly class FileEventsListener implements IEventListener {
 			try {
 				$verdict = $this->verdictService->scanFileById($node->getId());
 			} catch (Exception $e) {
-				$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
+				$unscannedTagIsDisabled = $this->appConfig->getValueBool(
+					Application::APP_ID, 'disableUnscannedTag'
+				);
 				if (!$unscannedTagIsDisabled) {
 					$this->tagService->setTag($node->getId(), TagService::UNSCANNED, silent: true);
 				}
-				$this->logger->error("Failed to scan uploaded file '{$node->getName()}' with ID '{$node->getId()}': {$e->getMessage()}");
+				$this->logger->error(
+					"Failed to scan uploaded file '{$node->getName()}' with
+					ID '{$node->getId()}': {$e->getMessage()}"
+				);
 				return;
 			}
 
@@ -71,14 +83,22 @@ readonly class FileEventsListener implements IEventListener {
 				$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
 				$this->fileService->deleteFile($node->getId());
 				if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
-					$this->mailService->notifyMaliciousUpload($verdict, $node->getPath(), $this->userSession->getUser()->getUID(), $node->getSize());
+					$this->mailService->notifyMaliciousUpload(
+						$verdict, $node->getPath(), $this->userSession->getUser()->getUID(), $node->getSize()
+					);
 				}
 				exit;
 			}
 		}
 	}
 
-	public function generateBody(Exception $ex): mixed {
+	private function sendErrorResponse(Exception $ex): void {
+		$this->server->httpResponse->setBody($this->generateBody($ex));
+		$this->server->httpResponse->setStatus(415);
+		$this->server->sapi->sendResponse($this->server->httpResponse);
+	}
+
+	public function generateBody(Exception $ex): string {
 		if ($this->acceptHtml()) {
 			$renderAs = 'guest';
 			$templateName = 'exception';
@@ -102,7 +122,7 @@ readonly class FileEventsListener implements IEventListener {
 		$content->assign('file', $ex->getFile());
 		$content->assign('line', $ex->getLine());
 		$content->assign('exception', $ex);
-        return $content->fetchPage();
+		return $content->fetchPage();
 	}
 
 	private function acceptHtml(): bool {
@@ -113,11 +133,5 @@ readonly class FileEventsListener implements IEventListener {
 			}
 		}
 		return false;
-	}
-
-	private function sendErrorResponse(Exception $ex): void {
-		$this->server->httpResponse->setBody($this->generateBody($ex));
-		$this->server->httpResponse->setStatus(415);
-		$this->server->sapi->sendResponse($this->server->httpResponse);
 	}
 }

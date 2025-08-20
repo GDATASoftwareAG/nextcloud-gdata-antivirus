@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
@@ -26,22 +30,26 @@ class GetTagIdCommand extends Command {
 	/**
 	 * @return void
 	 */
+	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:get-tag-id');
 		$this->setDescription('Gets the ID of a tag');
-		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, "Tag name you want to get the id for.");
+		$this->addArgument(
+			self::TAG_NAME, InputArgument::REQUIRED, 'Tag name you want to get the id for.'
+		);
 	}
 
+	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$tagName = $input->getArgument('tag-name');
 		try {
 			$tag = $this->tagService->getTag($tagName, false);
 		} catch (TagNotFoundException $e) {
-			$logger->error("Tag not found: ".$tagName." ".$e->getMessage());
+			$logger->error('Tag not found: ' . $tagName . ' ' . $e->getMessage());
 			return 1;
 		}
-		$logger->info("tag: ".$tag->getId());
+		$logger->info('tag: ' . $tag->getId());
 		return 0;
 	}
 }

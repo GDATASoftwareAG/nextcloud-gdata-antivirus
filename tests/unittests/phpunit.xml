@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<phpunit    bootstrap="bootstrap.php"    
-            verbose="true"
-		    convertDeprecationsToExceptions="true"
-		    timeoutForSmallTests="900"
-		    timeoutForMediumTests="900"
-		    timeoutForLargeTests="900"
-		>
-	<testsuite name='G DATA Antivirus'>
-		<directory suffix='Test.php'>.</directory>
-	</testsuite>
+
+<!--
+SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<phpunit bootstrap="bootstrap.php"
+         verbose="true"
+         convertDeprecationsToExceptions="true"
+         timeoutForSmallTests="900"
+         timeoutForMediumTests="900"
+         timeoutForLargeTests="900"
+>
+    <testsuite name='G DATA Antivirus'>
+        <directory suffix='Test.php'>.</directory>
+    </testsuite>
 </phpunit>

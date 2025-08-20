@@ -1,8 +1,13 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
+use OCP\DB\Exception;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
@@ -25,10 +30,10 @@ class TagUnscannedService {
 		$this->logger = $logger;
 		return $this;
 	}
-	
+
 	/**
 	 * @return int how many files where actually processed
-	 * @throws \OCP\DB\Exception if the database platform is not supported
+	 * @throws Exception if the database platform is not supported
 	 */
 	public function run(): int {
 		$unscannedTagIsDisabled = $this->appConfig->getValueBool(Application::APP_ID, 'disableUnscannedTag');
@@ -37,7 +42,7 @@ class TagUnscannedService {
 			return 0;
 		}
 
-		$this->logger->debug("Tagging unscanned files");
+		$this->logger->debug('Tagging unscanned files');
 
 		$unscannedTag = $this->tagService->getTag(TagService::UNSCANNED);
 		$maliciousTag = $this->tagService->getTag(TagService::MALICIOUS);
@@ -45,7 +50,13 @@ class TagUnscannedService {
 		$cleanTag = $this->tagService->getTag(TagService::CLEAN);
 		$wontScanTag = $this->tagService->getTag(TagService::WONT_SCAN);
 
-		$excludedTagIds = [$unscannedTag->getId(), $maliciousTag->getId(), $cleanTag->getId(), $pupTag->getId(), $wontScanTag->getId()];
+		$excludedTagIds = [
+			$unscannedTag->getId(),
+			$maliciousTag->getId(),
+			$cleanTag->getId(),
+			$pupTag->getId(),
+			$wontScanTag->getId()
+		];
 
 		$fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 10000);
 
@@ -56,7 +67,7 @@ class TagUnscannedService {
 			$this->tagService->setTag($fileId, TagService::UNSCANNED, silent: true);
 		}
 
-		$this->logger->debug("Tagged " . count($fileIds) . " unscanned files");
+		$this->logger->debug('Tagged ' . count($fileIds) . ' unscanned files');
 		return count($fileIds);
 	}
 
