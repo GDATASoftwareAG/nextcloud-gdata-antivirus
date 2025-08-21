@@ -6,7 +6,6 @@
 
 namespace OCA\GDataVaas\Service;
 
-use Coduo\PHPHumanizer\NumberHumanizer;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
 use OCP\Files\EntityTooLargeException;
@@ -66,7 +65,8 @@ class ScanService {
 			} catch (EntityTooLargeException) {
 				$this->logger->error(
 					"File $fileId is larger than
-					" . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de'));
+					" . $this->appConfig->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256) . 'MB.'
+				);
 			} catch (NotFoundException) {
 				$this->logger->error("File $fileId not found");
 			} catch (NotPermittedException) {

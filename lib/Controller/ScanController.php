@@ -6,8 +6,8 @@
 
 namespace OCA\GDataVaas\Controller;
 
-use Coduo\PHPHumanizer\NumberHumanizer;
 use Exception;
+use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -15,15 +15,18 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
+use OCP\IAppConfig;
 use OCP\IRequest;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 
 class ScanController extends Controller {
+	private IAppConfig $config;
 	private VerdictService $verdictService;
 
-	public function __construct($appName, IRequest $request, VerdictService $verdictService) {
+	public function __construct($appName, IRequest $request, VerdictService $verdictService, IAppConfig $config) {
 		parent::__construct($appName, $request);
 
+		$this->config = $config;
 		$this->verdictService = $verdictService;
 	}
 
@@ -39,8 +42,8 @@ class ScanController extends Controller {
 			return new JSONResponse(['verdict' => $verdict->verdict->value], 200);
 		} catch (EntityTooLargeException) {
 			return new JSONResponse(
-				['error' => "File $fileId is larger than " . NumberHumanizer::binarySuffix(
-					VerdictService::MAX_FILE_SIZE, 'de')], 413);
+				['error' => 'File is larger than '
+					. $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256) . 'MB.'], 413);
 		} catch (NotFoundException) {
 			return new JSONResponse(['error' => "File $fileId not found"], 404);
 		} catch (NotPermittedException) {

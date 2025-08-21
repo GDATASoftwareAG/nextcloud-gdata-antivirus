@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const scanOnlyThis = document.querySelector('#scanOnlyThis').value;
 		const doNotScanThis = document.querySelector('#doNotScanThis').value;
 		const notifyMails = document.querySelector('#notify_mails').value;
+		const maxScanSize = document.querySelector('#max-scan-size').value;
 
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
 			username: username,
@@ -74,7 +75,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 			quarantineFolder,
 			scanOnlyThis,
 			doNotScanThis,
-			notifyMails
+			notifyMails,
+			maxScanSize
 		});
 		const msgElement = document.querySelector('#auth_save_msg');
 

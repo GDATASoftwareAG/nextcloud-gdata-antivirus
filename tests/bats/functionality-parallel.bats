@@ -99,7 +99,7 @@ setup_file() {
 }
 
 @test "test wontscan tag for testuser" {
-    dd if=/dev/zero of=$FOLDER_PREFIX/too-large.dat  bs=1083741824  count=1
+    dd if=/dev/zero of=$FOLDER_PREFIX/too-large.dat  bs=268435457  count=1
 
     docker cp $FOLDER_PREFIX/too-large.dat nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
     docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
