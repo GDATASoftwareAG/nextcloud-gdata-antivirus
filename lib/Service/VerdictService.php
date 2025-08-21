@@ -24,8 +24,6 @@ use VaasSdk\Vaas;
 use VaasSdk\VaasVerdict;
 
 class VerdictService {
-	public const MAX_FILE_SIZE = 1073741824;
-
 	private string $username;
 	private string $password;
 	private string $clientId;
@@ -115,9 +113,10 @@ class VerdictService {
 	 * @param string $path
 	 * @return bool
 	 */
-	public static function isFileTooLargeToScan(string $path): bool {
+	public function isFileTooLargeToScan(string $path): bool {
 		$size = filesize($path);
-		return ($size === false) || $size > self::MAX_FILE_SIZE;
+		return ($size === false)
+			|| $size > ($this->appConfig->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256) * 1024 * 1024);
 	}
 
 	/**

@@ -62,6 +62,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 				<td><div title="<?php p($l->t('Mail addresses for notifications when malicious files are found or a user tries to upload them. Must be comma-separated.'));?>" class="visible"><label for="notify_mails"><?php p($l->t('Notify Mails'));?></label></div></td>
 				<td class="input_field"><input id="notify_mails" type="text" name="notify_mails" value="<?php p($_['notifyMail']); ?>"/></td>
 			</tr>
+			<tr class="max-scan-size">
+				<td><div title="<?php p($l->t('The maximum scan size for files to be scanned in MB. Files above this limit are tagged as “Won\'t Scan”.'));?>" class="visible"><label for="max-scan-size"><?php p($l->t('Maximum scan size'));?></label></div></td>
+				<td class="input_field"><input id="max-scan-size" type="number" min="0" name="max-scan-size" value="<?php p($_['maxScanSizeInMB']); ?>"/></td>
+			</tr>
 		</table>
 		<input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
 		<span id="auth_save_msg"></span>

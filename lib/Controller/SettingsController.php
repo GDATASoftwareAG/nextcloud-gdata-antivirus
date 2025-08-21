@@ -42,6 +42,7 @@ class SettingsController extends Controller {
 		$scanOnlyThis,
 		$doNotScanThis,
 		$notifyMails,
+		$maxScanSize,
 	): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
@@ -50,6 +51,9 @@ class SettingsController extends Controller {
 					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
 				}
 			}
+		}
+		if ((int)$maxScanSize < 1) {
+			return new JSONResponse(['status' => 'error', 'message' => 'Invalid max scan size: ' . $maxScanSize]);
 		}
 		$this->config->setValueString($this->appName, 'username', $username);
 		$this->config->setValueString($this->appName, 'password', $password);
@@ -60,6 +64,7 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
 		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
 		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
+		$this->config->setValueInt($this->appName, 'maxScanSizeInMB', (int)$maxScanSize);
 		return new JSONResponse(['status' => 'success']);
 	}
 
