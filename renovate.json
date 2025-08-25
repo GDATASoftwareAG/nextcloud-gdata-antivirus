@@ -1,11 +1,3 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "packageRules": [
-    {
-      "description": "disable major updates for the vaas dependency",
-      "matchDepNames": "gdata/vaas",
-      "enabled": false,
-      "matchUpdateTypes": ["major"]
-    }
-  ]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json"
 }
