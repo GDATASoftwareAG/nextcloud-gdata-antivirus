@@ -1,31 +1,28 @@
 {
-    "name": "PHP",
-    "image": "mcr.microsoft.com/devcontainers/php:1-8.3-bullseye",
-    "forwardPorts": [
-        80
-    ],
-    "containerEnv": {
-        "XDEBUG_MODE": "debug,develop"
-    },
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "CharlieGerard.pride-vscode-themes",
-                "junstyle.php-cs-fixer",
-                "stylelint.vscode-stylelint",
-                "jetmartin.bats",
-                "recca0120.vscode-phpunit"
-            ]
-        }
-    },
-    "postStartCommand": ".devcontainer/postCreateCommands.sh",
-    "features": {
-        "ghcr.io/devcontainers/features/node:1": {},
-        "ghcr.io/edouard-lopez/devcontainer-features/bats:0": {},
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-        "ghcr.io/devcontainers/features/github-cli:1": {},
-        "ghcr.io/wxw-matt/devcontainer-features/apt:latest": {
-            "packages": "bash-completion vim iputils-ping telnet"
-        }
+  "name": "PHP",
+  "image": "mcr.microsoft.com/devcontainers/php:1-8.4-bullseye",
+  "forwardPorts": [
+    8080,
+    8081
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "junstyle.php-cs-fixer",
+        "stylelint.vscode-stylelint",
+        "jetmartin.bats",
+        "recca0120.vscode-phpunit"
+      ]
     }
+  },
+  "postStartCommand": ".devcontainer/postCreateCommands.sh",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/szkiba/devcontainer-features/bats:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/wxw-matt/devcontainer-features/apt:latest": {
+        "packages": "bash-completion vim iputils-ping telnet"
+    }
+  }
 }

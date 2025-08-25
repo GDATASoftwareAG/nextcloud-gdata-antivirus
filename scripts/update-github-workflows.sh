@@ -33,7 +33,7 @@ find ./.github/workflows/ -type f -name '*.yml' -exec sed -i '/concurrency:/,/tr
 find ./.github/workflows/ -type f -name 'psalm-matrix.yml' -exec sed -i 's/phpVersion="${{ steps.versions.outputs.php-min }}/phpVersion="${{ steps.versions.outputs.php-min }}"/g' {} +
 
 # Insert './get-nc-server.sh' into the psalm-matrix.yml at line 65:10 -> As we use Nextcloud private classes Psalm needs to know them
-find ./.github/workflows/ -type f -name 'psalm-matrix.yml' -exec sed -i '65i\          ./get-nc-server.sh' {} +
+find ./.github/workflows/ -type f -name 'psalm-matrix.yml' -exec sed -i '65i\          ./scripts/get-nc-server.sh' {} +
 
 # Cleanup
 rm -rf "$temp"

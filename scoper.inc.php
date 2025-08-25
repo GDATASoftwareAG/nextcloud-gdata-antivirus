@@ -71,9 +71,7 @@ return [
 		Finder::create()
 			->files()
 			->notName('babel.config.js')
-			->notName('compose-install.yaml')
-			->notName('composer.local.*')
-			->notName('devcontainer.yaml')
+			->notName('docker-compose.yaml')
 			->notName('Dockerfile.Nextcloud')
 			->notName('empty-skeleton.config.php')
 			->notName('*.sh')
@@ -85,13 +83,12 @@ return [
 			->notName('stylelint.config.js')
 			->notName('use-*-vaas.sh')
 			->notName('webpack.config.js')
-			->notName('xdebug.*')
-			->notName('babel.config.js')
 			->ignoreVCS(true)
 			->ignoreDotFiles(true)
 			->exclude([
 				'build',
 				'nextcloud-server',
+				'scripts',
 				'tests',
 				'tmp',
 				'test',
@@ -161,6 +158,7 @@ return [
 		'OC_Template'
 	],
 	'exclude-functions' => [
+		'stream_context_set_options'
 	],
 	'exclude-constants' => [
 		// 'STDIN',

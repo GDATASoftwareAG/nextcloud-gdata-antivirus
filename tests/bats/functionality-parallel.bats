@@ -6,7 +6,7 @@
 
 setup_file() {
     source tests/bats/.env-test || return 1
-    source .env-local || echo "No .env-local file found."
+    source .env-local || source .env || echo "No .env files found."
     mkdir -p $FOLDER_PREFIX
     curl --output $FOLDER_PREFIX/pup.exe http://amtso.eicar.org/PotentiallyUnwanted.exe
     $DOCKER_EXEC_WITH_USER --env OC_PASS=$TESTUSER_PASSWORD nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
@@ -22,25 +22,6 @@ setup_file() {
     EICAR_LENGTH=$(echo $EICAR_STRING | wc -c)
     RESULT=$(echo $EICAR_STRING | curl -v -X PUT -d"$EICAR_STRING" -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
 
-    if [[ "$RESULT" =~ "curl failed" ]]; then
-        echo "debugging stuff"
-        docker exec -i nextcloud-container ls -lha /tmp/apache2-coredump
-        mkdir -p ./coredumps
-        docker container cp nextcloud-container:/tmp/apache2-coredump/* ./coredumps
-        ls -lha ./coredumps
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat .htaccess
-        df -h
-        free
-        mpstat
-        docker stats --no-stream --no-trunc
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat data/nextcloud.log
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat /var/www/html/data/php.log
-        docker logs nextcloud-container
-    fi
-
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
     [[ "$RESULT" =~ "Virus found" ]]
@@ -48,21 +29,6 @@ setup_file() {
 
 @test "test admin clean upload" {
     RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "curl failed")
-
-    if [[ "$RESULT" =~ "curl failed" ]]; then
-        echo "debugging stuff"
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container ls -lha data/admin/files
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat .htaccess
-        df -h
-        free
-        mpstat
-        docker stats --no-stream --no-trunc
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat data/nextcloud.log
-        $DOCKER_EXEC_WITH_USER -i nextcloud-container cat /var/www/html/data/php.log
-        docker logs nextcloud-container
-    fi
 
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "file not found"
