@@ -28,7 +28,7 @@ class VerdictService {
 	private string $password;
 	private string $clientId;
 	private string $clientSecret;
-	private string $authMethod;
+	public string $authMethod;
 	private string $tokenEndpoint;
 	private string $vaasUrl;
 	private IAppConfig $appConfig;
@@ -212,31 +212,33 @@ class VerdictService {
 		}
 		$options = new VaasOptions(true, true, $this->vaasUrl);
 		return Vaas::builder()
-			->withAuthenticator($this->getAuthenticator($this->authMethod))
+			->withAuthenticator($this->getAuthenticator($this->authMethod, $this->tokenEndpoint))
 			->withOptions($options)
 			->build();
 	}
 
 	/**
 	 * @param string $authMethod
+	 * @param string $tokenEndpoint
 	 * @return ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator
 	 * @throws VaasAuthenticationException
 	 */
 	public function getAuthenticator(
 		string $authMethod,
+		string $tokenEndpoint,
 	): ClientCredentialsGrantAuthenticator|ResourceOwnerPasswordGrantAuthenticator {
 		if ($authMethod === 'ResourceOwnerPassword') {
 			return new ResourceOwnerPasswordGrantAuthenticator(
 				'nextcloud-customer',
 				$this->username,
 				$this->password,
-				$this->tokenEndpoint
+				$tokenEndpoint
 			);
 		} elseif ($authMethod === 'ClientCredentials') {
 			return new ClientCredentialsGrantAuthenticator(
 				$this->clientId,
 				$this->clientSecret,
-				$this->tokenEndpoint
+				$tokenEndpoint
 			);
 		} else {
 			throw new VaasAuthenticationException('Invalid auth method: ' . $authMethod);

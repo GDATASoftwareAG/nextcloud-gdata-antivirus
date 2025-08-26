@@ -7,17 +7,23 @@
 namespace OCA\GDataVaas\Controller;
 
 use OCA\GDataVaas\Service\TagService;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
+use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Options\VaasOptions;
+use VaasSdk\Vaas;
+use VaasSdk\Verdict;
 
 class SettingsController extends Controller {
 	private IAppConfig $config;
 	private TagService $tagService;
 	private IMailer $mailer;
+	private VerdictService $verdictService;
 
 	public function __construct(
 		$appName,
@@ -25,11 +31,13 @@ class SettingsController extends Controller {
 		IAppConfig $config,
 		TagService $tagService,
 		IMailer $mailer,
+		VerdictService $verdictService,
 	) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
 		$this->mailer = $mailer;
+		$this->verdictService = $verdictService;
 	}
 
 	public function setconfig(
@@ -153,5 +161,29 @@ class SettingsController extends Controller {
 	public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
 		$this->config->setValueBool($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
 		return new JSONResponse(['status' => 'success']);
+	}
+
+	public function testSettings(string $tokenEndpoint, string $vaasUrl): JSONResponse {
+		try {
+			$authenticator = $this->verdictService->getAuthenticator($this->verdictService->authMethod, $tokenEndpoint);
+			$options = new VaasOptions(true, true, $vaasUrl);
+			$vaas = Vaas::builder()
+				->withAuthenticator($authenticator)
+				->withOptions($options)
+				->build();
+			$verdict = $vaas->forUrlAsync('https://www.gdata.de')->await();
+			if ($verdict->verdict === Verdict::CLEAN) {
+				return new JSONResponse(['status' => 'success']);
+			}
+			return new JSONResponse(['status' => 'error', 'message' => 'Test URL verdict: ' . $verdict->verdict->value]);
+		} catch (VaasAuthenticationException $e) {
+			return new JSONResponse([
+				'status' => 'error',
+				'message' => 'Authentication failed. Please also check your login details above and save them before
+				taking the test. ' . $e->getMessage()
+			]);
+		} catch (\Exception $e) {
+			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()]);
+		}
 	}
 }

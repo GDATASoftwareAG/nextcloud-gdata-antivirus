@@ -19,6 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
         <directory name="lib" />
         <ignoreFiles>
             <directory name="vendor" />
+            <directory name="nextcloud-server" />
         </ignoreFiles>
     </projectFiles>
     <extraFiles>

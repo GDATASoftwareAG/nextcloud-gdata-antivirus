@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const authSubmit = document.querySelector('#auth_submit');
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
+	const testSettings = document.querySelector('#test-settings');
 	const resetAllTags = document.querySelector('#reset');
 	const autoScanFiles = document.querySelector('#auto_scan_files');
 	const prefixMalicious = document.querySelector('#prefixMalicious');
@@ -88,6 +89,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 			} else {
 				msgElement.textContent = 'An error occurred when saving the data.';
 			}
+		}
+	});
+
+	testSettings.addEventListener('click', async (e) => {
+		e.preventDefault();
+		const tokenEndpoint = document.querySelector('#token_endpoint').value;
+		const vaasUrl = document.querySelector('#vaas_url').value;
+
+		const response = await postData(OC.generateUrl('apps/gdatavaas/testsettings'), {
+			tokenEndpoint,
+			vaasUrl
+		});
+		const msgElement = document.querySelector('#auth_save_msg_advanced');
+
+		if (response.status === "success") {
+			msgElement.textContent = 'Authentication successful and VaaS backend reachable.';
+		} else {
+			msgElement.textContent = response.message || 'An error occurred during the test.';
 		}
 	});
 

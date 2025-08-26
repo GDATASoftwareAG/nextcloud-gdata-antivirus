@@ -17,7 +17,7 @@ class VaasAdminSection implements IIconSection {
 
 	#[\Override]
 	public function getName(): string {
-		return 'Verdict-as-a-Service';
+		return 'G DATA Antivirus';
 	}
 
 	#[\Override]

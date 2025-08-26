@@ -26,6 +26,7 @@ return [
 		['name' => 'settings#getSendMailSummaryOfMaliciousFiles', 'url'
 			=> '/getSendMailSummaryOfMaliciousFiles', 'verb' => 'GET'],
 		['name' => 'settings#setSendMailSummaryOfMaliciousFiles', 'url'
-			=> '/setSendMailSummaryOfMaliciousFiles', 'verb' => 'POST']
+			=> '/setSendMailSummaryOfMaliciousFiles', 'verb' => 'POST'],
+		['name' => 'settings#testsettings', 'url' => '/testsettings', 'verb' => 'POST']
 	]
 ];

@@ -129,6 +129,7 @@ appstore: build
 	--exclude="$(source_build_directory)/psalm.xml" \
 	--exclude="$(source_build_directory)/webpack.config.json" \
 	--exclude="$(source_build_directory)/stylelint.config.json" \
+	--exclude="$(source_build_directory)/empty-skeleton.config.php" \
 	--exclude="$(source_build_directory)/scoper.inc.php" \
 	--exclude="$(source_build_directory)/renovate.json" \
 	--exclude="$(source_build_directory)/renovate.json.license" \

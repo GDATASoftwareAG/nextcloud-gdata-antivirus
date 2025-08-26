@@ -30,12 +30,12 @@
     },
     "scripts": {
         "lint": "find . -name \\*.php -not -path './vendor/*' -not -path './nextcloud-server/*' -not -path './node_modules/*'  -print0 | xargs -0 -n1 php -l",
-        "cs:check": "rm -rf node_modules/ nextcloud-server/ || true && ./vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php .",
-        "cs:fix": "rm -rf node_modules/ nextcloud-server/ || true && ./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php .",
-        "psalm": "rm -rf node_modules/ || true && vendor/psalm/phar/psalm.phar",
-        "psalm:check": "rm -rf node_modules/ || true && composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github --show-info=true",
-        "psalm:fix": "rm -rf node_modules/ || true && composer run psalm -- --alter --issues=MissingOverrideAttribute,ClassMustBeFinal,PossiblyUnusedMethod,MissingParamType",
-        "psalm:clear": "vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache"
+        "cs:check": "./vendor/bin/php-cs-fixer fix --dry-run --diff --config=.php-cs-fixer.dist.php .",
+        "cs:fix": "./vendor/bin/php-cs-fixer fix --config=.php-cs-fixer.dist.php .",
+        "psalm": "./vendor/psalm/phar/psalm.phar",
+        "psalm:check": "composer run psalm -- --threads=1 --monochrome --no-progress --output-format=github --show-info=true",
+        "psalm:fix": "composer run psalm -- --alter --issues=MissingOverrideAttribute,ClassMustBeFinal,PossiblyUnusedMethod,MissingParamType",
+        "psalm:clear": "./vendor/psalm/phar/psalm.phar --clear-cache && vendor/psalm/phar/psalm.phar --clear-global-cache"
     },
     "config": {
         "allow-plugins": {
