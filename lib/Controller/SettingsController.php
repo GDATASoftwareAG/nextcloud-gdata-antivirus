@@ -51,6 +51,9 @@ class SettingsController extends Controller {
 		$doNotScanThis,
 		$notifyMails,
 		$maxScanSize,
+		$timeout,
+		bool $cache,
+		bool $hashlookup,
 	): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
@@ -63,6 +66,9 @@ class SettingsController extends Controller {
 		if ((int)$maxScanSize < 1) {
 			return new JSONResponse(['status' => 'error', 'message' => 'Invalid max scan size: ' . $maxScanSize]);
 		}
+		if ((int)$timeout < 1) {
+			return new JSONResponse(['status' => 'error', 'message' => 'Invalid timeout: ' . $timeout]);
+		}
 		$this->config->setValueString($this->appName, 'username', $username);
 		$this->config->setValueString($this->appName, 'password', $password);
 		$this->config->setValueString($this->appName, 'clientId', $clientId);
@@ -73,6 +79,9 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
 		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		$this->config->setValueInt($this->appName, 'maxScanSizeInMB', (int)$maxScanSize);
+		$this->config->setValueInt($this->appName, 'timeout', (int)$timeout);
+		$this->config->setValueBool($this->appName, 'cache', $cache);
+		$this->config->setValueBool($this->appName, 'hashlookup', $hashlookup);
 		return new JSONResponse(['status' => 'success']);
 	}
 
@@ -185,5 +194,13 @@ class SettingsController extends Controller {
 		} catch (\Exception $e) {
 			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()]);
 		}
+	}
+
+	public function getCache(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'cache', true)]);
+	}
+
+	public function getHashlookup(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'hashlookup', true)]);
 	}
 }

@@ -6,7 +6,7 @@
 
 setup_file() {
     source tests/bats/.env-test || return 1
-    source .env-local || echo "No .env-local file found."
+    source .env-local || source .env || echo "No .env files found."
     mkdir -p $FOLDER_PREFIX/
     curl --output $FOLDER_PREFIX/pup.exe http://amtso.eicar.org/PotentiallyUnwanted.exe
     $DOCKER_EXEC_WITH_USER --env OC_PASS=$TESTUSER_PASSWORD nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
@@ -16,7 +16,7 @@ setup_file() {
     BATS_NO_PARALLELIZE_WITHIN_FILE=true
     # this is cache busting
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
-    docker exec nextcloud-container chown -R www-data:www-data /var/www/html/
+    $DOCKER_EXEC_WITH_USER nextcloud-container php occ app:enable gdatavaas
 }
 
 @test "test upload when vaas does not function" {

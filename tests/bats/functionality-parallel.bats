@@ -16,6 +16,7 @@ setup_file() {
     # this is cache busting
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
     sleep 2
+    $DOCKER_EXEC_WITH_USER nextcloud-container php occ app:enable gdatavaas
 }
 
 @test "test admin eicar Upload" {
@@ -68,7 +69,6 @@ setup_file() {
     dd if=/dev/zero of=$FOLDER_PREFIX/too-large.dat  bs=268435457  count=1
 
     docker cp $FOLDER_PREFIX/too-large.dat nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
-    docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.too-large.dat
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:scan
 
@@ -93,7 +93,6 @@ setup_file() {
 
 @test "test unscanned job for testuser" {
     docker cp $FOLDER_PREFIX/pup.exe nextcloud-container:/var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
-    docker exec -i nextcloud-container chown www-data:www-data /var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan $TESTUSER
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:tag-unscanned
 

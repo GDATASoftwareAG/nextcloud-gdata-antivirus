@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 		<h6>You may use self registration and create a new username and password by yourself <a href="https://vaas.gdata.de/login" target="_blank">here</a> for free.</h6>
 		<table class="basic_settings_table">
 			<tr class="basic_settings">
-				<td><div title="<?php p($l->t('If you have registered yourself with your e-mail address and a password, select "Resource Owner Password Flow" here, if you have received a client id and a client secret from G DATA CyberDefense AG, use "Client Credentials Flow". You can ignore the other fields.'));?>" class="visible"><label for="auth_method"><?php p($l->t('Authentication Method'));?></label></div></td>
+				<td><div title="<?php p($l->t('If you have registered yourself with your e-mail address and a password, select "Resource Owner Password Flow" here, if you have received a client id and a client secret from G DATA CyberDefense AG, use "Client Credentials Flow". You can ignore the other fields.'));?>" class="visible"><label for="authMethod"><?php p($l->t('Authentication Method'));?></label></div></td>
 				<td class="input_field">
 					<select id="authMethod" name="authMethod">
 						<option value="ClientCredentials" <?php if ($_['authMethod'] === 'ClientCredentials') {
@@ -65,6 +65,22 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<tr class="max-scan-size">
 				<td><div title="<?php p($l->t('The maximum scan size for files to be scanned in MB. Files above this limit are tagged as “Won\'t Scan”.'));?>" class="visible"><label for="max-scan-size"><?php p($l->t('Maximum scan size'));?></label></div></td>
 				<td class="input_field"><input id="max-scan-size" type="number" min="0" name="max-scan-size" value="<?php p($_['maxScanSizeInMB']); ?>"/></td>
+			</tr>
+			<tr class="timeout">
+				<td><div title="<?php p($l->t('The timeout determines how long a file scan may take in seconds before it is canceled. Please note: If the timeout is set too short, it will restrict the scanning of large files, which take a little longer.'));?>" class="visible"><label for="timeout"><?php p($l->t('Timeout'));?></label></div></td>
+				<td class="input_field"><input id="timeout" type="number" min="0" name="timeout" value="<?php p($_['timeout']); ?>"/></td>
+			</tr>
+			<tr class="cache">
+				<td><div title="<?php p($l->t('If this option is disabled, each file is always scanned again and no results are cached.'));?>" class="visible"><label for="cache"><?php p($l->t('Cache'));?></label></div></td>
+				<td class="input_field"><input id="cache" type="checkbox" name="cache" <?php if ($_['cache']) {
+					p('checked');
+				} ?>/></td>
+			</tr>
+			<tr class="hashlookup">
+				<td><div title="<?php p($l->t('During a hash lookup, the SHA256 checksum is transmitted to the G DATA Cloud before the scan to check whether a result is already available, thereby saving unnecessary network traffic, resource load, and time.'));?>" class="visible"><label for="hashlookup"><?php p($l->t('Hash lookup'));?></label></div></td>
+				<td class="input_field"><input id="hashlookup" type="checkbox" name="hashlookup" <?php if ($_['hashlookup']) {
+					p('checked');
+				} ?>/></td>
 			</tr>
 		</table>
 		<input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />

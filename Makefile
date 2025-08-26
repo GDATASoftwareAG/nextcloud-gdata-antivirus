@@ -101,6 +101,7 @@ local: build
 	docker stop nextcloud-container || true
 	docker container rm nextcloud-container || true
 	docker run --rm -d -p 8080:80 --name nextcloud-container -e SERVER_BRANCH="v31.0.8" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php84:latest
+	composer install
 
 # Builds the app for production and prepares it for the appstore under ./build/artifacts
 .PHONY: appstore

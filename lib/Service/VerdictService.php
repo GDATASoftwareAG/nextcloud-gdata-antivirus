@@ -210,7 +210,12 @@ class VerdictService {
 				$this->vaasUrl = 'https://' . substr($this->vaasUrl, 6);
 			}
 		}
-		$options = new VaasOptions(true, true, $this->vaasUrl);
+		$options = new VaasOptions(
+			useHashLookup: $this->appConfig->getValueBool(Application::APP_ID, 'hashlookup', true),
+			useCache: $this->appConfig->getValueBool(Application::APP_ID, 'cache', true),
+			vaasUrl: $this->vaasUrl,
+			timeout: $this->appConfig->getValueInt(Application::APP_ID, 'timeout', 300)
+		);
 		return Vaas::builder()
 			->withAuthenticator($this->getAuthenticator($this->authMethod, $this->tokenEndpoint))
 			->withOptions($options)

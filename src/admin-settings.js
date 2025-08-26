@@ -66,6 +66,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const doNotScanThis = document.querySelector('#doNotScanThis').value;
 		const notifyMails = document.querySelector('#notify_mails').value;
 		const maxScanSize = document.querySelector('#max-scan-size').value;
+		const timeout = document.querySelector('#timeout').value;
+		const cache = document.querySelector('#cache').checked;
+		const hashlookup = document.querySelector('#hashlookup').checked;
 
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
 			username: username,
@@ -77,7 +80,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 			scanOnlyThis,
 			doNotScanThis,
 			notifyMails,
-			maxScanSize
+			maxScanSize,
+			timeout,
+			cache,
+			hashlookup
 		});
 		const msgElement = document.querySelector('#auth_save_msg');
 
@@ -203,4 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		scanCounter.textContent = ' N/A';
 		console.log('Error getting files counter:', filesCounter['message']);
 	}
+
+	document.querySelector('#cache').checked = (await getData(OC.generateUrl('apps/gdatavaas/getCache'))).status;
+	document.querySelector('#hashlookup').checked = (await getData(OC.generateUrl('apps/gdatavaas/getHashlookup'))).status;
 });
