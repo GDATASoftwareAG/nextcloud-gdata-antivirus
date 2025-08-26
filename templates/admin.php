@@ -15,8 +15,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 <body>
 <div class="section section-auth">
 	<fieldset class="personalblock">
-		<h2>G DATA Verdict-as-a-Service</h2>
-		<h3>You may use self registration and create a new username and password by yourself <a href="https://vaas.gdata.de/login" target="_blank">here</a> for free.</h3>
+		<h2>G DATA Antivirus</h2>
+		<h6>You may use self registration and create a new username and password by yourself <a href="https://vaas.gdata.de/login" target="_blank">here</a> for free.</h6>
 		<table class="basic_settings_table">
 			<tr class="basic_settings">
 				<td><div title="<?php p($l->t('If you have registered yourself with your e-mail address and a password, select "Resource Owner Password Flow" here, if you have received a client id and a client secret from G DATA CyberDefense AG, use "Client Credentials Flow". You can ignore the other fields.'));?>" class="visible"><label for="auth_method"><?php p($l->t('Authentication Method'));?></label></div></td>
@@ -73,8 +73,8 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			<strong>Caution:</strong> The use of the <em>"Scan only this"</em> and <em>"Do not scan this"</em> settings should be approached with caution. Using these settings allows malicious users to upload and distribute malicious content via the Nextcloud instance. It is recommended that you carefully consider the implications of these settings and use them in a way that does not jeopardize the security of your system and data.
 		</div>
 		<div id="advanced_settings">
-			<h3><?php p($l->t('Advanced Settings'));?></h3>
-			<h4><?php p($l->t('If you are not sure about this, you can just leave it blank.'));?></h4>
+			<h2><?php p($l->t('Advanced Settings'));?></h2>
+			<h6><?php p($l->t('If you are not sure about this, you can just leave it blank.'));?></h6>
 			<table>
 				<tr class="token_endpoint">
 					<td><label for="token_endpoint">Token Endpoint</label></td>
@@ -87,11 +87,12 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			</table>
 			<table>
 				<tr id="advanced_buttons">
+					<td><input id="test-settings" type="submit" value="<?php p($l->t('Test'));?>" /></td>
 					<td><input id="auth_submit_advanced" type="submit" value="<?php p($l->t('Save'));?>" /></td>
 					<td><div title="<?php p($l->t('Removes all tags set by this app.'));?>" class="visible"><input class="submit-button" id="reset" type="submit" value="<?php p($l->t('Reset all tags'));?>"/></div></td>
-					<td><span id="auth_save_msg_advanced"></span></td>
 				</tr>
 			</table>
+			<span id="auth_save_msg_advanced"></span>
 		</div>
 	</fieldset>
 </div>

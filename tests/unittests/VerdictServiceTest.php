@@ -211,7 +211,10 @@ class VerdictServiceTest extends TestCase {
 			$this->createMock(FileService::class),
 			$this->createMock(TagService::class));
 
-		$authenticator = $verdictService->getAuthenticator('ResourceOwnerPassword');
+		$authenticator = $verdictService->getAuthenticator(
+			'ResourceOwnerPassword',
+			'https://account-staging.gdata.de/realms/vaas-staging/protocol/openid-connect/token'
+		);
 		$this->assertInstanceOf(ResourceOwnerPasswordGrantAuthenticator::class, $authenticator);
 	}
 }
