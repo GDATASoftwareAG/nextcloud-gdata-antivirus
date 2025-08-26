@@ -25,6 +25,10 @@ select {
 	box-sizing: border-box;
 }
 
+.basic_settings_table .input_field input[type=checkbox] {
+	margin: 8px 0 8px 50px;
+}
+
 input.toggle-round {
 	display: none;
 }

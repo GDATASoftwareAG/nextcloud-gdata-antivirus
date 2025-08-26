@@ -57,7 +57,10 @@ class VaasAdmin implements ISettings {
 				=> $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload'),
 			'notifyAdminEnabled' => $this->config->getValueBool(Application::APP_ID, 'notifyAdminEnabled'),
 			'maxScanSizeInMB'
-				=> $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256)
+				=> $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256),
+			'timeout' => $this->config->getValueInt(Application::APP_ID, 'timeout', 300),
+			'cache' => $this->config->getValueBool(Application::APP_ID, 'cache', true),
+			'hashlookup' => $this->config->getValueBool(Application::APP_ID, 'hashlookup', true),
 		];
 
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);

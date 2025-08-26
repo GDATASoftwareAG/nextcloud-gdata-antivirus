@@ -15,37 +15,42 @@ registerFileAction(new FileAction({
 	},
 	iconSvgInline: () => Magnifier,
 	async exec(file) {
-		const fileId = file.fileid;
-		let response = await fetch(OC.generateUrl('/apps/gdatavaas/scan'), {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'requesttoken': oc_requesttoken
-			},
-			body: JSON.stringify({
-				fileId: fileId
-			})
-		});
-		let vaasVerdict = await response.json();
-		if (response.status === 200) {
-			switch (vaasVerdict['verdict']) {
-				case 'Malicious':
-					showError(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Malicious'));
-					break;
-				case 'Clean':
-					showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
-					break;
-				case 'Pup':
-					showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as ' +
-						'verdict PUP (Potentially unwanted program)'));
-					break;
+		try {
+			const fileId = file.fileid;
+			let response = await fetch(OC.generateUrl('/apps/gdatavaas/scan'), {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'requesttoken': oc_requesttoken
+				},
+				body: JSON.stringify({
+					fileId: fileId
+				})
+			});
+			let vaasVerdict = await response.json();
+			if (response.status === 200) {
+				switch (vaasVerdict['verdict']) {
+					case 'Malicious':
+						showError(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Malicious'));
+						break;
+					case 'Clean':
+						showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
+						break;
+					case 'Pup':
+						showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as ' +
+							'verdict PUP (Potentially unwanted program)'));
+						break;
+				}
+			} else {
+				try {
+					showError(t('gdatavaas', vaasVerdict.error));
+				} catch (e) {
+					showError(t('gdatavaas', 'An unknown error occurred while scanning the file'));
+				}
 			}
-		} else {
-			try {
-				showError(t('gdatavaas', vaasVerdict.error));
-			} catch (e) {
-				showError(t('gdatavaas', 'An unknown error occurred while scanning the file'));
-			}
+		}
+		catch (e) {
+			showError(t('gdatavaas', 'An error occurred while trying to scan the file: ') + e);
 		}
 	},
 }))

@@ -27,6 +27,8 @@ return [
 			=> '/getSendMailSummaryOfMaliciousFiles', 'verb' => 'GET'],
 		['name' => 'settings#setSendMailSummaryOfMaliciousFiles', 'url'
 			=> '/setSendMailSummaryOfMaliciousFiles', 'verb' => 'POST'],
-		['name' => 'settings#testsettings', 'url' => '/testsettings', 'verb' => 'POST']
+		['name' => 'settings#testsettings', 'url' => '/testsettings', 'verb' => 'POST'],
+		['name' => 'settings#getCache', 'url' => '/getCache', 'verb' => 'GET'],
+		['name' => 'settings#getHashlookup', 'url' => '/getHashlookup', 'verb' => 'GET']
 	]
 ];
