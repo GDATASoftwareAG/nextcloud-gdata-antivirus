@@ -168,6 +168,8 @@ make npm
 
 ### Available Make targets
 
+- make prod
+  - Builds the app for production and deploys a production Nextcloud instance with the app inside. Sets everything up. Nextcloud on http://localhost:8080 and SMTP testing on http://localhost:8081. Code changes are not automatically picked up; you need to rebuild the container -> run `make prod` again.
 - make build
   - Fetches PHP dependencies and builds frontend assets.
 - make composer
@@ -201,7 +203,7 @@ docker stop nextcloud-container || true
 - Re-run make local to rebuild and restart the environment.
 
 Notes:
-- SMTP testing (smtp4dev) is available when using the Docker Compose-based test setup; it listens on http://localhost:8081. The simple make local flow runs a single Nextcloud container on port 8080.
+- SMTP testing (smtp4dev) is available when using make target `make prod`; it listens on http://localhost:8081. The simple `make local` flow runs a single Nextcloud container on port 8080.
 - The helper script scripts/run-app.sh orchestrates CI and test flows; for local development, stick to the Make targets above.
 
 ### Useful commands
@@ -217,7 +219,7 @@ Notes:
 
 ### Smtp4Dev
 
-When developing locally, SMTP4Dev is launched on port 8081 to simulate sending emails through the app.
+When developing locally, SMTP4Dev is launched on make target `make prod` on port 8081 to simulate sending emails through the app.
 
 For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
 
