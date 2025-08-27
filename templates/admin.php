@@ -142,13 +142,6 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 			</td>
 			<td><div title="<?php p($l->t('If a user tries to upload an infected file an email is send to all \'Notify Mails\' receiver'));?>" class="visible"><label><?php p($l->t('Send mails on infected file upload'));?></label></div></td>
 		</tr>
-		<tr>
-			<td>
-				<input id="send_summary_mail_for_malicious_files" class="toggle-round" type="checkbox">
-				<label for="send_summary_mail_for_malicious_files"></label>
-			</td>
-			<td><div title="<?php p($l->t('Send a summary of found malicious files to all \'Notify Mails\' receiver'));?>" class="visible"><label><?php p($l->t('Send weekly mails with a summary of malicious files'));?></label></div></td>
-		</tr>
 	</table>
 	<h3>
 		<label><?php p($l->t('Files scanned: '));?></label>

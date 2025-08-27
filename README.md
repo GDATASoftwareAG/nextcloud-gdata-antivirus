@@ -59,7 +59,7 @@ The app offers a variety of settings to customize the behavior of the antivirus.
 
 - **Authentication Method:** If you have created your own account on https://vaas.gdata.de/login, select 'Resource Owner Password Flow' here. If you have received access data from your provider (Client ID and Secret), select 'Client Credentials Flow'.
 - **Scan only this:** Equivalent to an allowlist. If the values here are separated by commas, e.g. "Documents, .exe, Scan", only those containing the corresponding values in the path are scanned. In this example, *.exe files and the contents of the Documents/ and Scan/ folders would be scanned.
-- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.time until all files are scanned. Recommended are values between 10 and 100.
+- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.
 - **Quarantine folder:** If an existing file is found to be malicious, it is moved to this folder in the user's home directory. If the folder does not exist, it is created automatically. If you do not want to use a quarantine folder, leave this field empty.
 - **Notify mails:** If an email address is entered here (or multiple comma seperated), a notification is sent to this address when a user uploads a file that is found to be malicious.
 - **Maximum scan size:** Files larger than this size (in MB) are not scanned and tagged as "Won't Scan". Recommended values are between 10 and 300 MB.
