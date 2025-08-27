@@ -42,7 +42,7 @@ class TagUnscannedCommand extends Command {
 	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
-		$logger->info('taggings files as unscanned');
+		$logger->info('tagging files as unscanned');
 		$start = microtime(true);
 		$taggedFilesCount = $this->tagUnscannedService
 			->withLogger($logger)

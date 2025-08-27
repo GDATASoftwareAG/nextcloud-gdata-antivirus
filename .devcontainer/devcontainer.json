@@ -12,10 +12,10 @@
         "jetmartin.bats",
         "ms-azuretools.vscode-containers",
         "github.vscode-github-actions",
-        "ms-vscode.makefile-tools",
         "ms-vscode-remote.remote-containers",
         "DEVSENSE.phptools-vscode",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "timonwong.shellcheck"
       ]
     }
   },

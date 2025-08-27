@@ -80,12 +80,6 @@ class VerdictService {
 	public function scanFileById(int $fileId): VaasVerdict {
 		$node = $this->fileService->getNodeFromFileId($fileId);
 		$filePath = $node->getStorage()->getLocalFile($node->getInternalPath());
-		if (file_exists($filePath) === false) {
-			$this->logger->debug('Could not Scan File. File does not exist: ' . $filePath);
-		}
-		if (is_dir($filePath)) {
-			$this->logger->debug('Could not Scan File. File is a directory: ' . $filePath);
-		}
 		if (self::isFileTooLargeToScan($filePath)) {
 			$this->tagService->setTag($fileId, TagService::WONT_SCAN, silent: true);
 			throw new EntityTooLargeException('File is too large');
@@ -127,7 +121,6 @@ class VerdictService {
 	 */
 	public function isAllowedToScan(string $filePath): bool {
 		$doNotScanThis = $this->getDoNotScanThis();
-		$this->logger->debug('doNotScanThis: ' . implode(', ', $doNotScanThis));
 		foreach ($doNotScanThis as $doNotScanThisItem) {
 			if (str_contains(strtolower($filePath), strtolower($doNotScanThisItem))) {
 				return false;
@@ -137,7 +130,6 @@ class VerdictService {
 		if (count($scanOnlyThis) === 0) {
 			return true;
 		}
-		$this->logger->debug('scanOnlyThis: ' . implode(', ', $scanOnlyThis));
 		foreach ($scanOnlyThis as $scanOnlyThisItem) {
 			if (str_contains(strtolower($filePath), strtolower($scanOnlyThisItem))) {
 				return true;
