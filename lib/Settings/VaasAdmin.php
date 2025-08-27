@@ -45,8 +45,6 @@ class VaasAdmin implements ISettings {
 			'quarantineFolder'
 				=> $this->config->getValueString(Application::APP_ID, 'quarantineFolder', 'Quarantine'),
 			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles'),
-			'scanOnlyNewFiles'
-				=> $this->config->getValueBool(Application::APP_ID, 'scanOnlyNewFiles', true),
 			'prefixMalicious'
 				=> $this->config->getValueBool(Application::APP_ID, 'prefixMalicious', true),
 			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag'),
@@ -55,7 +53,6 @@ class VaasAdmin implements ISettings {
 			'notifyMail' => $this->config->getValueString(Application::APP_ID, 'notifyMails'),
 			'sendMailOnVirusUpload'
 				=> $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload'),
-			'notifyAdminEnabled' => $this->config->getValueBool(Application::APP_ID, 'notifyAdminEnabled'),
 			'maxScanSizeInMB'
 				=> $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256),
 			'timeout' => $this->config->getValueInt(Application::APP_ID, 'timeout', 300),
