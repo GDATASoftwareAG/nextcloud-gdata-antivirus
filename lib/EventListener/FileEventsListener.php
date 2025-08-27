@@ -80,12 +80,27 @@ class FileEventsListener implements IEventListener {
 			}
 
 			if ($verdict->verdict->value == TagService::MALICIOUS) {
-				$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
-				$this->fileService->deleteFile($node->getId());
-				if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
-					$this->mailService->notifyMaliciousUpload(
-						$verdict, $node->getPath(), $this->userSession->getUser()->getUID(), $node->getSize()
-					);
+				try {
+					$this->sendErrorResponse(new VirusFoundException($verdict, $node->getName(), $node->getId()));
+					$this->fileService->deleteFile($node->getId());
+					if ($this->appConfig->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload')) {
+						$this->mailService->notifyMaliciousUpload(
+							$verdict, $node->getPath(), $this->userSession->getUser()->getUID(), $node->getSize()
+						);
+					}
+				} catch (Exception $e) {
+					try {
+						$this->fileService->setMaliciousPrefixIfActivated($node->getId());
+						$this->fileService->moveFileToQuarantineFolderIfDefined($node->getId());
+						$this->logger->error(
+							"Failed to block upload of malicious file '{$node->getName()}'.
+							File was quarantined instead. Error: {$e->getMessage()}"
+						);
+					} catch (Exception $e) {
+						$this->logger->error(
+							"Failed to set malicious prefix or move file to quarantine for '{$node->getName()}'. Error: {$e->getMessage()}"
+						);
+					}
 				}
 				exit;
 			}

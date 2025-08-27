@@ -8,6 +8,7 @@ namespace OCA\GDataVaas\Controller;
 
 use Exception;
 use OCA\GDataVaas\AppInfo\Application;
+use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -17,17 +18,30 @@ use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Verdict;
 
 class ScanController extends Controller {
+	private readonly LoggerInterface $logger;
 	private IAppConfig $config;
 	private VerdictService $verdictService;
+	private FileService $fileService;
 
-	public function __construct($appName, IRequest $request, VerdictService $verdictService, IAppConfig $config) {
+	public function __construct(
+		$appName,
+		IRequest $request,
+		VerdictService $verdictService,
+		IAppConfig $config,
+		FileService $fileService,
+		LoggerInterface $logger,
+	) {
 		parent::__construct($appName, $request);
 
+		$this->logger = $logger;
 		$this->config = $config;
 		$this->verdictService = $verdictService;
+		$this->fileService = $fileService;
 	}
 
 	/**
@@ -39,6 +53,14 @@ class ScanController extends Controller {
 	public function scan(int $fileId): JSONResponse {
 		try {
 			$verdict = $this->verdictService->scanFileById($fileId);
+			if ($verdict->verdict === Verdict::MALICIOUS) {
+				try {
+					$this->fileService->setMaliciousPrefixIfActivated($fileId);
+					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+				} catch (Exception $e) {
+					$this->logger->error("Failed to handle malicious file '{$fileId}': {$e->getMessage()}");
+				}
+			}
 			return new JSONResponse(['verdict' => $verdict->verdict->value], 200);
 		} catch (EntityTooLargeException) {
 			return new JSONResponse(

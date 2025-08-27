@@ -246,11 +246,6 @@ class VerdictService {
 		switch ($tagName) {
 			case TagService::MALICIOUS:
 				$this->tagService->setTag($fileId, TagService::MALICIOUS, silent: false);
-				try {
-					$this->fileService->setMaliciousPrefixIfActivated($fileId);
-					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
-				} catch (Exception) {
-				}
 				break;
 			case TagService::PUP:
 				$this->tagService->setTag($fileId, TagService::PUP, silent: false);

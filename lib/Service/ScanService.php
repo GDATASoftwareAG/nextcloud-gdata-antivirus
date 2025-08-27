@@ -14,6 +14,7 @@ use OCP\Files\NotPermittedException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Verdict;
 
 class ScanService {
 
@@ -60,7 +61,15 @@ class ScanService {
 		$fileIds = $this->getFileIdsToScan();
 		foreach ($fileIds as $fileId) {
 			try {
-				$this->verdictService->scanFileById($fileId);
+				$verdict = $this->verdictService->scanFileById($fileId);
+				if ($verdict->verdict === Verdict::MALICIOUS) {
+					try {
+						$this->fileService->setMaliciousPrefixIfActivated($fileId);
+						$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+					} catch (Exception $e) {
+						$this->logger->error("Failed to handle malicious file '{$fileId}': {$e->getMessage()}");
+					}
+				}
 				$scanned += 1;
 			} catch (EntityTooLargeException) {
 				$this->logger->error(
