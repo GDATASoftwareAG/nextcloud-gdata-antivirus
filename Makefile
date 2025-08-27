@@ -15,7 +15,7 @@ all: build
 
 # Fetches dependencies and builds it
 .PHONY: build
-build:
+build: oc
 ifneq (,$(wildcard $(CURDIR)/composer.json))
 	make composer
 endif
@@ -36,7 +36,7 @@ endif
 # Installs and updates the composer dependencies. If composer is not installed
 # a copy is fetched from the web
 .PHONY: composer
-composer:
+composer: oc
 ifeq (,$(composer))
 	@echo "No composer command available, downloading a copy from the web"
 	mkdir -p $(build_tools_directory)
@@ -95,7 +95,6 @@ distclean: clean
 	rm -rf node_modules
 	rm -rf js/vendor
 	rm -rf js/node_modules
-	rm -rf nextcloud-server
 	rm -rf build
 	rm -f composer.lock
 
@@ -120,6 +119,7 @@ appstore: build
 	--exclude-vcs \
 	--exclude="$(source_build_directory)/.git" \
 	--exclude="$(source_build_directory)/.github" \
+	--exclude="$(source_build_directory)/nextcloud-server" \
 	--exclude="$(source_build_directory)/composer.json" \
 	--exclude="$(source_build_directory)/composer.json.license" \
 	--exclude="$(source_build_directory)/babel.config.js" \
