@@ -24,7 +24,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function emergency($message, array $context = []): void {
 		$this->consoleOutput->writeln("<error>[emergency] $message</error>");
 
@@ -36,7 +35,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function alert($message, array $context = []): void {
 		$this->consoleOutput->writeln("<error>[alert] $message</error>");
 
@@ -48,7 +46,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function critical($message, array $context = []): void {
 		$this->consoleOutput->writeln("<error>[critical] $message</error>");
 
@@ -60,7 +57,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function error($message, array $context = []): void {
 		$this->consoleOutput->writeln("<error>[error] $message</error>");
 
@@ -72,7 +68,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function warning($message, array $context = []): void {
 		$this->consoleOutput->writeln("[warning] $message");
 
@@ -84,7 +79,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function notice($message, array $context = []): void {
 		$this->consoleOutput->writeln("<info>[notice] $message</info>");
 
@@ -96,7 +90,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function info($message, array $context = []): void {
 		$this->consoleOutput->writeln("<info>[info] $message</info>");
 
@@ -108,7 +101,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function debug($message, array $context = []): void {
 		if ($this->consoleOutput->getVerbosity() < OutputInterface::VERBOSITY_DEBUG) {
 			return;
@@ -125,7 +117,6 @@ class ConsoleCommandLogger implements LoggerInterface {
 	 * @param array $context
 	 * @return void
 	 */
-	#[\Override]
 	public function log($level, $message, array $context = []): void {
 		$this->consoleOutput->writeln("<info>[log] $message</info>");
 

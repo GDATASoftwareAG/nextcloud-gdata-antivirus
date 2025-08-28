@@ -49,7 +49,6 @@ class Application extends App implements IBootstrap {
 	 * @param IRegistrationContext $context
 	 * @return void
 	 */
-	#[\Override]
 	public function register(IRegistrationContext $context): void {
 		require_once file_exists(__DIR__ . '/../../vendor/scoper-autoload.php')
 			? __DIR__ . '/../../vendor/scoper-autoload.php'
@@ -74,7 +73,6 @@ class Application extends App implements IBootstrap {
 		FileEventsListener::register($context);
 	}
 
-	#[\Override]
 	public function boot(IBootContext $context): void {
 	}
 }

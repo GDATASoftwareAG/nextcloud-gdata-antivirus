@@ -30,14 +30,12 @@ class RemoveTagCommand extends Command {
 	/**
 	 * @return void
 	 */
-	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:remove-tag');
 		$this->setDescription('deletes a tag');
 		$this->addArgument(self::TAG_NAME, InputArgument::REQUIRED, 'Tag name want to delete.');
 	}
 
-	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$tagName = $input->getArgument('tag-name');

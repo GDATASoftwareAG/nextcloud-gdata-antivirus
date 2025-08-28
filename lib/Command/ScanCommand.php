@@ -35,7 +35,6 @@ class ScanCommand extends Command {
 	/**
 	 * @return void
 	 */
-	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:scan');
 		$this->setDescription('scan files for malware');
@@ -47,7 +46,6 @@ class ScanCommand extends Command {
 	 * @return int
 	 * @throws Exception
 	 */
-	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$logger->info('scanning files');

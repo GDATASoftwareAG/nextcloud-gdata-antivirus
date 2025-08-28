@@ -30,7 +30,6 @@ class GetTagIdCommand extends Command {
 	/**
 	 * @return void
 	 */
-	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:get-tag-id');
 		$this->setDescription('Gets the ID of a tag');
@@ -39,7 +38,6 @@ class GetTagIdCommand extends Command {
 		);
 	}
 
-	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$tagName = $input->getArgument('tag-name');

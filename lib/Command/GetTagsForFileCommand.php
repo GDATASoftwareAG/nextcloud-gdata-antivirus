@@ -44,7 +44,6 @@ class GetTagsForFileCommand extends Command {
 	/**
 	 * @return void
 	 */
-	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:get-tags-for-file');
 		$this->setDescription('get tags for file');
@@ -62,7 +61,6 @@ class GetTagsForFileCommand extends Command {
 	 * @throws NotFoundException
 	 * @throws NotPermittedException
 	 */
-	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 

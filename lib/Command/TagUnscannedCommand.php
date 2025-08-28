@@ -30,7 +30,6 @@ class TagUnscannedCommand extends Command {
 	/**
 	 * @return void
 	 */
-	#[\Override]
 	protected function configure(): void {
 		$this->setName('gdatavaas:tag-unscanned');
 		$this->setDescription('tags all files without tag from this app as unscanned');
@@ -39,7 +38,6 @@ class TagUnscannedCommand extends Command {
 	/**
 	 * @throws Exception
 	 */
-	#[\Override]
 	protected function execute(InputInterface $input, OutputInterface $output): int {
 		$logger = new ConsoleCommandLogger($this->logger, $output);
 		$logger->info('tagging files as unscanned');

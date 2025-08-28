@@ -33,7 +33,6 @@ class ScanJob extends TimedJob {
 	 * @return void
 	 * @throws Exception if the database platform is not supported
 	 */
-	#[\Override]
 	protected function run($argument): void {
 		$autoScan = $this->appConfig->getValueBool(Application::APP_ID, 'autoScanFiles');
 		if (!$autoScan) {

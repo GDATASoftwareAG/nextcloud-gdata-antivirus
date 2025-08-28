@@ -29,7 +29,6 @@ class TagUnscannedJob extends TimedJob {
 	 * @return void
 	 * @throws Exception if the database platform is not supported
 	 */
-	#[\Override]
 	protected function run($argument): void {
 		$this->tagUnscannedService->run();
 	}

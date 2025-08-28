@@ -19,7 +19,6 @@ class VaasAdmin implements ISettings {
 		$this->config = $config;
 	}
 
-	#[\Override]
 	public function getForm(): TemplateResponse {
 		$params = [
 			'username' => $this->config->getValueString(Application::APP_ID, 'username'),
@@ -63,12 +62,10 @@ class VaasAdmin implements ISettings {
 		return new TemplateResponse(Application::APP_ID, 'admin', $params);
 	}
 
-	#[\Override]
 	public function getSection(): string {
 		return 'vaas';
 	}
 
-	#[\Override]
 	public function getPriority(): int {
 		return 10;
 	}

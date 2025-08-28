@@ -15,22 +15,18 @@ class VaasAdminSection implements IIconSection {
 	) {
 	}
 
-	#[\Override]
 	public function getName(): string {
 		return 'G DATA Antivirus';
 	}
 
-	#[\Override]
 	public function getID(): string {
 		return 'vaas';
 	}
 
-	#[\Override]
 	public function getPriority(): int {
 		return 40;
 	}
 
-	#[\Override]
 	public function getIcon(): string {
 		return $this->urlGenerator->imagePath('gdatavaas', 'gdatalogo.svg');
 	}
