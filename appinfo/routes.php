@@ -12,8 +12,6 @@ return [
 		['name' => 'settings#setadvancedconfig', 'url' => '/setadvancedconfig', 'verb' => 'POST'],
 		['name' => 'settings#setAutoScan', 'url' => '/setAutoScan', 'verb' => 'POST'],
 		['name' => 'settings#getAutoScan', 'url' => '/getAutoScan', 'verb' => 'GET'],
-		['name' => 'settings#setScanOnlyNewFiles', 'url' => '/setScanOnlyNewFiles', 'verb' => 'POST'],
-		['name' => 'settings#getScanOnlyNewFiles', 'url' => '/getScanOnlyNewFiles', 'verb' => 'GET'],
 		['name' => 'settings#setPrefixMalicious', 'url' => '/setPrefixMalicious', 'verb' => 'POST'],
 		['name' => 'settings#getPrefixMalicious', 'url' => '/getPrefixMalicious', 'verb' => 'GET'],
 		['name' => 'settings#getAuthMethod', 'url' => '/getAuthMethod', 'verb' => 'GET'],
@@ -23,7 +21,8 @@ return [
 		['name' => 'settings#getCounters', 'url' => '/getCounters', 'verb' => 'GET'],
 		['name' => 'settings#getSendMailOnVirusUpload', 'url' => '/getSendMailOnVirusUpload', 'verb' => 'GET'],
 		['name' => 'settings#setSendMailOnVirusUpload', 'url' => '/setSendMailOnVirusUpload', 'verb' => 'POST'],
-		['name' => 'settings#getSendMailSummaryOfMaliciousFiles', 'url' => '/getSendMailSummaryOfMaliciousFiles', 'verb' => 'GET'],
-		['name' => 'settings#setSendMailSummaryOfMaliciousFiles', 'url' => '/setSendMailSummaryOfMaliciousFiles', 'verb' => 'POST']
+		['name' => 'settings#testsettings', 'url' => '/testsettings', 'verb' => 'POST'],
+		['name' => 'settings#getCache', 'url' => '/getCache', 'verb' => 'GET'],
+		['name' => 'settings#getHashlookup', 'url' => '/getHashlookup', 'verb' => 'GET']
 	]
 ];

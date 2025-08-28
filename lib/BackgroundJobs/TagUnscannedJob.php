@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\BackgroundJobs;
 
 use OCA\GDataVaas\Service\TagUnscannedService;
@@ -9,6 +13,7 @@ use OCP\DB\Exception;
 
 class TagUnscannedJob extends TimedJob {
 	private TagUnscannedService $tagUnscannedService;
+
 	public function __construct(ITimeFactory $time, TagUnscannedService $tagUnscannedService) {
 		parent::__construct($time);
 
@@ -24,6 +29,7 @@ class TagUnscannedJob extends TimedJob {
 	 * @return void
 	 * @throws Exception if the database platform is not supported
 	 */
+	#[\Override]
 	protected function run($argument): void {
 		$this->tagUnscannedService->run();
 	}

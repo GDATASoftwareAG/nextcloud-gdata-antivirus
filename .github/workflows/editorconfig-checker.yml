@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: editorconfig-checker
+
+on: pull_request
+
+jobs:
+  editorconfig:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: editorconfig-checker/action-editorconfig-checker@main
+      - run: editorconfig-checker -exclude "\.sh|\.ya?ml|\.md|\.gitignore|\.json|admin\.php|Dockerfile\.Nextcloud|\.txt|Makefile|\.xml|\.bats|\.env-test|\.ini"

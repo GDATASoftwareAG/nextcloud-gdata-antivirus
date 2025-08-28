@@ -1,20 +1,12 @@
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 services:
   nextcloud-container:
-    build:
-      context: .
-      dockerfile: Dockerfile.Nextcloud
-      args:
-        - NEXTCLOUD_VERSION=${NEXTCLOUD_VERSION:-31.0.0}
-        - INSTALL_XDEBUG=${INSTALL_XDEBUG:-1}
-    environment:
-      XDEBUG_MODE: ${XDEBUG_MODE:-develop}
+    image: nextcloud:31.0.8
     ports:
-      - "80:80"
-    privileged: true
-    # cap_add:
-    #   - SYS_PTRACE
-    #   - SYS_ADMIN
-    #   - NET_ADMIN
+      - "8080:80"
     container_name: nextcloud-container
     hostname: nextcloud-container
     depends_on:
@@ -23,7 +15,7 @@ services:
     networks:
       nextcloud-network:
   smtp:
-    image: rnwood/smtp4dev:v3
+    image: rnwood/smtp4dev:latest
     container_name: smtp
     hostname: smtp
     restart: unless-stopped

@@ -1,4 +1,8 @@
-name: Build and Test
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+name: Tests
 
 defaults:
   run:
@@ -11,21 +15,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  define-matrix:
-    runs-on: ubuntu-latest
-    outputs:
-      nextcloud_versions: ${{ steps.get-matrix.outputs.nextcloud_versions }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: get-matrix
-        run: echo "nextcloud_versions=$(./get-matrix.sh)" | tee -a "$GITHUB_OUTPUT"
-
   build-devcontainer:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3 
+        uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -37,19 +32,15 @@ jobs:
           cacheFrom: ghcr.io/gdatasoftwareag/nextcloud/builder
           push: always
 
-  test:
+  tests:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/gdatasoftwareag/nextcloud/builder:latest
       env:
-        IS_CI: true
+        IS_CI: 1
       options: --name nextcloud-antivirus-build-container
     needs: 
-      - define-matrix
       - build-devcontainer
-    strategy:
-      matrix:
-        nextcloud_version: ${{fromJson(needs.define-matrix.outputs.nextcloud_versions)}}
     steps:
       - uses: actions/checkout@v4
 
@@ -60,7 +51,6 @@ jobs:
       - name: add composer bin to path
         run: |
           echo $(composer config home --global)/vendor/bin >> $GITHUB_PATH
-          echo "/home/vscode/bin/" >> $GITHUB_PATH
 
       - name: replace version in ./appinfo/info.xml
         if: startsWith(github.ref, 'refs/tags/')
@@ -86,7 +76,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: ./install.sh ${{ matrix.nextcloud_version }} 1
+        run: ./scripts/run-app.sh 31.0.8 1
 
       - name: add builder into nextcloud network
         run: |
@@ -104,61 +94,11 @@ jobs:
             echo "bats_run=fail" | tee -a "$GITHUB_OUTPUT";
           fi
 
-      - uses: actions/upload-artifact@master
-        with:
-          overwrite: true
-          name: core-dump
-          path: coredumps/*
-
       - name: fail if bats tests did fail
         if: steps.bats-tests.outputs.bats_run == 'fail'
         run: exit 1
 
       - uses: actions/upload-artifact@master
         with:
-          overwrite: true
           name: build-dir
           path: build/
-
-  release:
-    needs:
-      - test
-      - define-matrix
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/download-artifact@master
-        with:
-          name: build-dir
-          path: build/
-
-      - name: write version to output
-        id: write-version-to-output
-        run: |
-          RELEASE_VERSION=${GITHUB_REF#refs/tags/}
-          echo "RELEASE_VERSION=$RELEASE_VERSION" >> $GITHUB_OUTPUT
-
-      - name: Github Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: build/artifacts/*
-
-      - name: Attach tarball to github release
-        uses: svenstaro/upload-release-action@v2
-        id: attach_to_release
-        with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ./build/artifacts/gdatavaas.tar.gz
-          asset_name: gdatavaas.tar.gz
-          tag: ${{ github.ref }}
-          overwrite: true
-
-      - name: Upload app to Nextcloud appstore
-        uses: nextcloud-releases/nextcloud-appstore-push-action@v1
-        with:
-          app_name: gdatavaas
-          appstore_token: ${{ secrets.VAAS_APPSTORE_TOKEN }}
-          download_url: ${{ steps.attach_to_release.outputs.browser_download_url }}
-          app_private_key: ${{ secrets.VAAS_NEXTCLOUD_KEY }}

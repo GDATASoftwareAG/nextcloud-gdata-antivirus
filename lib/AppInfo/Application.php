@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
@@ -40,31 +44,37 @@ class Application extends App implements IBootstrap {
 		});
 	}
 
-    /**
-     * Load the composer autoloader if it exists
-     * @param \OCP\AppFramework\Bootstrap\IRegistrationContext $context
-     * @return void
-     */
+	/**
+	 * Load the composer autoloader if it exists
+	 * @param IRegistrationContext $context
+	 * @return void
+	 */
+	#[\Override]
 	public function register(IRegistrationContext $context): void {
 		require_once file_exists(__DIR__ . '/../../vendor/scoper-autoload.php')
 			? __DIR__ . '/../../vendor/scoper-autoload.php'
 			: __DIR__ . '/../../vendor/autoload.php';
-		
+
 		// Manually register TagService so that we can customize the DI used for $silentTagMapper
 		$context->registerService(TagService::class, function ($c) {
 			$logger = $c->get(LoggerInterface::class);
 			$systemTagManager = $c->get(ISystemTagManager::class);
 			$standardTagMapper = $c->get(ISystemTagObjectMapper::class);
 			$dbConnection = $c->get(IDBConnection::class);
-			$silentTagMapper = SystemTagObjectMapperWithoutActivityFactory::createSilentSystemTagObjectMapper($dbConnection, $systemTagManager);
+			$silentTagMapper
+				= SystemTagObjectMapperWithoutActivityFactory::createSilentSystemTagObjectMapper(
+					$dbConnection,
+					$systemTagManager
+				);
 			$dbFileMapper = $c->get(DbFileMapper::class);
-			
+
 			return new TagService($logger, $systemTagManager, $standardTagMapper, $silentTagMapper, $dbFileMapper);
 		});
 
 		FileEventsListener::register($context);
 	}
 
+	#[\Override]
 	public function boot(IBootContext $context): void {
 	}
 }

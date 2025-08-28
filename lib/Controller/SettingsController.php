@@ -1,28 +1,60 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Controller;
 
 use OCA\GDataVaas\Service\TagService;
+use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
 use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
 use OCP\Mail\IMailer;
+use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Options\VaasOptions;
+use VaasSdk\Vaas;
+use VaasSdk\Verdict;
 
 class SettingsController extends Controller {
 	private IAppConfig $config;
 	private TagService $tagService;
 	private IMailer $mailer;
+	private VerdictService $verdictService;
 
-	public function __construct($appName, IRequest $request, IAppConfig $config, TagService $tagService, IMailer $mailer) {
+	public function __construct(
+		$appName,
+		IRequest $request,
+		IAppConfig $config,
+		TagService $tagService,
+		IMailer $mailer,
+		VerdictService $verdictService,
+	) {
 		parent::__construct($appName, $request);
 		$this->config = $config;
 		$this->tagService = $tagService;
 		$this->mailer = $mailer;
+		$this->verdictService = $verdictService;
 	}
 
-	public function setconfig($username, $password, $clientId, $clientSecret, $authMethod, $quarantineFolder, $scanOnlyThis, $doNotScanThis, $notifyMails): JSONResponse {
+	public function setconfig(
+		$username,
+		$password,
+		$clientId,
+		$clientSecret,
+		$authMethod,
+		$quarantineFolder,
+		$scanOnlyThis,
+		$doNotScanThis,
+		$notifyMails,
+		$maxScanSize,
+		$timeout,
+		bool $cache,
+		bool $hashlookup,
+	): JSONResponse {
 		if (!empty($notifyMails)) {
 			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
 			foreach ($mails as $mail) {
@@ -30,6 +62,12 @@ class SettingsController extends Controller {
 					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
 				}
 			}
+		}
+		if ((int)$maxScanSize < 1) {
+			return new JSONResponse(['status' => 'error', 'message' => 'Invalid max scan size: ' . $maxScanSize]);
+		}
+		if ((int)$timeout < 1) {
+			return new JSONResponse(['status' => 'error', 'message' => 'Invalid timeout: ' . $timeout]);
 		}
 		$this->config->setValueString($this->appName, 'username', $username);
 		$this->config->setValueString($this->appName, 'password', $password);
@@ -40,6 +78,10 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
 		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
 		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
+		$this->config->setValueInt($this->appName, 'maxScanSizeInMB', (int)$maxScanSize);
+		$this->config->setValueInt($this->appName, 'timeout', (int)$timeout);
+		$this->config->setValueBool($this->appName, 'cache', $cache);
+		$this->config->setValueBool($this->appName, 'hashlookup', $hashlookup);
 		return new JSONResponse(['status' => 'success']);
 	}
 
@@ -56,15 +98,6 @@ class SettingsController extends Controller {
 
 	public function getAutoScan(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'autoScanFiles')]);
-	}
-
-	public function setScanOnlyNewFiles(bool $scanOnlyNewFiles): JSONResponse {
-		$this->config->setValueBool($this->appName, 'scanOnlyNewFiles', $scanOnlyNewFiles);
-		return new JSONResponse(['status' => 'success']);
-	}
-
-	public function getScanOnlyNewFiles(): JSONResponse {
-		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'scanOnlyNewFiles')]);
 	}
 
 	public function setPrefixMalicious(bool $prefixMalicious): JSONResponse {
@@ -109,9 +142,11 @@ class SettingsController extends Controller {
 			'scanned' => $filesCount['scanned']
 		]);
 	}
-	
+
 	public function getSendMailOnVirusUpload(): JSONResponse {
-		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]);
+		return new JSONResponse(
+			['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]
+		);
 	}
 
 	public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
@@ -119,12 +154,35 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
-	public function getSendMailSummaryOfMaliciousFiles(): JSONResponse {
-		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'notifyAdminEnabled')]);
+	public function testSettings(string $tokenEndpoint, string $vaasUrl): JSONResponse {
+		try {
+			$authenticator = $this->verdictService->getAuthenticator($this->verdictService->authMethod, $tokenEndpoint);
+			$options = new VaasOptions(true, true, $vaasUrl);
+			$vaas = Vaas::builder()
+				->withAuthenticator($authenticator)
+				->withOptions($options)
+				->build();
+			$verdict = $vaas->forUrlAsync('https://www.gdata.de')->await();
+			if ($verdict->verdict === Verdict::CLEAN) {
+				return new JSONResponse(['status' => 'success']);
+			}
+			return new JSONResponse(['status' => 'error', 'message' => 'Test URL verdict: ' . $verdict->verdict->value]);
+		} catch (VaasAuthenticationException $e) {
+			return new JSONResponse([
+				'status' => 'error',
+				'message' => 'Authentication failed. Please also check your login details above and save them before
+				taking the test. ' . $e->getMessage()
+			]);
+		} catch (\Exception $e) {
+			return new JSONResponse(['status' => 'error', 'message' => $e->getMessage()]);
+		}
 	}
 
-	public function setSendMailSummaryOfMaliciousFiles(bool $sendMailSummaryOfMaliciousFiles): JSONResponse {
-		$this->config->setValueBool($this->appName, 'notifyAdminEnabled', $sendMailSummaryOfMaliciousFiles);
-		return new JSONResponse(['status' => 'success']);
+	public function getCache(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'cache', true)]);
+	}
+
+	public function getHashlookup(): JSONResponse {
+		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'hashlookup', true)]);
 	}
 }

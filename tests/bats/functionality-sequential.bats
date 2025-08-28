@@ -1,8 +1,12 @@
 #!/usr/bin/env bats
 
+# SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 setup_file() {
     source tests/bats/.env-test || return 1
-    source .env-local || echo "No .env-local file found."
+    source .env-local || source .env || echo "No .env files found."
     mkdir -p $FOLDER_PREFIX/
     curl --output $FOLDER_PREFIX/pup.exe http://amtso.eicar.org/PotentiallyUnwanted.exe
     $DOCKER_EXEC_WITH_USER --env OC_PASS=$TESTUSER_PASSWORD nextcloud-container php occ user:add $TESTUSER --password-from-env || echo "already exists"
@@ -12,7 +16,7 @@ setup_file() {
     BATS_NO_PARALLELIZE_WITHIN_FILE=true
     # this is cache busting
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ files:scan --all
-    docker exec nextcloud-container chown -R www-data:www-data /var/www/html/
+    $DOCKER_EXEC_WITH_USER nextcloud-container php occ app:enable gdatavaas
 }
 
 @test "test upload when vaas does not function" {
@@ -20,7 +24,7 @@ setup_file() {
     RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt)
     $DOCKER_EXEC_WITH_USER nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
-    
+
     echo "Actual: $RESULT"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]]
 }
@@ -62,7 +66,7 @@ setup_file() {
 
 @test "test croned scan for testuser files" {
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-    
+
     echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
     curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
     echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
@@ -99,7 +103,7 @@ setup_file() {
 @test "test when unscanned tag is deactivated" {
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="true"
-    
+
     echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
     echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
 
@@ -123,11 +127,11 @@ setup_file() {
 
     echo $RESULT
     [[ $RESULT =~ "Infected file upload" ]]
-    
-    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt  
+
+    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
 }
 
 tearddown_file() {
-    sleep 2   
+    sleep 2
     rm -rf $FOLDER_PREFIX/
 }

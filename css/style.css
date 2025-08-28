@@ -1,3 +1,9 @@
+/*
+ * SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+ *
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
 .input_field {
 	width: 100%;
 }
@@ -19,6 +25,10 @@ select {
 	box-sizing: border-box;
 }
 
+.basic_settings_table .input_field input[type=checkbox] {
+	margin: 8px 0 8px 50px;
+}
+
 input.toggle-round {
 	display: none;
 }
@@ -27,7 +37,7 @@ input.toggle-round+label {
 	display: block;
 	position: relative;
 	cursor: pointer;
-	margin-right: 20px;
+	margin-inline-end: 20px;
 	margin-top: 5px;
 	margin-bottom: 5px;
 	padding: 1px;
@@ -55,7 +65,7 @@ input.toggle-round:checked+label {
 }
 
 input.toggle-round:checked+label:after {
-	margin-left: 30px;
+	margin-inline-start: 30px;
 }
 
 #advanced_settings {

@@ -1,34 +1,17 @@
 <?php
 
-/**
- * @copyright Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
- *
- * @author Roeland Jago Douma <roeland@famdouma.nl>
- *
- * @license GNU AGPL version 3 or any later version
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation, either version 3 of the
- * License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+// Copyright (c) 2018 Roeland Jago Douma <roeland@famdouma.nl>
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
 
 namespace OCA\GDataVaas\Activity;
 
+use InvalidArgumentException;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\Activity\IEvent;
 use OCP\Activity\IProvider;
 use OCP\IURLGenerator;
-use OCP\L10N\IFactory;
 
 class Provider implements IProvider {
 	public const TYPE_VIRUS_DETECTED = 'virus_detected';
@@ -39,20 +22,17 @@ class Provider implements IProvider {
 
 	public const MESSAGE_FILE_DELETED = 'file_deleted';
 
-	/** @var IFactory */
-	private $languageFactory;
-
 	/** @var IURLGenerator */
-	private $urlGenerator;
+	private IURLGenerator $urlGenerator;
 
-	public function __construct(IFactory $languageFactory, IURLGenerator $urlGenerator) {
-		$this->languageFactory = $languageFactory;
+	public function __construct(IURLGenerator $urlGenerator) {
 		$this->urlGenerator = $urlGenerator;
 	}
 
-	public function parse($language, IEvent $event, ?IEvent $previousEvent = null) {
+	#[\Override]
+	public function parse($language, IEvent $event, ?IEvent $previousEvent = null): IEvent {
 		if ($event->getApp() !== Application::APP_ID || $event->getType() !== self::TYPE_VIRUS_DETECTED) {
-			throw new \InvalidArgumentException();
+			throw new InvalidArgumentException();
 		}
 
 		$parameters = [];

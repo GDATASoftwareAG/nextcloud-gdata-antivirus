@@ -3,6 +3,15 @@ SPDX-FileCopyrightText: Lennart Dohmann <lennart.dohmann@gdata.de>
 SPDX-License-Identifier: CC0-1.0
 -->
 
+[![Tests](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/tests.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/tests.yml)
+[![Static analysis](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/psalm-matrix.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/psalm-matrix.yml)
+[![REUSE Compliance Check](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/reuse.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/reuse.yml)
+[![Lint php-cs](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-php-cs.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-php-cs.yml)
+[![Lint php](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-php.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-php.yml)
+[![Lint info.xml](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-info-xml.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-info-xml.yml)
+[![Lint eslint](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-eslint.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/lint-eslint.yml)
+[![editorconfig-checker](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/editorconfig-checker.yml/badge.svg)](https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/actions/workflows/editorconfig-checker.yml)
+
 # G DATA Antivirus for Nextcloud
 
 ![Image](img/example.gif)
@@ -11,7 +20,7 @@ SPDX-License-Identifier: CC0-1.0
 
 Welcome to the G DATA Verdict-as-a-Service (VaaS) integration for Nextcloud. This project aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.
 
-VaaS scans files and tags them with either `Clean` or `Malicious` verdicts, providing users with immediate feedback about the safety of their files. Unscanned files are tagged as `Unscanned` and queued for background scanning.
+VaaS scans files and tags them with either `Clean`, `Malicious` or `PUP (Potentially Unwanted Program)` verdicts, providing users with immediate feedback about the safety of their files. Unscanned files are tagged as `Unscanned` and queued for background scanning.
 
 Verdict-as-a-Service is a cloud-based service provided by G DATA CyberDefense AG. It is designed to work on your own infrastructure as a self-hosted variant, ensuring a high level of security and privacy. If you are interested in using VaaS on-premise or have any questions, please contact vaas@gdata.de for more information or check out the [repository of our helm chart](https://github.com/GDATASoftwareAG/vaas-helm) for self-hosting the VaaS backend.
 
@@ -46,12 +55,20 @@ The support and maintenance of the versions of this app is based on the official
 
 ## Settings
 
-The app offers a variety of settings to customize the behavior of the antivirus. The settings can be found in the Nextcloud admin settings page under the "Verdict-as-a-Service" section.
+The app offers a variety of settings to customize the behavior of the antivirus. The settings can be found in the Nextcloud admin settings page under the "G DATA Antivirus" section.
 
-- **Authentication Method:** If you have created your own account on https://vaas.gdata.de/login, select 'Resource Owner Password Flow' here. If you have received access data from your provider (Client ID and Secret), select 'Client Credentials Flow'. You can simply leave the other fields empty.
+- **Authentication Method:** If you have created your own account on https://vaas.gdata.de/login, select 'Resource Owner Password Flow' here. If you have received access data from your provider (Client ID and Secret), select 'Client Credentials Flow'.
 - **Scan only this:** Equivalent to an allowlist. If the values here are separated by commas, e.g. "Documents, .exe, Scan", only those containing the corresponding values in the path are scanned. In this example, *.exe files and the contents of the Documents/ and Scan/ folders would be scanned.
-- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.time until all files are scanned. Recommended are values between 10 and 100.
+- **Do not scan this:** Equivalent to a blocklist. If there are values separated by commas, e.g. "Documents, .exe, Scan", these are not scanned.
+- **Quarantine folder:** If an existing file is found to be malicious, it is moved to this folder in the user's home directory. If the folder does not exist, it is created automatically. If you do not want to use a quarantine folder, leave this field empty.
+- **Notify mails:** If an email address is entered here (or multiple comma seperated), a notification is sent to this address when a user uploads a file that is found to be malicious.
+- **Maximum scan size:** Files larger than this size (in MB) are not scanned and tagged as "Won't Scan". Recommended values are between 10 and 300 MB.
+- **Timeout:** The time (in seconds) the app waits for a response from the VaaS backend before considering the scan as failed. Recommended values are between 10 and 300 seconds. Please note: If the timeout is set too short, it will restrict the scanning of large files, which take a little longer.
+- **Cache:** If this option is disabled, each file is always scanned again and no results are cached.
+- **Hash lookup:** During a hash lookup, the SHA256 checksum is transmitted to the G DATA Cloud before the scan to check whether a result is already available, thereby saving unnecessary network traffic, resource load, and time.
 - **Advanced Settings:** The token endpoint and the VaaS URL determine the scan backend. By default, the public G DATA Cloud is used for scanning. If the VaaS backend is self-hosted, the corresponding values for the self-hosted instance must be entered here.
+
+You can always hover over the settings name for more information.
 
 ## Self-hosting the scanning backend (VaaS)
 
@@ -74,7 +91,7 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:get-tags-for-file <file-path>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tags-for-file <file-path>`
 - **Arguments**:
-   - `<file-path>`: The path to the file (e.g., `username/files/filename`).
+    - `<file-path>`: The path to the file (e.g., `username/files/filename`).
 - **Details**: This command fetches and logs all tags associated with the specified file.
 
 #### `gdatavaas:remove-tag`
@@ -83,7 +100,7 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:remove-tag <tag-name>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:remove-tag <tag-name>`
 - **Arguments**:
-   - `<tag-name>`: The name of the tag to delete.
+    - `<tag-name>`: The name of the tag to delete.
 - **Details**: This command removes the specified tag from the system. If the tag does not exist, an error is logged.
 
 #### `gdatavaas:tag-unscanned`
@@ -99,48 +116,95 @@ The following commands are available for managing and interacting with the G DAT
 - **Usage**: `php occ gdatavaas:get-tag-id <tag-name>`
 - **Docker Usage**: `docker exec --user www-data nextcloud-container php occ gdatavaas:get-tag-id <tag-name>`
 - **Arguments**:
-   - `<tag-name>`: The name of the tag to get the ID for.
+    - `<tag-name>`: The name of the tag to get the ID for.
 - **Details**: This command retrieves and logs the ID of the specified tag. If the tag does not exist, an error is logged.
 
 ## Setting up a development environment
 
-Before you start, make sure you have the following tools installed:
+This project ships Make targets that set up and run a full Nextcloud dev instance in Docker.
 
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- [Composer](https://getcomposer.org/)
-- [Node.js](https://nodejs.org/en/)
-- [npm](https://www.npmjs.com/)
+The easiest way to get started is to use the Devcontainer with VSCode. It has all prerequisites installed and automatically mounts the app into the container.
 
-Also, you need to make an ```npm install```, ```npm run build``` and ```composer install``` to install dependencies and build the node modules.
-You always need to do this before you start the development environment or copy the app to your Nextcloud instance manually.
-If you copy the app directory manually in your Nextcloud instance you have to rename the folder to ```gdatavaas```. 
+But you can also set up the environment manually on your host machine:
 
-### Linux
-* Make sure you have the tools mentioned above installed.
-* With the provided `./install.sh` script you can install the dependencies and build the node modules.
+### Prerequisites
 
-### `install.sh` Script
+Install these locally (or ensure your devcontainer provides them):
 
-The `install.sh` script is used to set up and configure a Nextcloud instance with the G DATA VaaS app and Smtp4Dev. Below is an explanation of the script's features:
+- Docker and Docker Compose
+- GNU Make
+- Node.js 20.x and npm (used by make npm)
+- PHP CLI (8.1+)
+- Optional for tests and packaging:
+  - Bats (for make bats)
+  - php-scoper (only for make appstore - if you want to execute bats tests or want the production app, not development version)
 
-1. **Environment Variables in `.env-local`**:
-    - `CLIENT_ID`: Sets the client ID for the G DATA VaaS app.
-    - `CLIENT_SECRET`: Sets the client secret for the G DATA VaaS app.
-   
-   If you want to use the ResourceOwnerPasswordFlow you have to set these settings manually in the Nextcloud settings after the installation.
+Note: The Makefile will download composer.phar if Composer isn’t available, but it still requires a local PHP CLI to run it.
 
-2. **Specify the Nextcloud server version**:
-    - The Nextcloud version defaults to 30.0.0
-    - You can start the `install.sh` script with the desired Nextcloud version as an argument, e.g. `./install.sh 30`
+### Quick start: run Nextcloud with the app mounted
 
-3. **Smtp4Dev**:
-    - Starts a container with the Smtp4Dev tool to capture emails sent by Nextcloud.
-    - The tool is accessible at `http://localhost:8081` and can be used to view emails sent by Nextcloud.
+```bash
+# From the repository root
+make local
+```
 
-4. **Additional Install Script**:
-    - Sources `install.local` if it exists for any additional installation steps.
+What this does:
+- Builds backend and frontend assets (make build → make composer + make npm).
+- Starts a Nextcloud dev container on http://localhost:8080 and bind-mounts this app into /var/www/html/apps-extra/gdatavaas.
+- Installs PHP dependencies on the host so local tooling works.
 
+After the container is up, open Nextcloud at http://localhost:8080 and enable the app via the Apps UI:
+- Find `G DATA Antivirus` in your apps and click `Enable`.
+- Important: Enable only. Do not upgrade to the app store version. That overrides your local code in the container.
+
+### Day-to-day workflow
+
+- Edit PHP (server) code: changes are picked up immediately by the container via the bind mount; just refresh the page.
+- Edit frontend (JS/CSS/Vue): rebuild assets explicitly (no hot reload) and refresh the page without cache (CTRL + F5):
+
+```bash
+make npm
+```
+
+### Available Make targets
+
+- make prod
+  - Builds the app for production and deploys a production Nextcloud instance with the app inside. Sets everything up. Nextcloud on http://localhost:8080 and SMTP testing on http://localhost:8081. Code changes are not automatically picked up; you need to rebuild the container -> run `make prod` again.
+- make build
+  - Fetches PHP dependencies and builds frontend assets.
+- make composer
+  - Installs/upgrades PHP dependencies. If Composer isn’t installed, a local composer.phar is fetched and used.
+- make npm
+  - Installs Node dependencies and builds JS/CSS bundles. Re-run this whenever you change frontend code.
+- make oc
+  - Clones the Nextcloud server into ./nextcloud-server (used for local development that requires private OC namespaces).
+- make local
+  - Rebuilds the app and runs a Nextcloud dev container on http://localhost:8080 with this app mounted. Safe to re-run; it replaces any existing container named nextcloud-container.
+- make clean
+  - Removes the build/ directory.
+- make distclean
+  - Also removes vendor/, node_modules/, js/node_modules/, nextcloud-server/, composer.lock, etc.
+- make unittests
+  - Runs PHP unit tests via ./vendor/bin/phpunit using tests/unittests/bootstrap.php. Installs Composer deps first.
+- make bats
+  - Spins up a complete environment using Docker Compose and runs end-to-end Bats tests from tests/bats with the production build of the app.
+  - Requirements: Bats installed locally and two environment variables set: CLIENT_ID and CLIENT_SECRET (valid VaaS credentials).
+- make appstore
+  - Builds a distributable tarball at build/artifacts/gdatavaas.tar.gz. Intended for releases; requires php-scoper available in PATH.
+
+### Stopping and restarting
+
+- Stop/remove the dev container manually if needed:
+
+```bash
+docker stop nextcloud-container || true
+```
+
+- Re-run make local to rebuild and restart the environment.
+
+Notes:
+- SMTP testing (smtp4dev) is available when using make target `make prod`; it listens on http://localhost:8081. The simple `make local` flow runs a single Nextcloud container on port 8080.
+- The helper script scripts/run-app.sh orchestrates CI and test flows; for local development, stick to the Make targets above.
 
 ### Useful commands
 
@@ -155,8 +219,9 @@ The `install.sh` script is used to set up and configure a Nextcloud instance wit
 
 ### Smtp4Dev
 
-For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
+When developing locally, SMTP4Dev is launched on make target `make prod` on port 8081 to simulate sending emails through the app.
 
+For more information about Smtp4Dev, please refer to the [official README](https://github.com/rnwood/smtp4dev/blob/master/README.md).
 
 ### Configuring via the command line
 
@@ -195,8 +260,14 @@ php occ config:app:set gdatavaas doNotScanThis <string>
 php occ config:app:set gdatavaas notifyMail <email>
 # Whether to send email notifications on upload, when files are infected. Default: false
 php occ config:app:set gdatavaas sendMailOnVirusUpload <true|false>
-# Whether to send a weekly summary of malicious files to an administrator. Default: false
-php occ config:app:set gdatavaas notifyAdminEnabled <true|false>
+# Maximum file size (in MB) to scan. Default: 256
+php occ config:app:set gdatavaas maxScanSizeInMB <int>
+# Timeout (in seconds) for the VaaS backend. Default: 300
+php occ config:app:set gdatavaas timeout <int>
+# Whether to cache scan results. Default: true
+php occ config:app:set gdatavaas cache <true|false>
+# Whether to perform a hash lookup before uploading the file. Default: true
+php occ config:app:set gdatavaas hashlookup <true|false>
 ```
 
 You can also install and/or update the app via OCC:

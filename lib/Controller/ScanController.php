@@ -1,10 +1,14 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 namespace OCA\GDataVaas\Controller;
 
-use Coduo\PHPHumanizer\NumberHumanizer;
 use Exception;
-use GuzzleHttp\Exception\ServerException;
+use OCA\GDataVaas\AppInfo\Application;
+use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
@@ -12,16 +16,32 @@ use OCP\AppFramework\Http\JSONResponse;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\NotFoundException;
 use OCP\Files\NotPermittedException;
+use OCP\IAppConfig;
 use OCP\IRequest;
+use Psr\Log\LoggerInterface;
 use VaasSdk\Exceptions\VaasAuthenticationException;
+use VaasSdk\Verdict;
 
 class ScanController extends Controller {
+	private readonly LoggerInterface $logger;
+	private IAppConfig $config;
 	private VerdictService $verdictService;
+	private FileService $fileService;
 
-	public function __construct($appName, IRequest $request, VerdictService $verdictService) {
+	public function __construct(
+		$appName,
+		IRequest $request,
+		VerdictService $verdictService,
+		IAppConfig $config,
+		FileService $fileService,
+		LoggerInterface $logger,
+	) {
 		parent::__construct($appName, $request);
 
+		$this->logger = $logger;
+		$this->config = $config;
 		$this->verdictService = $verdictService;
+		$this->fileService = $fileService;
 	}
 
 	/**
@@ -29,21 +49,35 @@ class ScanController extends Controller {
 	 * @param int $fileId
 	 * @return JSONResponse
 	 */
-    #[NoAdminRequired]
-    public function scan(int $fileId): JSONResponse {
+	#[NoAdminRequired]
+	public function scan(int $fileId): JSONResponse {
 		try {
 			$verdict = $this->verdictService->scanFileById($fileId);
+			if ($verdict->verdict === Verdict::MALICIOUS) {
+				try {
+					$this->fileService->setMaliciousPrefixIfActivated($fileId);
+					$this->fileService->moveFileToQuarantineFolderIfDefined($fileId);
+				} catch (Exception $e) {
+					$this->logger->error("Failed to handle malicious file '{$fileId}': {$e->getMessage()}");
+				}
+			}
 			return new JSONResponse(['verdict' => $verdict->verdict->value], 200);
 		} catch (EntityTooLargeException) {
-			return new JSONResponse(['error' => "File $fileId is larger than " . NumberHumanizer::binarySuffix(VerdictService::MAX_FILE_SIZE, 'de')], 413);
+			return new JSONResponse(
+				['error' => 'File is larger than '
+					. $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256) . 'MB.'], 413);
 		} catch (NotFoundException) {
 			return new JSONResponse(['error' => "File $fileId not found"], 404);
 		} catch (NotPermittedException) {
-			return new JSONResponse(['error' => "Current settings do not permit scanning file with ID $fileId"], 403);
+			return new JSONResponse(
+				['error' => "Current settings do not permit scanning file with ID $fileId"], 403);
 		} catch (VaasAuthenticationException) {
-			return new JSONResponse(['error' => 'Authentication failed. Please check your credentials.'], 401);
+			return new JSONResponse(
+				['error' => 'Authentication failed. Please check your credentials.'], 401);
 		} catch (Exception) {
-            return new JSONResponse(['error' => "An unexpected error occurred while scanning file $fileId with GData VaaS. Please check the logs for more information and contact your administrator."], 500);
-        }
+			return new JSONResponse(
+				['error' => "An unexpected error occurred while scanning file $fileId with GData VaaS. Please
+				check the logs for more information and contact your administrator."], 500);
+		}
 	}
 }

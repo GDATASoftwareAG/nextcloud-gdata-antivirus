@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 declare(strict_types=1);
 use Isolated\Symfony\Component\Finder\Finder;
 
@@ -41,9 +45,9 @@ $excludedFolders = array_merge(
 				->files(),
 			false,
 		),
-));
+	));
 
-$excludedFiles = array_merge($excludedFiles, $excludedFolders); 
+$excludedFiles = array_merge($excludedFiles, $excludedFolders);
 
 return [
 	// The prefix configuration. If a non-null value is used, a random prefix
@@ -67,9 +71,7 @@ return [
 		Finder::create()
 			->files()
 			->notName('babel.config.js')
-			->notName('compose-install.yaml')
-			->notName('composer.local.*')
-			->notName('devcontainer.yaml')
+			->notName('docker-compose.yaml')
 			->notName('Dockerfile.Nextcloud')
 			->notName('empty-skeleton.config.php')
 			->notName('*.sh')
@@ -81,13 +83,12 @@ return [
 			->notName('stylelint.config.js')
 			->notName('use-*-vaas.sh')
 			->notName('webpack.config.js')
-			->notName('xdebug.*')
-			->notName('babel.config.js')
 			->ignoreVCS(true)
 			->ignoreDotFiles(true)
 			->exclude([
 				'build',
 				'nextcloud-server',
+				'scripts',
 				'tests',
 				'tmp',
 				'test',
@@ -107,7 +108,7 @@ return [
 	// PHP version (e.g. `'7.2'`) in which the PHP parser and printer will be configured into. This will affect what
 	// level of code it will understand and how the code will be printed.
 	// If none (or `null`) is configured, then the host version will be used.
-	'php-version' => null,
+	// 'php-version' => null,
 
 	// When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the
 	// original namespace. These will include, for example, strings or string manipulations. PHP-Scoper has limited
@@ -118,7 +119,7 @@ return [
 	'patchers' => [
 		static function (string $filePath, string $prefix, string $contents): string {
 			// Change the contents here.
-			
+
 			if (str_ends_with($filePath, 'vendor/netresearch/jsonmapper/src/JsonMapper.php') === true) {
 				$contents = str_replace("namespace $prefix;", "namespace $prefix\\JsonMapper;", $contents);
 			}
@@ -128,7 +129,11 @@ return [
 			}
 
 			if (str_ends_with($filePath, 'vendor/gdata/vaas/Vaas.php') === true) {
-				$contents = str_replace('use OCA\GDataVaas\Vendor\JsonMapper', 'use OCA\GDataVaas\Vendor\JsonMapper\JsonMapper', $contents);
+				$contents = str_replace(
+					'use OCA\GDataVaas\Vendor\JsonMapper',
+					'use OCA\GDataVaas\Vendor\JsonMapper\JsonMapper',
+					$contents
+				);
 			}
 
 			return $contents;
@@ -153,6 +158,7 @@ return [
 		'OC_Template'
 	],
 	'exclude-functions' => [
+		'stream_context_set_options'
 	],
 	'exclude-constants' => [
 		// 'STDIN',

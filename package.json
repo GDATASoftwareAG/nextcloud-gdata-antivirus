@@ -1,7 +1,7 @@
 {
   "name": "gdatavaas",
   "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "author": "Lennart Dohmann <lennart.dohmann@gdata.de>",
   "contributors": [],
   "bugs": {
@@ -14,8 +14,8 @@
     "dev": "webpack --node-env development --progress",
     "watch": "webpack --node-env development --progress --watch",
     "serve": "webpack --node-env development serve --progress",
-    "stylelint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",
-    "stylelint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
+    "lint": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue",
+    "lint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
   },
   "dependencies": {
     "@mdi/svg": "^7.4.47",
@@ -40,7 +40,7 @@
   },
   "overrides": {
     "@nextcloud/webpack-vue-config": {
-      "webpack-dev-server": "5.2.1",
+      "webpack-dev-server": "5.2.2",
       "vue-loader": "^17"
     }
   }

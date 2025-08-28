@@ -1,4 +1,11 @@
 <?xml version="1.0"?>
+
+<!--
+SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <info>
     <!--
     SPDX-FileCopyrightText: Lennart Dohmann <lennart.dohmann@gdata.de>
@@ -44,29 +51,28 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/scanned.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/context.png</screenshot>
     <screenshot>https://raw.githubusercontent.com/GDATASoftwareAG/nextcloud-gdata-antivirus/main/img/settings.png</screenshot>
-    <website>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus</website>
-    <settings>
-        <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
-        <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
-    </settings>
+    <dependencies>
+        <database>pgsql</database>
+        <database>mysql</database>
+        <database>sqlite</database>
+        <nextcloud min-version="31" max-version="31"/>
+    </dependencies>
+    <background-jobs>
+        <job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
+        <job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
+        <job>OCA\GDataVaas\BackgroundJobs\NotifyAdminJob</job>
+    </background-jobs>
     <commands>
         <command>OCA\GDataVaas\Command\GetTagIdCommand</command>
         <command>OCA\GDataVaas\Command\RemoveTagCommand</command>
         <command>OCA\GDataVaas\Command\ScanCommand</command>
         <command>OCA\GDataVaas\Command\TagUnscannedCommand</command>
         <command>OCA\GDataVaas\Command\GetTagsForFileCommand</command>
-	</commands>
-    <dependencies>
-        <nextcloud min-version="31" max-version="31"/>
-    </dependencies>
-	<background-jobs>
-		<job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
-		<job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
-		<job>OCA\GDataVaas\BackgroundJobs\NotifyAdminJob</job>
-	</background-jobs>
-	<database>pgsql</database>
-	<database>mysql</database>
-	<database>sqlite</database>
+    </commands>
+    <settings>
+        <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
+        <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
+    </settings>
     <activity>
         <providers>
             <provider>OCA\GDataVaas\Activity\Provider</provider>

@@ -1,33 +1,56 @@
 <?xml version="1.0"?>
+
+<!--
+SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <psalm
-        totallyTyped="true"
-        errorLevel="5"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns="https://getpsalm.org/schema/config"
-        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    totallyTyped="true"
+    errorLevel="5"
+    resolveFromConfigFile="true"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="https://getpsalm.org/schema/config"
+    xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
+    phpVersion="8.1"
 >
     <projectFiles>
         <directory name="lib" />
         <ignoreFiles>
             <directory name="vendor" />
+            <directory name="nextcloud-server" />
         </ignoreFiles>
     </projectFiles>
     <extraFiles>
         <directory name="vendor" />
+        <ignoreFiles>
+            <directory name="vendor/phpunit/php-code-coverage" />
+        </ignoreFiles>
     </extraFiles>
     <issueHandlers>
         <UndefinedClass>
             <errorLevel type="suppress">
                 <referencedClass name="OC" />
+                <referencedClass name="Sabre\DAV\Server" />
+                <referencedClass name="OC_Template" />
             </errorLevel>
         </UndefinedClass>
-        <UndefinedDocblockClass>
+        <PossiblyUnusedMethod>
             <errorLevel type="suppress">
-                <referencedClass name="Doctrine\DBAL\Schema\Schema" />
-                <referencedClass name="Doctrine\DBAL\Schema\SchemaException" />
-                <referencedClass name="Doctrine\DBAL\Driver\Statement" />
-                <referencedClass name="Doctrine\DBAL\Schema\Table" />
+                <file name="lib/**/*.php" />
             </errorLevel>
-        </UndefinedDocblockClass>
+        </PossiblyUnusedMethod>
+        <UnusedClass>
+            <errorLevel type="suppress">
+                <file name="lib/**/*.php" />
+            </errorLevel>
+        </UnusedClass>
+        <MissingTemplateParam>
+            <errorLevel type="suppress">
+                <file name="lib/Db/DbFileMapper.php" />
+                <file name="lib/EventListener/FileEventsListener.php" />
+            </errorLevel>
+        </MissingTemplateParam>
     </issueHandlers>
 </psalm>
