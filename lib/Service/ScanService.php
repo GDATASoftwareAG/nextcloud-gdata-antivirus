@@ -17,9 +17,7 @@ use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Verdict;
 
 class ScanService {
-
 	private const SCAN_TIME_SECONDS = 120;
-
 	private TagService $tagService;
 	private VerdictService $verdictService;
 	private FileService $fileService;
