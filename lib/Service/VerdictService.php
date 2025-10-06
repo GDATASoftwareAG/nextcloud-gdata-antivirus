@@ -7,7 +7,7 @@
 namespace OCA\GDataVaas\Service;
 
 use Exception;
-use OCP\User\NoUserException;
+use OC\User\NoUserException;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\Files\EntityTooLargeException;
 use OCP\Files\NotFoundException;
