@@ -6,7 +6,7 @@
 
 set -e
 
-export NEXTCLOUD_VERSION=${1:-31.0.8}
+export NEXTCLOUD_VERSION=${1:-32.0.0}
 export IS_CI=${2:-0}
 
 if [ "$IS_CI" -eq 0 ]; then
