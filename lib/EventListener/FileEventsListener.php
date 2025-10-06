@@ -7,7 +7,7 @@
 namespace OCA\GDataVaas\EventListener;
 
 use Exception;
-use OC_Template;
+use OCP\Template\ITemplateManager;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCA\GDataVaas\Service\FileService;
@@ -42,6 +42,7 @@ class FileEventsListener implements IEventListener {
 		private readonly TagService $tagService,
 		private readonly IAppConfig $appConfig,
 		private readonly MailService $mailService,
+		private readonly ITemplateManager $templateManager
 	) {
 	}
 
@@ -125,7 +126,7 @@ class FileEventsListener implements IEventListener {
 
 		$debug = $this->config->getSystemValueBool('debug');
 
-		$content = new OC_Template('gdatavaas', $templateName, $renderAs);
+		$content = $this->templateManager->getTemplate('gdatavaas', $templateName, $renderAs);
 		$content->assign('title', 'Error');
 		$content->assign('message', $ex->getMessage());
 		$content->assign('remoteAddr', $this->request->getRemoteAddress());
