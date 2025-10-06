@@ -6,7 +6,7 @@
 
 namespace OCA\GDataVaas\SystemTag;
 
-use OCP\SystemTag\SystemTagObjectMapper;
+use OC\SystemTag\SystemTagObjectMapper;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
