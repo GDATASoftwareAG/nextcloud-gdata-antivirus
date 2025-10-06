@@ -55,7 +55,7 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
         <database>pgsql</database>
         <database>mysql</database>
         <database>sqlite</database>
-        <nextcloud min-version="31" max-version="31"/>
+    <nextcloud min-version="31" max-version="32"/>
     </dependencies>
     <background-jobs>
         <job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>

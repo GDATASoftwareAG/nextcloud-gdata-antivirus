@@ -16,7 +16,6 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
@@ -37,11 +36,8 @@ class Application extends App implements IBootstrap {
 		parent::__construct(self::APP_ID);
 
 		$container = $this->getContainer();
-		$eventDispatcher = $container->get(IEventDispatcher::class);
-		assert($eventDispatcher instanceof IEventDispatcher);
-		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
-			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
-		});
+		// Add the script directly for Nextcloud 32 compatibility
+		Util::addScript(self::APP_ID, 'gdatavaas-files-action');
 	}
 
 	/**

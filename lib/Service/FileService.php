@@ -6,8 +6,7 @@
 
 namespace OCA\GDataVaas\Service;
 
-use OC;
-use OC\User\NoUserException;
+use OCP\User\NoUserException;
 use OCA\Files_Trashbin\Trash\ITrashManager;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\App\IAppManager;
@@ -30,6 +29,7 @@ class FileService {
 	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 	private IAppManager $appManager;
+	private ?ITrashManager $trashManager;
 
 	public function __construct(
 		LoggerInterface $logger,
@@ -37,12 +37,14 @@ class FileService {
 		IRootFolder $rootFolder,
 		IAppConfig $appConfig,
 		IAppManager $appManager,
+		?ITrashManager $trashManager = null,
 	) {
 		$this->userMountCache = $userMountCache;
 		$this->rootFolder = $rootFolder;
 		$this->appConfig = $appConfig;
 		$this->logger = $logger;
 		$this->appManager = $appManager;
+		$this->trashManager = $trashManager;
 	}
 
 	/**
@@ -138,10 +140,14 @@ class FileService {
 		$file = $this->getNodeFromFileId($fileId);
 		$file->unlock(ILockingProvider::LOCK_SHARED);
 		if ($this->appManager->isEnabledForUser('files_trashbin')) {
-			$trashManager = OC::$server->get(ITrashManager::class);
-			$trashManager->pauseTrash();
-			$file->delete();
-			$trashManager->resumeTrash();
+			if ($this->trashManager !== null) {
+				$this->trashManager->pauseTrash();
+				$file->delete();
+				$this->trashManager->resumeTrash();
+			} else {
+				// Fallback: if no trash manager is available, just delete the file
+				$file->delete();
+			}
 		} else {
 			$file->delete();
 		}
