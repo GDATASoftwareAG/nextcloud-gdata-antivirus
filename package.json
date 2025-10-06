@@ -18,30 +18,28 @@
     "lint:fix": "stylelint css/*.css css/*.scss src/**/*.scss src/**/*.vue --fix"
   },
   "dependencies": {
-    "@mdi/svg": "^7.4.47",
-    "@nextcloud/axios": "^2.5.0",
-    "@nextcloud/dialogs": "^6.0.0",
-    "@nextcloud/files": "^3.2.1",
-    "@nextcloud/router": "^3.0.1"
+    "@mdi/svg": "7.4.47",
+    "@nextcloud/dialogs": "6.3.2",
+    "@nextcloud/files": "3.12.0",
+    "@nextcloud/router": "3.0.1"
   },
   "browserslist": [
     "extends @nextcloud/browserslist-config"
   ],
   "engines": {
-    "node": "^20.0.0",
-    "npm": "^7.0.0 || ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=7.0.0"
   },
   "devDependencies": {
-    "@nextcloud/babel-config": "^1.2.0",
-    "@nextcloud/browserslist-config": "^3.0.1",
-    "@nextcloud/eslint-config": "^8.4.1",
-    "@nextcloud/stylelint-config": "^3.0.1",
-    "@nextcloud/webpack-vue-config": "^6.0.1"
+    "@nextcloud/babel-config": "1.2.0",
+    "@nextcloud/browserslist-config": "3.0.1",
+    "@nextcloud/eslint-config": "8.4.2",
+    "@nextcloud/stylelint-config": "3.1.0",
+    "@nextcloud/webpack-vue-config": "6.3.0"
   },
   "overrides": {
-    "@nextcloud/webpack-vue-config": {
-      "webpack-dev-server": "5.2.2",
-      "vue-loader": "^17"
+    "@nextcloud/axios": {
+      "axios": "1.12.2"
     }
   }
 }
