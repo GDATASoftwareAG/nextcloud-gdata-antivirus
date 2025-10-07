@@ -80,13 +80,13 @@ unittests:
 # Run bats tests
 .PHONY: bats
 bats:
-	./scripts/run-app.sh "31.0.8" 1
+	./scripts/run-app.sh "32.0.0" 1
 	bats --verbose-run --timing --trace ./tests/bats
 
 # Complete production like but static Nextcloud and app setup
 .PHONY: prod
 prod: oc
-	./scripts/run-app.sh "31.0.8" 1
+	./scripts/run-app.sh "32.0.0" 1
 
 # Same as clean but also removes dependencies and build related folders
 .PHONY: distclean

@@ -60,7 +60,6 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
     <background-jobs>
         <job>OCA\GDataVaas\BackgroundJobs\ScanJob</job>
         <job>OCA\GDataVaas\BackgroundJobs\TagUnscannedJob</job>
-        <job>OCA\GDataVaas\BackgroundJobs\NotifyAdminJob</job>
     </background-jobs>
     <commands>
         <command>OCA\GDataVaas\Command\GetTagIdCommand</command>
