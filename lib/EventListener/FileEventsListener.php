@@ -7,7 +7,6 @@
 namespace OCA\GDataVaas\EventListener;
 
 use Exception;
-use OCP\Template\ITemplateManager;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCA\GDataVaas\Service\FileService;
@@ -28,6 +27,7 @@ use OCP\IConfig;
 use OCP\IRequest;
 use OCP\IUserSession;
 use OCP\Lock\LockedException;
+use OCP\Template\ITemplateManager;
 use Psr\Log\LoggerInterface;
 use Sabre\DAV\Server;
 
@@ -43,8 +43,9 @@ class FileEventsListener implements IEventListener {
 		private readonly TagService $tagService,
 		private readonly IAppConfig $appConfig,
 		private readonly MailService $mailService,
-		private readonly ITemplateManager $templateManager
-	) {}
+		private readonly ITemplateManager $templateManager,
+	) {
+	}
 
 	public static function register(IRegistrationContext $context): void {
 		$context->registerEventListener(NodeWrittenEvent::class, self::class);
