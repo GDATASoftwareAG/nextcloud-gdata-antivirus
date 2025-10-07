@@ -7,7 +7,7 @@
 namespace OCA\GDataVaas\EventListener;
 
 use Exception;
-use OC_Template;
+use OCP\Template\ITemplateManager;
 use OCA\GDataVaas\AppInfo\Application;
 use OCA\GDataVaas\Exceptions\VirusFoundException;
 use OCA\GDataVaas\Service\FileService;
@@ -15,6 +15,7 @@ use OCA\GDataVaas\Service\MailService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
 use OCP\Files\Events\Node\NodeWrittenEvent;
@@ -42,8 +43,8 @@ class FileEventsListener implements IEventListener {
 		private readonly TagService $tagService,
 		private readonly IAppConfig $appConfig,
 		private readonly MailService $mailService,
-	) {
-	}
+		private readonly ITemplateManager $templateManager
+	) {}
 
 	public static function register(IRegistrationContext $context): void {
 		$context->registerEventListener(NodeWrittenEvent::class, self::class);
@@ -115,17 +116,17 @@ class FileEventsListener implements IEventListener {
 
 	public function generateBody(Exception $ex): string {
 		if ($this->acceptHtml()) {
-			$renderAs = 'guest';
+			$renderAs = TemplateResponse::RENDER_AS_GUEST;
 			$templateName = 'exception';
 		} else {
 			$templateName = 'xml_exception';
-			$renderAs = null;
+			$renderAs = TemplateResponse::RENDER_AS_BLANK;
 			$this->server->httpResponse->setHeader('Content-Type', 'application/xml; charset=utf-8');
 		}
 
 		$debug = $this->config->getSystemValueBool('debug');
 
-		$content = new OC_Template('gdatavaas', $templateName, $renderAs);
+		$content = $this->templateManager->getTemplate('gdatavaas', $templateName, $renderAs);
 		$content->assign('title', 'Error');
 		$content->assign('message', $ex->getMessage());
 		$content->assign('remoteAddr', $this->request->getRemoteAddress());
