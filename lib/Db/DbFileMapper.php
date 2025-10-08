@@ -69,6 +69,7 @@ class DbFileMapper extends QBMapper {
 				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
 				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
 			))
+			->andWhere($qb->expr()->notLike('f.path', $qb->createNamedParameter('__groupfolders/versions/%')))
 			->orderBy('f.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
@@ -107,6 +108,7 @@ class DbFileMapper extends QBMapper {
 				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
 				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
 			))
+			->andWhere($qb->expr()->notLike('f.path', $qb->createNamedParameter('__groupfolders/versions/%')))
 			->orderBy('f.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
@@ -138,7 +140,9 @@ class DbFileMapper extends QBMapper {
 			->andWhere($fileQuery->expr()->orX(
 				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')),
 				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('__groupfolders/%'))
-			));
+			))
+			->andWhere($fileQuery->expr()->notLike('f.path', $fileQuery->createNamedParameter('__groupfolders/versions/%')));
+
 
 		$storageQuery = $this->db->getQueryBuilder();
 		$storageQuery->selectAlias('numeric_id', 'id')

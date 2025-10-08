@@ -132,7 +132,7 @@ class ScanService {
 						$this->logger->debug("File with ID $fileId is not readable or not allowed to scan, skipping.");
 					}
 				} catch (NotFoundException $e) {
-					$this->logger->error("File with ID $fileId not found, skipping: " . $e->getMessage());
+					$this->logger->error("File with ID $fileId not found, skipping: " . $e->getMessage(), ['exception' => $e]);
 				} catch (NotPermittedException $e) {
 					$this->logger->error(
 						"Current settings do not permit scanning file with ID $fileId, skipping: " . $e->getMessage()
