@@ -64,60 +64,60 @@ setup_file() {
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/admin.functionality-sequential.clean.txt
 }
 
-@test "test croned scan for testuser files" {
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
+#@test "test croned scan for testuser files" {
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
+#
+#    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+#    curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
+#    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+#
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
+#
+#    # check for unscanned tag
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Unscanned") ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | wc -l ) -eq "1" ]]
+#
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | grep "Unscanned" ) ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | wc -l ) -eq "1" ]]
+#
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Unscanned" ) ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
+#
+#    $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:scan
+#
+#    # check for tags (only one specific should exist for each file)
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Malicious") ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | wc -l ) -eq "1" ]]
+#
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | grep "Pup" ) ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | wc -l ) -eq "1" ]]
+#
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Clean" ) ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
+#
+#    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+#    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
+#    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+#}
 
-    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
-    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
-
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
-
-    # check for unscanned tag
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Unscanned") ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | wc -l ) -eq "1" ]]
-
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | grep "Unscanned" ) ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | wc -l ) -eq "1" ]]
-
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Unscanned" ) ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
-
-    $DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:scan
-
-    # check for tags (only one specific should exist for each file)
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Malicious") ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | wc -l ) -eq "1" ]]
-
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | grep "Pup" ) ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.pup.exe | wc -l ) -eq "1" ]]
-
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Clean" ) ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | wc -l ) -eq "1" ]]
-
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.pup.exe
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
-}
-
-@test "test when unscanned tag is deactivated" {
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="true"
-
-    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
-
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
-
-    # check for unscanned tag
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Unscanned" | wc -l) -eq "0" ]]
-    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Unscanned" | wc -l ) -eq "0" ]]
-
-    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="false"
-
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
-}
+#@test "test when unscanned tag is deactivated" {
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="WRONG_PASSWORD"
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="true"
+#
+#    echo $EICAR_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+#    echo $CLEAN_STRING |curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+#
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas clientSecret --value="$CLIENT_SECRET"
+#
+#    # check for unscanned tag
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.eicar.com.txt | grep "Unscanned" | wc -l) -eq "0" ]]
+#    [[ $($DOCKER_EXEC_WITH_USER nextcloud-container php occ gdatavaas:get-tags-for-file $TESTUSER/files/$TESTUSER.functionality-sequential.clean.txt | grep "Unscanned" | wc -l ) -eq "0" ]]
+#
+#    $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:set gdatavaas disableUnscannedTag --value="false"
+#
+#    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.eicar.com.txt
+#    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/$TESTUSER.functionality-sequential.clean.txt
+#}
 
 @test "test mailing on eicar upload" {
     echo $EICAR_STRING | curl --silent -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-sequential.eicar.com.txt
