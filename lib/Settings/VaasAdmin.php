@@ -42,17 +42,6 @@ class VaasAdmin implements ISettings {
 					'vaasUrl',
 					'https://gateway.staging.vaas.gdatasecurity.de'
 				),
-			'quarantineFolder'
-				=> $this->config->getValueString(Application::APP_ID, 'quarantineFolder', 'Quarantine'),
-			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles'),
-			'prefixMalicious'
-				=> $this->config->getValueBool(Application::APP_ID, 'prefixMalicious', true),
-			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag'),
-			'scanOnlyThis' => $this->config->getValueString(Application::APP_ID, 'scanOnlyThis'),
-			'doNotScanThis' => $this->config->getValueString(Application::APP_ID, 'doNotScanThis'),
-			'notifyMail' => $this->config->getValueString(Application::APP_ID, 'notifyMails'),
-			'sendMailOnVirusUpload'
-				=> $this->config->getValueBool(Application::APP_ID, 'sendMailOnVirusUpload'),
 			'maxScanSizeInMB'
 				=> $this->config->getValueInt(Application::APP_ID, 'maxScanSizeInMB', 256),
 			'timeout' => $this->config->getValueInt(Application::APP_ID, 'timeout', 300),
