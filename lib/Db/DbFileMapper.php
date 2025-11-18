@@ -1,8 +1,14 @@
 <?php
 
-// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+// SPDX-FileCopyrightText: 2025 G DATA CyberDefense AG
+// SPDX-FileCopyrightText: 2017-2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: 2012-2016 ownCloud, Inc.
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
+
+// Parts of this file are copied from the nextcloud files_antivirus app
+// https://github.com/nextcloud/files_antivirus
+// /blob/00b25bfe35af45627d871e905c8eb94554df4b9d/lib/BackgroundJob/BackgroundScanner.php
 
 namespace OCA\GDataVaas\Db;
 
