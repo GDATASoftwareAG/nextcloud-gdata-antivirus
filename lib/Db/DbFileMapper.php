@@ -13,21 +13,18 @@ use OCP\Files\FileInfo;
 use OCP\Files\IMimeTypeLoader;
 use OCP\IConfig;
 use OCP\IDBConnection;
-use Psr\Log\LoggerInterface;
 
 class DbFileMapper extends QBMapper {
 	private string $stringType;
-	private LoggerInterface $logger;
 	private IMimeTypeLoader $mimeTypeLoader;
 	private IConfig $config;
 
 	/**
 	 * @throws Exception
 	 */
-	public function __construct(IDBConnection $db, LoggerInterface $logger, IMimeTypeLoader $mimeTypeLoader, IConfig $config) {
+	public function __construct(IDBConnection $db, IMimeTypeLoader $mimeTypeLoader, IConfig $config) {
 		parent::__construct($db, 'filecache');
 		$this->stringType = $this->getStringTypeDeclarationSQL();
-		$this->logger = $logger;
 		$this->mimeTypeLoader = $mimeTypeLoader;
 		$this->config = $config;
 	}
@@ -109,7 +106,7 @@ class DbFileMapper extends QBMapper {
 			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->leftJoin(
 				'fc', 'systemtag_object_mapping', 'o', $query->expr()->eq(
-				'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
+					'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
 			->where($query->expr()->in(
 				'o.systemtagid', $query->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
 			->orWhere($query->expr()->isNull('o.systemtagid'))
