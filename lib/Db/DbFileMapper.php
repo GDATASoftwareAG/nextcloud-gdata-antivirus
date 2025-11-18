@@ -1,25 +1,38 @@
 <?php
 
-// SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
+// SPDX-FileCopyrightText: 2025 G DATA CyberDefense AG
+// SPDX-FileCopyrightText: 2017-2024 Nextcloud GmbH and Nextcloud contributors
+// SPDX-FileCopyrightText: 2012-2016 ownCloud, Inc.
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
+
+// Parts of this file are copied from the nextcloud files_antivirus app
+// https://github.com/nextcloud/files_antivirus
+// /blob/00b25bfe35af45627d871e905c8eb94554df4b9d/lib/BackgroundJob/BackgroundScanner.php
 
 namespace OCA\GDataVaas\Db;
 
 use OCP\AppFramework\Db\QBMapper;
 use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
+use OCP\Files\FileInfo;
+use OCP\Files\IMimeTypeLoader;
+use OCP\IConfig;
 use OCP\IDBConnection;
 
 class DbFileMapper extends QBMapper {
 	private string $stringType;
+	private IMimeTypeLoader $mimeTypeLoader;
+	private IConfig $config;
 
 	/**
 	 * @throws Exception
 	 */
-	public function __construct(IDBConnection $db) {
+	public function __construct(IDBConnection $db, IMimeTypeLoader $mimeTypeLoader, IConfig $config) {
 		parent::__construct($db, 'filecache');
 		$this->stringType = $this->getStringTypeDeclarationSQL();
+		$this->mimeTypeLoader = $mimeTypeLoader;
+		$this->config = $config;
 	}
 
 	/**
@@ -48,34 +61,33 @@ class DbFileMapper extends QBMapper {
 	 * @throws Exception if the database platform is not supported
 	 */
 	public function getFileIdsWithoutTags(array $excludedTagIds, int $limit, int $offset = 0): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->automaticTablePrefix(true);
+		$dirMimeTypeId = $this->mimeTypeLoader->getId(FileInfo::MIMETYPE_FOLDER);
+		$instanceId = $this->config->getSystemValue('instanceid', '');
 
-		$qb->select('f.fileid')
-			->from($this->getTableName(), 'f')
+		$query = $this->db->getQueryBuilder();
+		$query->select('fc.fileid')
+			->from('filecache', 'fc')
+			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->leftJoin(
-				'f', 'systemtag_object_mapping', 'o', $qb->expr()->eq(
-					'o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
-			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
-			->where($qb->expr()->notIn(
-				'o.systemtagid', $qb->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->orWhere($qb->expr()->isNull('o.systemtagid'))
-			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->orX(
-				$qb->expr()->eq('o.objecttype', $qb->createNamedParameter('files')),
-				$qb->expr()->isNull('o.objecttype')
+				'fc', 'systemtag_object_mapping', 'o', $query->expr()->eq(
+					'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
+			->where($query->expr()->notIn(
+				'o.systemtagid', $query->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->orWhere($query->expr()->isNull('o.systemtagid'))
+			->andWhere($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
+			->andWhere($query->expr()->orX(
+				$query->expr()->like('fc.path', $query->createNamedParameter('files/%')),
+				$query->expr()->notLike('s.id', $query->createNamedParameter('home::%'))
 			))
-			->andWhere($qb->expr()->orX(
-				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
-				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
-			))
-			->andWhere($qb->expr()->notLike('f.path', $qb->createNamedParameter('__groupfolders/versions/%')))
-			->orderBy('f.fileid', 'DESC')
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("appdata_$instanceId/%")))
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("\_\_groupfolders/versions/%")))
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("\_\_groupfolders/trash/%")))
+			->orderBy('fc.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
 
 		$fileIds = [];
-		$result = $qb->executeQuery();
+		$result = $query->executeQuery();
 		while ($row = $result->fetch()) {
 			$fileIds[] = $row['fileid'];
 		}
@@ -91,30 +103,33 @@ class DbFileMapper extends QBMapper {
 	 * @throws Exception if the database platform is not supported
 	 */
 	public function getFileIdsWithTags(array $includedTagIds, int $limit, int $offset = 0): array {
-		$qb = $this->db->getQueryBuilder();
-		$qb->automaticTablePrefix(true);
+		$dirMimeTypeId = $this->mimeTypeLoader->getId(FileInfo::MIMETYPE_FOLDER);
+		$instanceId = $this->config->getSystemValue('instanceid', '');
 
-		$qb->select('f.fileid')
-			->from($this->getTableName(), 'f')
+		$query = $this->db->getQueryBuilder();
+		$query->select('fc.fileid')
+			->from('filecache', 'fc')
+			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->leftJoin(
-				'f', 'systemtag_object_mapping', 'o', $qb->expr()->eq(
-					'o.objectid', $qb->createFunction(sprintf('CAST(f.fileid AS %s)', $this->stringType))))
-			->leftJoin('f', 'mimetypes', 'm', $qb->expr()->eq('f.mimetype', 'm.id'))
-			->where($qb->expr()->in(
-				'o.systemtagid', $qb->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->andWhere($qb->expr()->notLike('m.mimetype', $qb->createNamedParameter('%unix-directory%')))
-			->andWhere($qb->expr()->eq('o.objecttype', $qb->createNamedParameter('files')))
-			->andWhere($qb->expr()->orX(
-				$qb->expr()->like('f.path', $qb->createNamedParameter('files/%')),
-				$qb->expr()->like('f.path', $qb->createNamedParameter('__groupfolders/%'))
+				'fc', 'systemtag_object_mapping', 'o', $query->expr()->eq(
+					'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
+			->where($query->expr()->in(
+				'o.systemtagid', $query->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
+			->orWhere($query->expr()->isNull('o.systemtagid'))
+			->andWhere($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
+			->andWhere($query->expr()->orX(
+				$query->expr()->like('fc.path', $query->createNamedParameter('files/%')),
+				$query->expr()->notLike('s.id', $query->createNamedParameter('home::%'))
 			))
-			->andWhere($qb->expr()->notLike('f.path', $qb->createNamedParameter('__groupfolders/versions/%')))
-			->orderBy('f.fileid', 'DESC')
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("appdata_$instanceId/%")))
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("\_\_groupfolders/versions/%")))
+			->andWhere($query->expr()->notLike('fc.path', $query->createNamedParameter("\_\_groupfolders/trash/%")))
+			->orderBy('fc.fileid', 'DESC')
 			->setFirstResult($offset)
 			->setMaxResults($limit);
 
 		$fileIds = [];
-		$result = $qb->executeQuery();
+		$result = $query->executeQuery();
 		while ($row = $result->fetch()) {
 			$fileIds[] = $row['fileid'];
 		}
@@ -129,20 +144,22 @@ class DbFileMapper extends QBMapper {
 	public function getFilesCount(): int {
 		$fileCount = 0;
 
+		$dirMimeTypeId = $this->mimeTypeLoader->getId(FileInfo::MIMETYPE_FOLDER);
+		$instanceId = $this->config->getSystemValue('instanceid', '');
+
 		$fileQuery = $this->db->getQueryBuilder();
 		$fileQuery->select($fileQuery->func()->count())
-			->from('filecache', 'f')
-			->leftJoin('f', 'mimetypes', 'm', $fileQuery->expr()->eq('f.mimetype', 'm.id'))
-			->where($fileQuery->expr()->eq('storage', $fileQuery->createParameter('storageId')))
-			->andWhere($fileQuery->expr()->notLike(
-				'm.mimetype', $fileQuery->createNamedParameter('%unix-directory%'))
-			)
+			->from('filecache', 'fc')
+			->leftJoin('fc', 'storages', 's', $fileQuery->expr()->eq('fc.storage', 's.numeric_id'))
+			->where($fileQuery->expr()->eq('fc.storage', $fileQuery->createParameter('storageId')))
+			->andWhere($fileQuery->expr()->neq('fc.mimetype', $fileQuery->createNamedParameter($dirMimeTypeId)))
 			->andWhere($fileQuery->expr()->orX(
-				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('files/%')),
-				$fileQuery->expr()->like('f.path', $fileQuery->createNamedParameter('__groupfolders/%'))
+				$fileQuery->expr()->like('fc.path', $fileQuery->createNamedParameter('files/%')),
+				$fileQuery->expr()->notLike('s.id', $fileQuery->createNamedParameter('home::%'))
 			))
-			->andWhere($fileQuery->expr()->notLike('f.path', $fileQuery->createNamedParameter('__groupfolders/versions/%')));
-
+			->andWhere($fileQuery->expr()->notLike('fc.path', $fileQuery->createNamedParameter("appdata_$instanceId/%")))
+			->andWhere($fileQuery->expr()->notLike('fc.path', $fileQuery->createNamedParameter("\_\_groupfolders/versions/%")))
+			->andWhere($fileQuery->expr()->notLike('fc.path', $fileQuery->createNamedParameter("\_\_groupfolders/trash/%")));
 
 		$storageQuery = $this->db->getQueryBuilder();
 		$storageQuery->selectAlias('numeric_id', 'id')
