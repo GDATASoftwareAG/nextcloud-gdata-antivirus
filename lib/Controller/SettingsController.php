@@ -8,8 +8,10 @@ namespace OCA\GDataVaas\Controller;
 
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
+use OCA\GDataVaas\Settings\VaasOperator;
 use OCP\AppFramework\Controller;
 use OCP\AppFramework\Http\JSONResponse;
+use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
 use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
@@ -40,29 +42,18 @@ class SettingsController extends Controller {
 		$this->verdictService = $verdictService;
 	}
 
-	public function setconfig(
+    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	public function setAdminSettings(
 		$username,
 		$password,
 		$clientId,
 		$clientSecret,
 		$authMethod,
-		$quarantineFolder,
-		$scanOnlyThis,
-		$doNotScanThis,
-		$notifyMails,
 		$maxScanSize,
 		$timeout,
 		bool $cache,
 		bool $hashlookup,
 	): JSONResponse {
-		if (!empty($notifyMails)) {
-			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
-			foreach ($mails as $mail) {
-				if ($this->mailer->validateMailAddress($mail) === false) {
-					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
-				}
-			}
-		}
 		if ((int)$maxScanSize < 1) {
 			return new JSONResponse(['status' => 'error', 'message' => 'Invalid max scan size: ' . $maxScanSize]);
 		}
@@ -74,10 +65,6 @@ class SettingsController extends Controller {
 		$this->config->setValueString($this->appName, 'clientId', $clientId);
 		$this->config->setValueString($this->appName, 'clientSecret', $clientSecret);
 		$this->config->setValueString($this->appName, 'authMethod', $authMethod);
-		$this->config->setValueString($this->appName, 'quarantineFolder', $quarantineFolder);
-		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
-		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
-		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
 		$this->config->setValueInt($this->appName, 'maxScanSizeInMB', (int)$maxScanSize);
 		$this->config->setValueInt($this->appName, 'timeout', (int)$timeout);
 		$this->config->setValueBool($this->appName, 'cache', $cache);
@@ -91,20 +78,46 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
+    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	public function setOperatorSettings(
+		$quarantineFolder,
+		$scanOnlyThis,
+		$doNotScanThis,
+		$notifyMails,
+	): JSONResponse {
+		if (!empty($notifyMails)) {
+			$mails = explode(',', preg_replace('/\s+/', '', $notifyMails));
+			foreach ($mails as $mail) {
+				if ($this->mailer->validateMailAddress($mail) === false) {
+					return new JSONResponse(['status' => 'error', 'message' => 'Invalid email address: ' . $mail]);
+				}
+			}
+		}
+		$this->config->setValueString($this->appName, 'quarantineFolder', $quarantineFolder);
+		$this->config->setValueString($this->appName, 'scanOnlyThis', $scanOnlyThis);
+		$this->config->setValueString($this->appName, 'doNotScanThis', $doNotScanThis);
+		$this->config->setValueString($this->appName, 'notifyMails', $notifyMails);
+		return new JSONResponse(['status' => 'success']);
+	}
+
+    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setAutoScan(bool $autoScanFiles): JSONResponse {
 		$this->config->setValueBool($this->appName, 'autoScanFiles', $autoScanFiles);
 		return new JSONResponse(['status' => 'success']);
 	}
 
+    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getAutoScan(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'autoScanFiles')]);
 	}
 
+    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setPrefixMalicious(bool $prefixMalicious): JSONResponse {
 		$this->config->setValueBool($this->appName, 'prefixMalicious', $prefixMalicious);
 		return new JSONResponse(['status' => 'success']);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getPrefixMalicious(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'prefixMalicious')]);
 	}
@@ -113,11 +126,13 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => $this->config->getValueString($this->appName, 'authMethod')]);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setDisableUnscannedTag(bool $disableUnscannedTag): JSONResponse {
 		$this->config->setValueBool($this->appName, 'disableUnscannedTag', $disableUnscannedTag);
 		return new JSONResponse(['status' => 'success']);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getDisableUnscannedTag(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'disableUnscannedTag')]);
 	}
@@ -127,6 +142,7 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getCounters(): JSONResponse {
 		try {
 			$filesCount = $this->tagService->getScannedFilesCount();
@@ -143,12 +159,14 @@ class SettingsController extends Controller {
 		]);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getSendMailOnVirusUpload(): JSONResponse {
 		return new JSONResponse(
 			['status' => $this->config->getValueBool($this->appName, 'sendMailOnVirusUpload')]
 		);
 	}
 
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setSendMailOnVirusUpload(bool $sendMailOnVirusUpload): JSONResponse {
 		$this->config->setValueBool($this->appName, 'sendMailOnVirusUpload', $sendMailOnVirusUpload);
 		return new JSONResponse(['status' => 'success']);
