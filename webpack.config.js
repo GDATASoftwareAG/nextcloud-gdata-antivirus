@@ -13,5 +13,6 @@ webpackConfig.module.rules = Object.values(webpackRules)
 
 webpackConfig.entry['admin-settings'] = path.join(__dirname, 'src', 'admin-settings.js')
 webpackConfig.entry['files-action'] = path.join(__dirname, 'src', 'files-action.js')
+webpackConfig.entry['operator-settings'] = path.join(__dirname, 'src', 'operator-settings.js')
 
 module.exports = webpackConfig
