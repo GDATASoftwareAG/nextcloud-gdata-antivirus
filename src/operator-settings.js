@@ -27,21 +27,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return response.json();
 	}
 
-	const authSubmit = document.querySelector('#auth_submit');
-	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
-	const resetAllTags = document.querySelector('#reset');
+	const operatorSubmit = document.querySelector('#operator_submit');
 	const autoScanFiles = document.querySelector('#auto_scan_files');
 	const prefixMalicious = document.querySelector('#prefixMalicious');
-	const authMethod = document.querySelector('#authMethod');
 	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
 	const scanCounter = document.querySelector('#scan_counter');
 	const sendMailOnVirusUpload = document.querySelector('#send_mail_on_virus_upload');
 
-	authMethod.addEventListener('change', (e) => {
-		hideUnneccessaryFields(e.target.value);
-	});
-
-	authSubmit.addEventListener('click', async (e) => {
+	operatorSubmit.addEventListener('click', async (e) => {
 		e.preventDefault();
 		const quarantineFolder = document.querySelector('#quarantine_folder').value;
 		const scanOnlyThis = document.querySelector('#scanOnlyThis').value;
@@ -49,7 +42,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const notifyMails = document.querySelector('#notify_mails').value;
 
 		// TODO: Use other controller
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
+		const response = await postData(OC.generateUrl('apps/gdatavaas/operatorSettings'), {
 			quarantineFolder,
 			scanOnlyThis,
 			doNotScanThis,
@@ -65,36 +58,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			} else {
 				msgElement.textContent = 'An error occurred when saving the data.';
 			}
-		}
-	});
-
-	authSubmitAdvanced.addEventListener('click', async (e) => {
-		e.preventDefault();
-		const tokenEndpoint = document.querySelector('#token_endpoint').value;
-		const vaasUrl = document.querySelector('#vaas_url').value;
-
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setadvancedconfig'), {
-			tokenEndpoint,
-			vaasUrl
-		});
-		const msgElement = document.querySelector('#auth_save_msg_advanced');
-
-		if (response.status === "success") {
-			msgElement.textContent = 'Data saved successfully.';
-		} else {
-			msgElement.textContent = 'An error occurred when saving the data.';
-		}
-	});
-
-	resetAllTags.addEventListener('click', async (e) => {
-		e.preventDefault();
-		const response = await postData(OC.generateUrl('apps/gdatavaas/resetalltags'), {});
-		const msgElement = document.querySelector('#auth_save_msg_advanced');
-
-		if (response.status === "success") {
-			msgElement.textContent = 'All tags have been reset successfully.';
-		} else {
-			msgElement.textContent = 'An error occurred when resetting the tags.';
 		}
 	});
 

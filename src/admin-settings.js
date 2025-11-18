@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const cache = document.querySelector('#cache').checked;
 		const hashlookup = document.querySelector('#hashlookup').checked;
 
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
+		const response = await postData(OC.generateUrl('apps/gdatavaas/adminSettings'), {
 			username: username,
 			password: password,
 			clientId: clientId,

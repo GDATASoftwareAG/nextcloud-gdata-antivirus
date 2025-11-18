@@ -30,8 +30,8 @@ style('gdatavaas', 'style');
 				<td class="input_field"><input id="notify_mails" type="text" name="notify_mails" value="<?php p($_['notifyMail']); ?>"/></td>
 			</tr>
 		</table>
-		<input class="submit-button" id="auth_submit" type="submit" value="<?php p($l->t('Save'));?>" />
-		<span id="auth_save_msg"></span>
+		<input class="submit-button" id="operator_submit" type="submit" value="<?php p($l->t('Save'));?>" />
+		<span id="operator_save_msg"></span>
 		<div class="warning">
 			<strong>Caution:</strong> The use of the <em>"Scan only this"</em> and <em>"Do not scan this"</em> settings should be approached with caution. Using these settings allows malicious users to upload and distribute malicious content via the Nextcloud instance. It is recommended that you carefully consider the implications of these settings and use them in a way that does not jeopardize the security of your system and data.
 		</div>
