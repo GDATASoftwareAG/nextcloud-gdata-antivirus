@@ -9,7 +9,6 @@ return [
 	'routes' => [
 		// user
 		['name' => 'scan#scan', 'url' => '/scan', 'verb' => 'POST'],
-		['name' => 'settings#getCounters', 'url' => '/getCounters', 'verb' => 'GET'],
 		// operator
 		['name' => 'settings#setOperatorSettings', 'url' => '/operatorSettings', 'verb' => 'POST'],
 		['name' => 'settings#getSendMailOnVirusUpload', 'url' => '/getSendMailOnVirusUpload', 'verb' => 'GET'],
@@ -20,6 +19,7 @@ return [
 		['name' => 'settings#getPrefixMalicious', 'url' => '/getPrefixMalicious', 'verb' => 'GET'],
 		['name' => 'settings#setDisableUnscannedTag', 'url' => '/setDisableUnscannedTag', 'verb' => 'POST'],
 		['name' => 'settings#getDisableUnscannedTag', 'url' => '/getDisableUnscannedTag', 'verb' => 'GET'],
+		['name' => 'settings#getCounters', 'url' => '/getCounters', 'verb' => 'GET'],
 		// admin
 		['name' => 'settings#setAdminSettings', 'url' => '/adminSettings', 'verb' => 'POST'],
 		['name' => 'settings#setadvancedconfig', 'url' => '/setadvancedconfig', 'verb' => 'POST'],

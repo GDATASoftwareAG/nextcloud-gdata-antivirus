@@ -42,7 +42,6 @@ class SettingsController extends Controller {
 		$this->verdictService = $verdictService;
 	}
 
-    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setAdminSettings(
 		$username,
 		$password,
