@@ -112,14 +112,13 @@ abstract class BaseIntegrationTest extends TestCase
         // Add authentication if provided
         if (isset($options['auth'])) {
             $credentials = base64_encode($options['auth']['username'] . ':' . $options['auth']['password']);
+            $request->removeHeader('Authorization');
             $request->setHeader('Authorization', 'Basic ' . $credentials);
-            unset($options['auth']);
         }
 
         // Add request body if provided
         if (isset($options['body'])) {
             $request->setBody($options['body']);
-            unset($options['body']);
         }
 
         // Add headers if provided
@@ -130,16 +129,14 @@ abstract class BaseIntegrationTest extends TestCase
                     $request->setHeader(trim($name), trim($value));
                 }
             }
-            unset($options['headers']);
         }
 
         // Handle file upload for PUT requests
         if (isset($options['file_handle'])) {
             $request->setBody($options['file_handle']);
-            unset($options['file_handle']);
         }
 
-
+        var_dump($request);
 
         try {
             $response = $client->request($request);
