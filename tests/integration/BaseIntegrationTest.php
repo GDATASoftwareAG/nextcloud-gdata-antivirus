@@ -6,8 +6,14 @@
 
 namespace Integration;
 
+use Amp\Http\Client\HttpClient;
+use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\Request;
+use Amp\Http\Client\Response;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+
+use function Amp\async;
 
 abstract class BaseIntegrationTest extends TestCase
 {
@@ -100,59 +106,58 @@ abstract class BaseIntegrationTest extends TestCase
 
     protected function makeHttpRequest(string $method, string $url, array $options = []): array
     {
-        $ch = curl_init();
-        
-        $defaultOptions = [
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_HEADER => false,
-            CURLOPT_NOBODY => false,
-            CURLOPT_VERBOSE => false,
-        ];
+        return async(function () use ($method, $url, $options) {
+            $client = HttpClientBuilder::buildDefault();
+            $request = new Request($url, $method);
 
-        // Add authentication if provided
-        if (isset($options['auth'])) {
-            $defaultOptions[CURLOPT_USERPWD] = $options['auth']['username'] . ':' . $options['auth']['password'];
-            unset($options['auth']);
-        }
+            // Add authentication if provided
+            if (isset($options['auth'])) {
+                $credentials = base64_encode($options['auth']['username'] . ':' . $options['auth']['password']);
+                $request->setHeader('Authorization', 'Basic ' . $credentials);
+                unset($options['auth']);
+            }
 
-        // Add request body if provided
-        if (isset($options['body'])) {
-            $defaultOptions[CURLOPT_POSTFIELDS] = $options['body'];
-            unset($options['body']);
-        }
+            // Add request body if provided
+            if (isset($options['body'])) {
+                $request->setBody($options['body']);
+                unset($options['body']);
+            }
 
-        // Add headers if provided
-        if (isset($options['headers'])) {
-            $defaultOptions[CURLOPT_HTTPHEADER] = $options['headers'];
-            unset($options['headers']);
-        }
+            // Add headers if provided
+            if (isset($options['headers'])) {
+                foreach ($options['headers'] as $header) {
+                    if (is_string($header) && strpos($header, ':') !== false) {
+                        [$name, $value] = explode(':', $header, 2);
+                        $request->setHeader(trim($name), trim($value));
+                    }
+                }
+                unset($options['headers']);
+            }
 
-        // Merge with provided options
-        foreach ($options as $key => $value) {
-            $defaultOptions[$key] = $value;
-        }
+            // Handle file upload for PUT requests
+            if (isset($options['file_handle'])) {
+                $request->setBody($options['file_handle']);
+                unset($options['file_handle']);
+            }
 
-        curl_setopt_array($ch, $defaultOptions);
-        
-        $body = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        
-        curl_close($ch);
+            
 
-        if ($body === false) {
-            throw new RuntimeException("cURL error: " . $error);
-        }
-
-        return [
-            'body' => $body,
-            'http_code' => $httpCode,
-            'error' => $error
-        ];
+            try {
+                $response = $client->request($request);
+                
+                return [
+                    'body' => $response->getBody()->buffer(),
+                    'http_code' => $response->getStatus(),
+                    'error' => ''
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'body' => '',
+                    'http_code' => 0,
+                    'error' => $e->getMessage()
+                ];
+            }
+        })->await();
     }
 
     protected function uploadFileViaWebDAV(string $username, string $password, string $filename, string $content): array
@@ -182,21 +187,16 @@ abstract class BaseIntegrationTest extends TestCase
         }
 
         $url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
-        $fileHandle = fopen($localPath, 'r');
+        $fileContent = file_get_contents($localPath);
         
-        if (!$fileHandle) {
-            throw new RuntimeException("Could not open file: {$localPath}");
+        if ($fileContent === false) {
+            throw new RuntimeException("Could not read file: {$localPath}");
         }
 
-        try {
-            return $this->makeHttpRequest('PUT', $url, [
-                'auth' => ['username' => $username, 'password' => $password],
-                CURLOPT_INFILE => $fileHandle,
-                CURLOPT_INFILESIZE => filesize($localPath),
-            ]);
-        } finally {
-            fclose($fileHandle);
-        }
+        return $this->makeHttpRequest('PUT', $url, [
+            'auth' => ['username' => $username, 'password' => $password],
+            'body' => $fileContent,
+        ]);
     }
 
     protected function testGetEndpoint(string $endpoint, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void
