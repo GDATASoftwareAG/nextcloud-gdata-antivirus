@@ -6,6 +6,8 @@
 
 namespace Integration;
 
+require_once __DIR__ . '/BaseIntegrationTest.php';
+
 class ApiEndpointTest extends BaseIntegrationTest
 {
     /**
