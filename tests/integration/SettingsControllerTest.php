@@ -37,11 +37,25 @@ class SettingsControllerTest extends BaseIntegrationTest
     }
 
     #[DataProvider('adminGetRouteProvider')]
-    public function testAdminCanAccessAllRoutes(string $route): void
+    public function testAdminCanAccessAdminGetRoutes(string $route): void
     {
-        echo "Testing admin access to {$route}...\n";
         $this->testGetEndpoint($route, "Admin access to {$route}", 200);
     }
+
+    // testAdminCanAccessAdminGetRoutes
+    // testAdminCanAccessAdminPostRoutes
+    // testAdminCanAccessOperatorGetRoutes
+    // testAdminCanAccessOperatorPostRoutes
+
+    // testOperatorCannotAccessAdminGetRoutes
+    // testOperatorCannotAccessAdminPostRoutes
+    // testOperatorCanAccessOperatorGetRoutes
+    // testOperatorCanAccessOperatorPostRoutes
+
+    // testUserCannotAccessAdminGetRoutes
+    // testUserCannotAccessAdminPostRoutes
+    // testUserCannotAccessOperatorGetRoutes
+    // testUserCannotAccessOperatorPostRoutes
 
     // /**
     //  * Test scan endpoint (POST /scan)

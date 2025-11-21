@@ -32,7 +32,7 @@ abstract class BaseIntegrationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Load environment variables
         $this->hostname = $_ENV['HOSTNAME'] ?? '127.0.0.1:8080';
         $this->folderPrefix = $_ENV['FOLDER_PREFIX'] ?? './tmp/functionality-parallel';
@@ -71,7 +71,7 @@ abstract class BaseIntegrationTest extends TestCase
         $this->executeDockerCommand("php occ user:add {$this->testUser} --password-from-env", [
             'OC_PASS' => $this->testUserPassword
         ]);
-        
+
         // Create user directory
         $this->executeDockerCommand("mkdir -p /var/www/html/data/{$this->testUser}/files");
 
@@ -92,11 +92,11 @@ abstract class BaseIntegrationTest extends TestCase
         foreach ($env as $key => $value) {
             $envString .= " --env {$key}=\"{$value}\"";
         }
-        
+
         $fullCommand = "{$this->dockerExecWithUser}{$envString} nextcloud-container {$command}";
-        
+
         exec($fullCommand . ' 2>&1', $output, $returnCode);
-        
+
         return [
             'output' => $output,
             'return_code' => $returnCode,
@@ -106,64 +106,62 @@ abstract class BaseIntegrationTest extends TestCase
 
     protected function makeHttpRequest(string $method, string $url, array $options = []): array
     {
-        return async(function () use ($method, $url, $options) {
-            $client = HttpClientBuilder::buildDefault();
-            $request = new Request($url, $method);
+        $client = HttpClientBuilder::buildDefault();
+        $request = new Request($url, $method);
 
-            // Add authentication if provided
-            if (isset($options['auth'])) {
-                $credentials = base64_encode($options['auth']['username'] . ':' . $options['auth']['password']);
-                $request->setHeader('Authorization', 'Basic ' . $credentials);
-                unset($options['auth']);
-            }
+        // Add authentication if provided
+        if (isset($options['auth'])) {
+            $credentials = base64_encode($options['auth']['username'] . ':' . $options['auth']['password']);
+            $request->setHeader('Authorization', 'Basic ' . $credentials);
+            unset($options['auth']);
+        }
 
-            // Add request body if provided
-            if (isset($options['body'])) {
-                $request->setBody($options['body']);
-                unset($options['body']);
-            }
+        // Add request body if provided
+        if (isset($options['body'])) {
+            $request->setBody($options['body']);
+            unset($options['body']);
+        }
 
-            // Add headers if provided
-            if (isset($options['headers'])) {
-                foreach ($options['headers'] as $header) {
-                    if (is_string($header) && strpos($header, ':') !== false) {
-                        [$name, $value] = explode(':', $header, 2);
-                        $request->setHeader(trim($name), trim($value));
-                    }
+        // Add headers if provided
+        if (isset($options['headers'])) {
+            foreach ($options['headers'] as $header) {
+                if (is_string($header) && strpos($header, ':') !== false) {
+                    [$name, $value] = explode(':', $header, 2);
+                    $request->setHeader(trim($name), trim($value));
                 }
-                unset($options['headers']);
             }
+            unset($options['headers']);
+        }
 
-            // Handle file upload for PUT requests
-            if (isset($options['file_handle'])) {
-                $request->setBody($options['file_handle']);
-                unset($options['file_handle']);
-            }
+        // Handle file upload for PUT requests
+        if (isset($options['file_handle'])) {
+            $request->setBody($options['file_handle']);
+            unset($options['file_handle']);
+        }
 
-            
 
-            try {
-                $response = $client->request($request);
-                
-                return [
-                    'body' => $response->getBody()->buffer(),
-                    'http_code' => $response->getStatus(),
-                    'error' => ''
-                ];
-            } catch (\Throwable $e) {
-                return [
-                    'body' => '',
-                    'http_code' => 0,
-                    'error' => $e->getMessage()
-                ];
-            }
-        })->await();
+
+        try {
+            $response = $client->request($request);
+
+            return [
+                'body' => $response->getBody()->buffer(),
+                'http_code' => $response->getStatus(),
+                'error' => ''
+            ];
+        } catch (\Throwable $e) {
+            return [
+                'body' => '',
+                'http_code' => 0,
+                'error' => $e->getMessage()
+            ];
+        }
     }
 
     protected function uploadFileViaWebDAV(string $username, string $password, string $filename, string $content): array
     {
         $url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
-        
+
         return $this->makeHttpRequest('PUT', $url, [
             'auth' => ['username' => $username, 'password' => $password],
             'body' => $content,
@@ -174,7 +172,7 @@ abstract class BaseIntegrationTest extends TestCase
     protected function deleteFileViaWebDAV(string $username, string $password, string $filename): array
     {
         $url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
-        
+
         return $this->makeHttpRequest('DELETE', $url, [
             'auth' => ['username' => $username, 'password' => $password]
         ]);
@@ -188,7 +186,7 @@ abstract class BaseIntegrationTest extends TestCase
 
         $url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
         $fileContent = file_get_contents($localPath);
-        
+
         if ($fileContent === false) {
             throw new RuntimeException("Could not read file: {$localPath}");
         }
@@ -202,11 +200,11 @@ abstract class BaseIntegrationTest extends TestCase
     protected function testGetEndpoint(string $endpoint, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void
     {
         $url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
-        
+
         $result = $this->makeHttpRequest('GET', $url, [
             'auth' => ['username' => $username, 'password' => $password]
         ]);
-        
+
         echo "{$description} result: {$result['http_code']}\n";
         $this->assertEquals($expectedHttpStatus, $result['http_code'], "Failed: {$description}");
     }
@@ -214,13 +212,13 @@ abstract class BaseIntegrationTest extends TestCase
     protected function testPostEndpoint(string $endpoint, array $data, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void
     {
         $url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
-        
+
         $result = $this->makeHttpRequest('POST', $url, [
             'auth' => ['username' => $username, 'password' => $password],
             'body' => json_encode($data),
             'headers' => ['Content-Type: application/json']
         ]);
-        
+
         echo "{$description} result: {$result['http_code']}\n";
         $this->assertEquals($expectedHttpStatus, $result['http_code'], "Failed: {$description}");
     }
@@ -253,7 +251,7 @@ abstract class BaseIntegrationTest extends TestCase
     {
         $tags = $this->getTagsForFile($filePath);
         // Filter out empty lines
-        $nonEmptyTags = array_filter($tags, function($line) {
+        $nonEmptyTags = array_filter($tags, function ($line) {
             return trim($line) !== '';
         });
         $this->assertCount($expectedCount, $nonEmptyTags, "Expected {$expectedCount} tags, got " . count($nonEmptyTags));
@@ -262,7 +260,7 @@ abstract class BaseIntegrationTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-        
+
         // Clean up temporary files
         $folderPrefix = $_ENV['FOLDER_PREFIX'] ?? './tmp/functionality-parallel';
         if (is_dir($folderPrefix)) {
@@ -275,9 +273,9 @@ abstract class BaseIntegrationTest extends TestCase
         if (!is_dir($dir)) {
             return;
         }
-        
+
         $files = array_diff(scandir($dir), ['.', '..']);
-        
+
         foreach ($files as $file) {
             $path = $dir . DIRECTORY_SEPARATOR . $file;
             if (is_dir($path)) {
@@ -286,7 +284,7 @@ abstract class BaseIntegrationTest extends TestCase
                 unlink($path);
             }
         }
-        
+
         rmdir($dir);
     }
 }
