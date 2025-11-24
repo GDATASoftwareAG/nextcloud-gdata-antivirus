@@ -15,24 +15,55 @@ class SettingsControllerTest extends BaseIntegrationTest
     public static function adminGetRouteProvider(): array
     {
         return [
-            ['getCounters'],
             ['getAuthMethod'],
             ['getCache'],
             ['getHashlookup'],
+        ];
+    }
+
+    public static function adminPostRouteProvider(): array
+    {
+        return [
+            // TODO: use default settings
+            ['adminSettings', [
+                'username' => 'username',
+                'password' => 'password',
+                'clientId' => 'clientId',
+                'clientSecret' => 'clientSecret',
+                'authMethod' => 'authMethod',
+                'maxScanSize' => 209715200,
+                'timeout' => 900,
+                'cache' => true,
+                'hashlookup' => true
+            ]],
+            // ['setadvancedconfig'],
+        ];
+    }
+
+    public static function operatorGetRouteProvider(): array
+    {
+        return [
             ['getSendMailOnVirusUpload'],
             ['getAutoScan'],
             ['getPrefixMalicious'],
             ['getDisableUnscannedTag'],
-            // ['setAutoScan'],
-            // ['setPrefixMalicious'],
-            // ['setSendMailOnVirusUpload'],
-            // ['setDisableUnscannedTag'],
-            // ['setadvancedconfig'],
-            ['operatorSettings'],
-            ['adminSettings'],
-            // ['resetalltags'],
-            // ['testsettings'],
-            // ['scan']
+            ['getCounters'],
+        ];
+    }
+
+    public static function operatorPostRouteProvider(): array
+    {
+        return [
+            ['operatorSettings', [
+                'quarantineFolder' => '',
+                'scanOnlyThis' => '',
+                'doNotScanThis' => '',
+                'notifyMails' => '',
+            ]],
+            ['setAutoScan', ['autoScanFiles' => true]],
+            ['setPrefixMalicious', ['prefixMalicious' => '[VIRUS] ']],
+            ['setSendMailOnVirusUpload', ['sendMailOnVirusUpload' => 'false']],
+            ['setDisableUnscannedTag', ['disableUnscannedTag' => 'false']],
         ];
     }
 
@@ -42,20 +73,85 @@ class SettingsControllerTest extends BaseIntegrationTest
         $this->testGetEndpoint($route, "Admin access to {$route}", 200);
     }
 
-    // testAdminCanAccessAdminGetRoutes
-    // testAdminCanAccessAdminPostRoutes
-    // testAdminCanAccessOperatorGetRoutes
-    // testAdminCanAccessOperatorPostRoutes
 
-    // testOperatorCannotAccessAdminGetRoutes
-    // testOperatorCannotAccessAdminPostRoutes
-    // testOperatorCanAccessOperatorGetRoutes
-    // testOperatorCanAccessOperatorPostRoutes
+    #[DataProvider('adminPostRouteProvider')]
+    public function testAdminCanAccessAdminPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
+    }
 
-    // testUserCannotAccessAdminGetRoutes
-    // testUserCannotAccessAdminPostRoutes
-    // testUserCannotAccessOperatorGetRoutes
-    // testUserCannotAccessOperatorPostRoutes
+    #[DataProvider('operatorGetRouteProvider')]
+    public function testAdminCanAccessOperatorGetRoutes(string $route): void
+    {
+        $this->testGetEndpoint($route, "Admin access to {$route}", 200);
+    }
+
+    #[DataProvider('operatorPostRouteProvider')]
+    public function testAdminCanAccessOperatorPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
+    }
+
+
+    #[DataProvider('adminGetRouteProvider')]
+    public function testOperatorCannotAccessAdminGetRoutes(string $route): void
+    {
+        $this->testGetEndpoint($route, "Operator access to {$route}", 403, username: "vaas-operator", password: "gdatavaas-operator");
+    }
+
+
+    #[DataProvider('adminPostRouteProvider')]
+    public function testOperatorCannotAccessAdminPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: "vaas-operator", password: "gdatavaas-operator");
+    }
+
+    #[DataProvider('operatorGetRouteProvider')]
+    public function testOperatorCanAccessOperatorGetRoutes(string $route): void
+    {
+        $this->testGetEndpoint($route, "Operator access to {$route}", 200, username: "vaas-operator", password: "gdatavaas-operator");
+    }
+
+    #[DataProvider('operatorPostRouteProvider')]
+    public function testOperatorCanAccessOperatorPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Operator access to {$route}", 200, username: "vaas-operator", password: "gdatavaas-operator");
+    }
+
+
+    #[DataProvider('adminGetRouteProvider')]
+    public function testUserCannotAccessAdminGetRoutes(string $route): void
+    {
+        $this->testGetEndpoint($route, "User access to {$route}", 403, username: "user", password: "gdatavaas-user");
+    }
+
+
+    #[DataProvider('adminPostRouteProvider')]
+    public function testUserCannotAccessAdminPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: "user", password: "gdatavaas-user");
+    }
+
+    #[DataProvider('operatorGetRouteProvider')]
+    public function testUserCannotAccessOperatorGetRoutes(string $route): void
+    {
+        $this->testGetEndpoint($route, "Operator access to {$route}", 403, username: "user", password: "gdatavaas-user");
+    }
+
+    #[DataProvider('operatorPostRouteProvider')]
+    public function testUserCannotAccessOperatorPostRoutes(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: "user", password: "gdatavaas-user");
+    }
+
+
+    #[DataProvider('adminPostRouteProvider')]
+    #[DataProvider('operatorPostRouteProvider')]
+    public function testPostRoutesReturn400ForEmptyBody(string $route, array $data): void
+    {
+        $this->testPostEndpoint($route, [], "Admin access to {$route}", 400);
+    }
+
 
     // /**
     //  * Test scan endpoint (POST /scan)
@@ -96,16 +192,6 @@ class SettingsControllerTest extends BaseIntegrationTest
     // }
 
     // /**
-    //  * Test all GET endpoints
-    //  * @dataProvider getEndpointsProvider
-    //  */
-    // public function testGetEndpoints(string $endpoint, string $description): void
-    // {
-    //     echo "Testing {$endpoint}...\n";
-    //     $this->testGetEndpoint($endpoint, $description, 200);
-    // }
-
-    // /**
     //  * Data provider for GET endpoints
     //  */
     // public static function getEndpointsProvider(): array
@@ -120,16 +206,6 @@ class SettingsControllerTest extends BaseIntegrationTest
     //         ['getPrefixMalicious', 'Get prefix malicious'],
     //         ['getDisableUnscannedTag', 'Get disable unscanned tag'],
     //     ];
-    // }
-
-    // /**
-    //  * Test all POST settings endpoints
-    //  * @dataProvider postEndpointsProvider
-    //  */
-    // public function testPostSettingsEndpoints(string $endpoint, array $data, string $description): void
-    // {
-    //     echo "Testing {$endpoint}...\n";
-    //     $this->testPostEndpoint($endpoint, $data, $description, 200);
     // }
 
     // /**
