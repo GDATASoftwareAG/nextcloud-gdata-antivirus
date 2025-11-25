@@ -10,8 +10,8 @@ use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCA\GDataVaas\Settings\VaasOperator;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http\JSONResponse;
 use OCP\AppFramework\Http\Attribute\AuthorizedAdminSetting;
+use OCP\AppFramework\Http\JSONResponse;
 use OCP\DB\Exception;
 use OCP\IAppConfig;
 use OCP\IRequest;
@@ -77,7 +77,7 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
-    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setOperatorSettings(
 		$quarantineFolder,
 		$scanOnlyThis,
@@ -99,18 +99,18 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
-    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setAutoScan(bool $autoScanFiles): JSONResponse {
 		$this->config->setValueBool($this->appName, 'autoScanFiles', $autoScanFiles);
 		return new JSONResponse(['status' => 'success']);
 	}
 
-    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function getAutoScan(): JSONResponse {
 		return new JSONResponse(['status' => $this->config->getValueBool($this->appName, 'autoScanFiles')]);
 	}
 
-    #[AuthorizedAdminSetting(settings: VaasOperator::class)]
+	#[AuthorizedAdminSetting(settings: VaasOperator::class)]
 	public function setPrefixMalicious(bool $prefixMalicious): JSONResponse {
 		$this->config->setValueBool($this->appName, 'prefixMalicious', $prefixMalicious);
 		return new JSONResponse(['status' => 'success']);

@@ -53,11 +53,11 @@ class VaasOperator implements IDelegatedSettings {
 
 	#[\Override]
 	public function getName(): ?string {
-        return $this->l->t('Operator Settings');
-    }
+		return $this->l->t('Operator Settings');
+	}
 
 	#[\Override]
-    public function getAuthorizedAppConfig(): array {
-        return [];
-    }
+	public function getAuthorizedAppConfig(): array {
+		return [];
+	}
 }
