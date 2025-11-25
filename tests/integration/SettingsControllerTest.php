@@ -86,23 +86,49 @@ class SettingsControllerTest extends BaseIntegrationTest {
 
 	#[DataProvider('adminGetRouteProvider')]
 	public function testOperatorCannotAccessAdminGetRoutes(string $route): void {
-		$this->testGetEndpoint($route, "Operator access to {$route}", 403, username: 'vaas-operator', password: 'gdatavaas-operator');
+		$this->testGetEndpoint(
+			$route, 
+			"Operator access to {$route}", 
+			403, 
+			username: 'vaas-operator', 
+			password: 'gdatavaas-operator'
+		);
 	}
 
 
 	#[DataProvider('adminPostRouteProvider')]
 	public function testOperatorCannotAccessAdminPostRoutes(string $route, array $data): void {
-		$this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: 'vaas-operator', password: 'gdatavaas-operator');
+		$this->testPostEndpoint(
+			$route, 
+			$data, 
+			"Operator access to {$route}", 
+			403, 
+			username: 'vaas-operator', 
+			password: 'gdatavaas-operator'
+		);
 	}
 
 	#[DataProvider('operatorGetRouteProvider')]
 	public function testOperatorCanAccessOperatorGetRoutes(string $route): void {
-		$this->testGetEndpoint($route, "Operator access to {$route}", 200, username: 'vaas-operator', password: 'gdatavaas-operator');
+		$this->testGetEndpoint(
+			$route, 
+			"Operator access to {$route}", 
+			200, 
+			username: 'vaas-operator', 
+			password: 'gdatavaas-operator'
+		);
 	}
 
 	#[DataProvider('operatorPostRouteProvider')]
 	public function testOperatorCanAccessOperatorPostRoutes(string $route, array $data): void {
-		$this->testPostEndpoint($route, $data, "Operator access to {$route}", 200, username: 'vaas-operator', password: 'gdatavaas-operator');
+		$this->testPostEndpoint(
+			$route, 
+			$data, 
+			"Operator access to {$route}", 
+			200, 
+			username: 'vaas-operator', 
+			password: 'gdatavaas-operator'
+		);
 	}
 
 
@@ -114,7 +140,14 @@ class SettingsControllerTest extends BaseIntegrationTest {
 
 	#[DataProvider('adminPostRouteProvider')]
 	public function testUserCannotAccessAdminPostRoutes(string $route, array $data): void {
-		$this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: 'user', password: 'gdatavaas-user');
+		$this->testPostEndpoint(
+			$route, 
+			$data, 
+			"Operator access to {$route}", 
+			403, 
+			username: 'user', 
+			password: 'gdatavaas-user'
+		);
 	}
 
 	#[DataProvider('operatorGetRouteProvider')]
@@ -124,7 +157,14 @@ class SettingsControllerTest extends BaseIntegrationTest {
 
 	#[DataProvider('operatorPostRouteProvider')]
 	public function testUserCannotAccessOperatorPostRoutes(string $route, array $data): void {
-		$this->testPostEndpoint($route, $data, "Operator access to {$route}", 403, username: 'user', password: 'gdatavaas-user');
+		$this->testPostEndpoint(
+			$route, 
+			$data, 
+			"Operator access to {$route}", 
+			403, 
+			username: 'user', 
+			password: 'gdatavaas-user'
+		);
 	}
 
 

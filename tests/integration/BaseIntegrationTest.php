@@ -182,7 +182,13 @@ abstract class BaseIntegrationTest extends TestCase {
 		]);
 	}
 
-	protected function testGetEndpoint(string $endpoint, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void {
+	protected function testGetEndpoint(
+		string $endpoint, 
+		string $description, 
+		int $expectedHttpStatus = 200, 
+		string $username = 'admin', 
+		string $password = 'admin'
+	): void {
 		$url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
 
 		$result = $this->makeHttpRequest('GET', $url, [
@@ -192,7 +198,14 @@ abstract class BaseIntegrationTest extends TestCase {
 		$this->assertEquals($expectedHttpStatus, $result['http_code'], "Failed: {$description}");
 	}
 
-	protected function testPostEndpoint(string $endpoint, array $data, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void {
+	protected function testPostEndpoint(
+		string $endpoint, 
+		array $data, 
+		string $description, 
+		int $expectedHttpStatus = 200, 
+		string $username = 'admin', 
+		string $password = 'admin'
+	): void {
 		$url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
 
 		$result = $this->makeHttpRequest('POST', $url, [
