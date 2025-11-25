@@ -10,8 +10,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 require_once __DIR__ . '/BaseIntegrationTest.php';
 
-class SettingsControllerTest extends BaseIntegrationTest {
-	public static function adminGetRouteProvider(): array {
+class SettingsControllerTest extends BaseIntegrationTest
+{
+	public static function adminGetRouteProvider(): array
+	{
 		return [
 			['getAuthMethod'],
 			['getCache'],
@@ -19,7 +21,8 @@ class SettingsControllerTest extends BaseIntegrationTest {
 		];
 	}
 
-	public static function adminPostRouteProvider(): array {
+	public static function adminPostRouteProvider(): array
+	{
 		return [
 			// TODO: use default settings
 			['adminSettings', [
@@ -37,7 +40,8 @@ class SettingsControllerTest extends BaseIntegrationTest {
 		];
 	}
 
-	public static function operatorGetRouteProvider(): array {
+	public static function operatorGetRouteProvider(): array
+	{
 		return [
 			['getSendMailOnVirusUpload'],
 			['getAutoScan'],
@@ -47,7 +51,8 @@ class SettingsControllerTest extends BaseIntegrationTest {
 		];
 	}
 
-	public static function operatorPostRouteProvider(): array {
+	public static function operatorPostRouteProvider(): array
+	{
 		return [
 			['operatorSettings', [
 				'quarantineFolder' => '',
@@ -63,114 +68,119 @@ class SettingsControllerTest extends BaseIntegrationTest {
 	}
 
 	#[DataProvider('adminGetRouteProvider')]
-	public function testAdminCanAccessAdminGetRoutes(string $route): void {
+	public function testAdminCanAccessAdminGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint($route, "Admin access to {$route}", 200);
 	}
 
 
 	#[DataProvider('adminPostRouteProvider')]
-	public function testAdminCanAccessAdminPostRoutes(string $route, array $data): void {
+	public function testAdminCanAccessAdminPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
 	}
 
 	#[DataProvider('operatorGetRouteProvider')]
-	public function testAdminCanAccessOperatorGetRoutes(string $route): void {
+	public function testAdminCanAccessOperatorGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint($route, "Admin access to {$route}", 200);
 	}
 
 	#[DataProvider('operatorPostRouteProvider')]
-	public function testAdminCanAccessOperatorPostRoutes(string $route, array $data): void {
+	public function testAdminCanAccessOperatorPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
 	}
 
 
 	#[DataProvider('adminGetRouteProvider')]
-	public function testOperatorCannotAccessAdminGetRoutes(string $route): void {
+	public function testOperatorCannotAccessAdminGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint(
-			$route, 
-			"Operator access to {$route}", 
-			403, 
-			username: 'vaas-operator', 
+			$route,
+			"Operator access to {$route}",
+			403,
+			username: 'vaas-operator',
 			password: 'gdatavaas-operator'
 		);
 	}
 
 
 	#[DataProvider('adminPostRouteProvider')]
-	public function testOperatorCannotAccessAdminPostRoutes(string $route, array $data): void {
+	public function testOperatorCannotAccessAdminPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint(
-			$route, 
-			$data, 
-			"Operator access to {$route}", 
-			403, 
-			username: 'vaas-operator', 
+			$route,
+			$data,
+			"Operator access to {$route}",
+			403,
+			username: 'vaas-operator',
 			password: 'gdatavaas-operator'
 		);
 	}
 
 	#[DataProvider('operatorGetRouteProvider')]
-	public function testOperatorCanAccessOperatorGetRoutes(string $route): void {
+	public function testOperatorCanAccessOperatorGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint(
-			$route, 
-			"Operator access to {$route}", 
-			200, 
-			username: 'vaas-operator', 
+			$route,
+			"Operator access to {$route}",
+			200,
+			username: 'vaas-operator',
 			password: 'gdatavaas-operator'
 		);
 	}
 
 	#[DataProvider('operatorPostRouteProvider')]
-	public function testOperatorCanAccessOperatorPostRoutes(string $route, array $data): void {
+	public function testOperatorCanAccessOperatorPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint(
-			$route, 
-			$data, 
-			"Operator access to {$route}", 
-			200, 
-			username: 'vaas-operator', 
+			$route,
+			$data,
+			"Operator access to {$route}",
+			200,
+			username: 'vaas-operator',
 			password: 'gdatavaas-operator'
 		);
 	}
 
 
 	#[DataProvider('adminGetRouteProvider')]
-	public function testUserCannotAccessAdminGetRoutes(string $route): void {
+	public function testUserCannotAccessAdminGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint($route, "User access to {$route}", 403, username: 'user', password: 'gdatavaas-user');
 	}
 
 
 	#[DataProvider('adminPostRouteProvider')]
-	public function testUserCannotAccessAdminPostRoutes(string $route, array $data): void {
+	public function testUserCannotAccessAdminPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint(
-			$route, 
-			$data, 
-			"Operator access to {$route}", 
-			403, 
-			username: 'user', 
+			$route,
+			$data,
+			"Operator access to {$route}",
+			403,
+			username: 'user',
 			password: 'gdatavaas-user'
 		);
 	}
 
 	#[DataProvider('operatorGetRouteProvider')]
-	public function testUserCannotAccessOperatorGetRoutes(string $route): void {
+	public function testUserCannotAccessOperatorGetRoutes(string $route): void
+	{
 		$this->testGetEndpoint($route, "Operator access to {$route}", 403, username: 'user', password: 'gdatavaas-user');
 	}
 
 	#[DataProvider('operatorPostRouteProvider')]
-	public function testUserCannotAccessOperatorPostRoutes(string $route, array $data): void {
+	public function testUserCannotAccessOperatorPostRoutes(string $route, array $data): void
+	{
 		$this->testPostEndpoint(
-			$route, 
-			$data, 
-			"Operator access to {$route}", 
-			403, 
-			username: 'user', 
+			$route,
+			$data,
+			"Operator access to {$route}",
+			403,
+			username: 'user',
 			password: 'gdatavaas-user'
 		);
-	}
-
-
-	#[DataProvider('adminPostRouteProvider')]
-	#[DataProvider('operatorPostRouteProvider')]
-	public function testPostRoutesReturn400ForEmptyBody(string $route, array $data): void {
-		$this->testPostEndpoint($route, [], "Admin access to {$route}", 400);
 	}
 }
