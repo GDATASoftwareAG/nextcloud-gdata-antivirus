@@ -102,6 +102,6 @@ setup_file() {
     $DOCKER_EXEC_WITH_USER nextcloud-container rm /var/www/html/data/$TESTUSER/files/$TESTUSER.unscanned.pup.exe
 }
 
-teardown_file() {
+@teardown_file() {
     rm -rf $FOLDER_PREFIX/
 }

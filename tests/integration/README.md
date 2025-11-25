@@ -1,10 +1,10 @@
 # Integration Tests
 
-This directory contains PHPUnit integration tests.
+This directory contains PHPUnit integration tests. These tests verify the functionality of the G DATA Antivirus app by testing real HTTP requests
+and `php occ` interactions.
 
-## Prerequisites
-
-How-to run:
+## How-to run
+  1. In the project root
   1. Setup .env
-  2. make test
-  
+  1. make test
+
