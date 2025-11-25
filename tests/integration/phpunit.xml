@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 >
     <testsuite name='G DATA Antivirus Integration Tests'>
         <directory suffix='Test.php'>.</directory>
+        <exclude>BaseIntegrationTest.php</exclude>
     </testsuite>
     <php>
         <env name="PHPUNIT_INTEGRATION_ENV" value="true"/>
