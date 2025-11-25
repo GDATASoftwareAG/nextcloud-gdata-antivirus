@@ -11,8 +11,7 @@ use Amp\Http\Client\Request;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-abstract class BaseIntegrationTest extends TestCase
-{
+abstract class BaseIntegrationTest extends TestCase {
 	protected string $hostname;
 	protected string $folderPrefix;
 	protected string $testUser;
@@ -25,8 +24,7 @@ abstract class BaseIntegrationTest extends TestCase
 
 	protected static bool $setupCompleted = false;
 
-	protected function setUp(): void
-	{
+	protected function setUp(): void {
 		parent::setUp();
 
 		// Load environment variables
@@ -46,8 +44,7 @@ abstract class BaseIntegrationTest extends TestCase
 		}
 	}
 
-	protected function setupEnvironment(): void
-	{
+	protected function setupEnvironment(): void {
 		// Create temporary folder
 		if (!is_dir($this->folderPrefix)) {
 			mkdir($this->folderPrefix, 0755, true);
@@ -82,8 +79,7 @@ abstract class BaseIntegrationTest extends TestCase
 		$this->executeDockerCommand('php occ app:enable gdatavaas');
 	}
 
-	protected function executeDockerCommand(string $command, array $env = []): array
-	{
+	protected function executeDockerCommand(string $command, array $env = []): array {
 		$envString = '';
 		foreach ($env as $key => $value) {
 			$envString .= " --env {$key}=\"{$value}\"";
@@ -100,8 +96,7 @@ abstract class BaseIntegrationTest extends TestCase
 		];
 	}
 
-	protected function makeHttpRequest(string $method, string $url, array $options = []): array
-	{
+	protected function makeHttpRequest(string $method, string $url, array $options = []): array {
 		$client = HttpClientBuilder::buildDefault();
 		$request = new Request($url, $method);
 
@@ -151,8 +146,7 @@ abstract class BaseIntegrationTest extends TestCase
 		}
 	}
 
-	protected function uploadFileViaWebDAV(string $username, string $password, string $filename, string $content): array
-	{
+	protected function uploadFileViaWebDAV(string $username, string $password, string $filename, string $content): array {
 		$url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
 
 		return $this->makeHttpRequest('PUT', $url, [
@@ -162,8 +156,7 @@ abstract class BaseIntegrationTest extends TestCase
 		]);
 	}
 
-	protected function deleteFileViaWebDAV(string $username, string $password, string $filename): array
-	{
+	protected function deleteFileViaWebDAV(string $username, string $password, string $filename): array {
 		$url = "http://{$this->hostname}/remote.php/dav/files/{$username}/{$filename}";
 
 		return $this->makeHttpRequest('DELETE', $url, [
@@ -171,8 +164,7 @@ abstract class BaseIntegrationTest extends TestCase
 		]);
 	}
 
-	protected function uploadFileFromDisk(string $username, string $password, string $filename, string $localPath): array
-	{
+	protected function uploadFileFromDisk(string $username, string $password, string $filename, string $localPath): array {
 		if (!file_exists($localPath)) {
 			throw new RuntimeException("File not found: {$localPath}");
 		}
@@ -190,8 +182,7 @@ abstract class BaseIntegrationTest extends TestCase
 		]);
 	}
 
-	protected function testGetEndpoint(string $endpoint, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void
-	{
+	protected function testGetEndpoint(string $endpoint, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void {
 		$url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
 
 		$result = $this->makeHttpRequest('GET', $url, [
@@ -201,8 +192,7 @@ abstract class BaseIntegrationTest extends TestCase
 		$this->assertEquals($expectedHttpStatus, $result['http_code'], "Failed: {$description}");
 	}
 
-	protected function testPostEndpoint(string $endpoint, array $data, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void
-	{
+	protected function testPostEndpoint(string $endpoint, array $data, string $description, int $expectedHttpStatus = 200, string $username = 'admin', string $password = 'admin'): void {
 		$url = "http://{$this->hostname}/apps/gdatavaas/{$endpoint}";
 
 		$result = $this->makeHttpRequest('POST', $url, [
@@ -214,32 +204,27 @@ abstract class BaseIntegrationTest extends TestCase
 		$this->assertEquals($expectedHttpStatus, $result['http_code'], "Failed: {$description}");
 	}
 
-	protected function assertContainsVirusFound(array $response): void
-	{
+	protected function assertContainsVirusFound(array $response): void {
 		$this->assertStringContainsString('Virus found', $response['body'], 'Expected "Virus found" in response body');
 	}
 
-	protected function assertHttpCodeInRange(int $httpCode, int $min = 200, int $max = 299): void
-	{
+	protected function assertHttpCodeInRange(int $httpCode, int $min = 200, int $max = 299): void {
 		$this->assertGreaterThanOrEqual($min, $httpCode, "HTTP code {$httpCode} is below expected range {$min}-{$max}");
 		$this->assertLessThan($max + 1, $httpCode, "HTTP code {$httpCode} is above expected range {$min}-{$max}");
 	}
 
-	protected function getTagsForFile(string $filePath): array
-	{
+	protected function getTagsForFile(string $filePath): array {
 		$result = $this->executeDockerCommand("php occ gdatavaas:get-tags-for-file {$filePath}");
 		return $result['output'];
 	}
 
-	protected function assertHasTag(string $filePath, string $expectedTag): void
-	{
+	protected function assertHasTag(string $filePath, string $expectedTag): void {
 		$tags = $this->getTagsForFile($filePath);
 		$tagString = implode("\n", $tags);
 		$this->assertStringContainsString($expectedTag, $tagString, "Expected tag '{$expectedTag}' not found in file tags");
 	}
 
-	protected function assertTagCount(string $filePath, int $expectedCount): void
-	{
+	protected function assertTagCount(string $filePath, int $expectedCount): void {
 		$tags = $this->getTagsForFile($filePath);
 		// Filter out empty lines
 		$nonEmptyTags = array_filter($tags, function ($line) {
@@ -248,8 +233,7 @@ abstract class BaseIntegrationTest extends TestCase
 		$this->assertCount($expectedCount, $nonEmptyTags, "Expected {$expectedCount} tags, got " . count($nonEmptyTags));
 	}
 
-	public static function tearDownAfterClass(): void
-	{
+	public static function tearDownAfterClass(): void {
 		parent::tearDownAfterClass();
 
 		// Clean up temporary files
@@ -259,8 +243,7 @@ abstract class BaseIntegrationTest extends TestCase
 		}
 	}
 
-	private static function removeDirectory(string $dir): void
-	{
+	private static function removeDirectory(string $dir): void {
 		if (!is_dir($dir)) {
 			return;
 		}
