@@ -77,6 +77,13 @@ unittests:
 	composer install
 	./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
 
+# Run integration tests
+.PHONY: integrationtests
+integrationtests:
+	./scripts/run-app.sh "32.0.0" 1
+	composer install
+	./vendor/bin/phpunit -c tests/integration/phpunit.xml tests/integration/ --testdox
+
 # Run bats tests
 .PHONY: bats
 bats:

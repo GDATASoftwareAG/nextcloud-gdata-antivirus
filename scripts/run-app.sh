@@ -82,6 +82,12 @@ docker exec --user www-data -i nextcloud-container php occ config:app:set gdatav
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas authMethod --value=ClientCredentials
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas autoScanFiles --value=true
 
+# Add groups and users
+docker exec -e OC_PASS=gdatavaas-user --user www-data -i nextcloud-container php occ user:add user --password-from-env
+docker exec --user www-data -i nextcloud-container php occ group:add vaas-operators
+docker exec -e OC_PASS=gdatavaas-operator --user www-data -i nextcloud-container php occ user:add vaas-operator --password-from-env --group vaas-operators
+docker exec --user www-data -i nextcloud-container php occ admin-delegation:add 'OCA\GDataVaas\Settings\VaasOperator' vaas-operators
+
 # Configure Nextcloud to send emails
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas notifyMails --value="test@example.com"
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas sendMailOnVirusUpload --value=true

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!--
+SPDX-FileCopyrightText: 2025 G DATA CyberDefense AG <vaas@gdata.de>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<phpunit bootstrap="bootstrap.php"
+         defaultTimeLimit="60"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
+>
+    <testsuite name='G DATA Antivirus Integration Tests'>
+        <directory suffix='Test.php'>.</directory>
+    </testsuite>
+    <php>
+        <env name="PHPUNIT_INTEGRATION_ENV" value="true"/>
+    </php>
+</phpunit>
