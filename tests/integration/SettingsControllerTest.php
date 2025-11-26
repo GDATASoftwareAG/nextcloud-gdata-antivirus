@@ -8,9 +8,9 @@ namespace Integration;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 
-require_once __DIR__ . '/BaseIntegrationTest.php';
+require_once __DIR__ . '/IntegrationTestBase.php';
 
-class SettingsControllerTest extends BaseIntegrationTest {
+class SettingsControllerTest extends IntegrationTestBase {
 	public static function adminGetRouteProvider(): array {
 		return [
 			['getAuthMethod'],

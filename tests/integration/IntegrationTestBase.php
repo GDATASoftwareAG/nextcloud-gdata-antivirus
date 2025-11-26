@@ -11,7 +11,7 @@ use Amp\Http\Client\Request;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
-abstract class BaseIntegrationTest extends TestCase {
+abstract class IntegrationTestBase extends TestCase {
 	protected string $hostname;
 	protected string $folderPrefix;
 	protected string $testUser;
@@ -28,7 +28,7 @@ abstract class BaseIntegrationTest extends TestCase {
 		parent::setUp();
 
 		// Load environment variables
-		$this->hostname = $_ENV['HOSTNAME'] ?? '127.0.0.1:8080';
+		$this->hostname = $_ENV['NEXTCLOUD_HOSTNAME'] ?? '127.0.0.1:8080';
 		$this->folderPrefix = $_ENV['FOLDER_PREFIX'] ?? './tmp/functionality-parallel';
 		$this->testUser = $_ENV['TESTUSER'] ?? 'testuser';
 		$this->testUserPassword = $_ENV['TESTUSER_PASSWORD'] ?? 'myfancysecurepassword234';
