@@ -1,6 +1,6 @@
 {
   "name": "PHP",
-  "image": "mcr.microsoft.com/devcontainers/php:1-8.4-bullseye",
+  "image": "mcr.microsoft.com/devcontainers/php:2-8.4-bullseye",
   "forwardPorts": [
     8080,
     8081

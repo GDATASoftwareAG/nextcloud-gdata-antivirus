@@ -10,6 +10,6 @@ jobs:
   editorconfig:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: editorconfig-checker/action-editorconfig-checker@main
       - run: editorconfig-checker -exclude "\.sh|\.ya?ml|\.md|\.gitignore|\.json|admin\.php|Dockerfile\.Nextcloud|\.txt|Makefile|\.xml|\.bats|\.env-test|\.ini"
