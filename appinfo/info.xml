@@ -71,6 +71,7 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
     </commands>
     <settings>
         <admin>OCA\GDataVaas\Settings\VaasAdmin</admin>
+        <admin>OCA\GDataVaas\Settings\VaasOperator</admin>
         <admin-section>OCA\GDataVaas\Settings\VaasAdminSection</admin-section>
     </settings>
     <activity>

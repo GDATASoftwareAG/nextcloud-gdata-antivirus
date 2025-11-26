@@ -9,8 +9,8 @@ defaults:
     shell: bash
 on:
   push:
-    branches: ["main"]
-    tags: ["*"]
+    branches: ['main']
+    tags: ['*']
   pull_request:
   workflow_dispatch:
 
@@ -39,7 +39,7 @@ jobs:
       env:
         IS_CI: 1
       options: --name nextcloud-antivirus-build-container
-    needs: 
+    needs:
       - build-devcontainer
     steps:
       - uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
       - name: postCreateCommands
         run: |
           source .devcontainer/postCreateCommands.sh
-      
+
       - name: add composer bin to path
         run: |
           echo $(composer config home --global)/vendor/bin >> $GITHUB_PATH
@@ -82,21 +82,14 @@ jobs:
         run: |
           docker network connect nextcloud-gdata-antivirus_nextcloud-network nextcloud-antivirus-build-container
 
-      - name: run tests
-        id: bats-tests
+      - name: run integration tests
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
+          NEXTCLOUD_HOSTNAME: nextcloud-container
         run: |
-          if bats --verbose-run --timing --trace ./tests/bats; then
-            echo "bats_run=success" | tee -a "$GITHUB_OUTPUT";
-          else
-            echo "bats_run=fail" | tee -a "$GITHUB_OUTPUT";
-          fi
-
-      - name: fail if bats tests did fail
-        if: steps.bats-tests.outputs.bats_run == 'fail'
-        run: exit 1
+          bats --verbose-run --timing --trace ./tests/bats
+          ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php tests/integration/
 
       - uses: actions/upload-artifact@master
         with:

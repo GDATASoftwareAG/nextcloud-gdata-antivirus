@@ -40,12 +40,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const authSubmitAdvanced = document.querySelector('#auth_submit_advanced');
 	const testSettings = document.querySelector('#test-settings');
 	const resetAllTags = document.querySelector('#reset');
-	const autoScanFiles = document.querySelector('#auto_scan_files');
-	const prefixMalicious = document.querySelector('#prefixMalicious');
 	const authMethod = document.querySelector('#authMethod');
-	const disableUnscannedTag = document.querySelector('#disable_tag_unscanned');
-	const scanCounter = document.querySelector('#scan_counter');
-	const sendMailOnVirusUpload = document.querySelector('#send_mail_on_virus_upload');
 
 	hideUnneccessaryFields(authMethod.value);
 
@@ -59,25 +54,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const password = document.querySelector('#password').value;
 		const clientId = document.querySelector('#clientId').value;
 		const clientSecret = document.querySelector('#clientSecret').value;
-		const quarantineFolder = document.querySelector('#quarantine_folder').value;
-		const scanOnlyThis = document.querySelector('#scanOnlyThis').value;
-		const doNotScanThis = document.querySelector('#doNotScanThis').value;
-		const notifyMails = document.querySelector('#notify_mails').value;
 		const maxScanSize = document.querySelector('#max-scan-size').value;
 		const timeout = document.querySelector('#timeout').value;
 		const cache = document.querySelector('#cache').checked;
 		const hashlookup = document.querySelector('#hashlookup').checked;
 
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setconfig'), {
+		const response = await postData(OC.generateUrl('apps/gdatavaas/adminSettings'), {
 			username: username,
 			password: password,
 			clientId: clientId,
 			clientSecret: clientSecret,
 			authMethod: authMethod.value,
-			quarantineFolder,
-			scanOnlyThis,
-			doNotScanThis,
-			notifyMails,
 			maxScanSize,
 			timeout,
 			cache,
@@ -119,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const tokenEndpoint = document.querySelector('#token_endpoint').value;
 		const vaasUrl = document.querySelector('#vaas_url').value;
 
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setadvancedconfig'), {
+		const response = await postData(OC.generateUrl('apps/gdatavaas/setAdvancedConfig'), {
 			tokenEndpoint,
 			vaasUrl
 		});
@@ -143,61 +130,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			msgElement.textContent = 'An error occurred when resetting the tags.';
 		}
 	});
-
-	autoScanFiles.addEventListener('click', async () => {
-		await toggleAutoScan(autoScanFiles.checked);
-	});
-
-	prefixMalicious.addEventListener('click', async () => {
-		await postData(
-			OC.generateUrl('apps/gdatavaas/setPrefixMalicious'),
-			{prefixMalicious: prefixMalicious.checked}
-		);
-	});
-
-	disableUnscannedTag.addEventListener('click', async () => {
-		await postData(
-			OC.generateUrl('apps/gdatavaas/setDisableUnscannedTag'),
-			{disableUnscannedTag: disableUnscannedTag.checked}
-		);
-	});
-
-	sendMailOnVirusUpload.addEventListener('click', async () => {
-		await postData(
-			OC.generateUrl('apps/gdatavaas/setSendMailOnVirusUpload'),
-			{sendMailOnVirusUpload: sendMailOnVirusUpload.checked}
-		);
-	});
-
-	// Activate or deactivate automatic file scanning
-	const toggleAutoScan = async (enable) => {
-		autoScanFiles.checked = enable;
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setAutoScan'), {autoScanFiles: enable});
-		if (response.status !== "success") {
-			OC.Notification.showTemporary(
-				`An Error occurred when ${enable ? 'activating' : 'deactivating'} automatic file scanning.`
-			);
-		}
-	}
-
-	// Set values on page load
-	const autoScanResponse = await getData(OC.generateUrl('apps/gdatavaas/getAutoScan'));
-	if (autoScanResponse.status) {
-		autoScanFiles.checked = true;
-	} else {
-		autoScanFiles.checked = false;
-	}
-	prefixMalicious.checked = (await getData(OC.generateUrl('apps/gdatavaas/getPrefixMalicious'))).status;
-	disableUnscannedTag.checked = (await getData(OC.generateUrl('apps/gdatavaas/getDisableUnscannedTag'))).status;
-	sendMailOnVirusUpload.checked = (await getData(OC.generateUrl('apps/gdatavaas/getSendMailOnVirusUpload'))).status;
-
-	let filesCounter = await getData(OC.generateUrl('apps/gdatavaas/getCounters'));
-	if (filesCounter['status'] === 'success') {
-		scanCounter.textContent = filesCounter["scanned"] + ' / ' + filesCounter["all"];
-	} else {
-		scanCounter.textContent = ' N/A';
-		console.log('Error getting files counter:', filesCounter['message']);
-	}
 
 	document.querySelector('#cache').checked = (await getData(OC.generateUrl('apps/gdatavaas/getCache'))).status;
 	document.querySelector('#hashlookup').checked = (await getData(OC.generateUrl('apps/gdatavaas/getHashlookup'))).status;
