@@ -11,8 +11,7 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 /**
  * Search upward from the given directory for a .env file.
  */
-function findEnvDirectory(string $startDir): ?string
-{
+function findEnvDirectory(string $startDir): ?string {
 	$dir = $startDir;
 
 	while (true) {
