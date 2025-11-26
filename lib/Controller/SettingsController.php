@@ -71,7 +71,7 @@ class SettingsController extends Controller {
 		return new JSONResponse(['status' => 'success']);
 	}
 
-	public function setadvancedconfig($tokenEndpoint, $vaasUrl): JSONResponse {
+	public function setAdvancedConfig($tokenEndpoint, $vaasUrl): JSONResponse {
 		$this->config->setValueString($this->appName, 'tokenEndpoint', $tokenEndpoint);
 		$this->config->setValueString($this->appName, 'vaasUrl', $vaasUrl);
 		return new JSONResponse(['status' => 'success']);

@@ -10,54 +10,57 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 define('INTEGRATION_TEST_ROOT', __DIR__);
 define('PROJECT_ROOT', __DIR__ . '/../..');
 
-// Load environment variables for integration testing
-$envFile = __DIR__ . '/../bats/.env-test';
-if (file_exists($envFile)) {
-	$envContent = file_get_contents($envFile);
-	$envLines = explode("\n", $envContent);
+$dotenv = Dotenv\Dotenv::createImmutable(PROJECT_ROOT);
+$dotenv->load();
 
-	foreach ($envLines as $line) {
-		$line = trim($line);
-		if (empty($line) || strpos($line, '#') === 0 || strpos($line, 'export') !== 0) {
-			continue;
-		}
+// // Load environment variables for integration testing
+// $envFile = __DIR__ . '/../bats/.env-test';
+// if (file_exists($envFile)) {
+// 	$envContent = file_get_contents($envFile);
+// 	$envLines = explode("\n", $envContent);
 
-		// Remove 'export ' prefix and parse key=value
-		$line = substr($line, 7); // Remove 'export '
-		if (strpos($line, '=') !== false) {
-			[$key, $value] = explode('=', $line, 2);
-			// Remove quotes if present
-			$value = trim($value, '"\'');
-			$_ENV[$key] = $value;
-			putenv("$key=$value");
-		}
-	}
-}
+// 	foreach ($envLines as $line) {
+// 		$line = trim($line);
+// 		if (empty($line) || strpos($line, '#') === 0 || strpos($line, 'export') !== 0) {
+// 			continue;
+// 		}
 
-// Load local environment files
-$localEnvFiles = [PROJECT_ROOT . '/.env-local', PROJECT_ROOT . '/.env'];
-foreach ($localEnvFiles as $envFile) {
-	if (file_exists($envFile)) {
-		$envContent = file_get_contents($envFile);
-		$envLines = explode("\n", $envContent);
+// 		// Remove 'export ' prefix and parse key=value
+// 		$line = substr($line, 7); // Remove 'export '
+// 		if (strpos($line, '=') !== false) {
+// 			[$key, $value] = explode('=', $line, 2);
+// 			// Remove quotes if present
+// 			$value = trim($value, '"\'');
+// 			$_ENV[$key] = $value;
+// 			putenv("$key=$value");
+// 		}
+// 	}
+// }
 
-		foreach ($envLines as $line) {
-			$line = trim($line);
-			if (empty($line) || strpos($line, '#') === 0) {
-				continue;
-			}
+// // Load local environment files
+// $localEnvFiles = [PROJECT_ROOT . '/.env-local', PROJECT_ROOT . '/.env'];
+// foreach ($localEnvFiles as $envFile) {
+// 	if (file_exists($envFile)) {
+// 		$envContent = file_get_contents($envFile);
+// 		$envLines = explode("\n", $envContent);
 
-			if (strpos($line, '=') !== false) {
-				[$key, $value] = explode('=', $line, 2);
-				// Remove quotes if present
-				$value = trim($value, '"\'');
-				$_ENV[$key] = $value;
-				putenv("$key=$value");
-			}
-		}
-		break; // Use first found env file
-	}
-}
+// 		foreach ($envLines as $line) {
+// 			$line = trim($line);
+// 			if (empty($line) || strpos($line, '#') === 0) {
+// 				continue;
+// 			}
+
+// 			if (strpos($line, '=') !== false) {
+// 				[$key, $value] = explode('=', $line, 2);
+// 				// Remove quotes if present
+// 				$value = trim($value, '"\'');
+// 				$_ENV[$key] = $value;
+// 				putenv("$key=$value");
+// 			}
+// 		}
+// 		break; // Use first found env file
+// 	}
+// }
 
 // Set default values if not defined
 if (!isset($_ENV['HOSTNAME'])) {

@@ -22,7 +22,7 @@ return [
 		['name' => 'settings#getCounters', 'url' => '/getCounters', 'verb' => 'GET'],
 		// admin
 		['name' => 'settings#setAdminSettings', 'url' => '/adminSettings', 'verb' => 'POST'],
-		['name' => 'settings#setadvancedconfig', 'url' => '/setadvancedconfig', 'verb' => 'POST'],
+		['name' => 'settings#setAdvancedConfig', 'url' => '/setAdvancedConfig', 'verb' => 'POST'],
 		['name' => 'settings#getAuthMethod', 'url' => '/getAuthMethod', 'verb' => 'GET'],
 		['name' => 'settings#resetAllTags', 'url' => '/resetalltags', 'verb' => 'POST'],
 		['name' => 'settings#testsettings', 'url' => '/testsettings', 'verb' => 'POST'],

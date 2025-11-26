@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const tokenEndpoint = document.querySelector('#token_endpoint').value;
 		const vaasUrl = document.querySelector('#vaas_url').value;
 
-		const response = await postData(OC.generateUrl('apps/gdatavaas/setadvancedconfig'), {
+		const response = await postData(OC.generateUrl('apps/gdatavaas/setAdvancedConfig'), {
 			tokenEndpoint,
 			vaasUrl
 		});

@@ -24,19 +24,18 @@ class SettingsControllerTest extends BaseIntegrationTest
 	public static function adminPostRouteProvider(): array
 	{
 		return [
-			// TODO: use default settings
 			['adminSettings', [
-				'username' => 'username',
-				'password' => 'password',
+				'username' => 'admin',
+				'password' => 'admin',
 				'clientId' => 'clientId',
 				'clientSecret' => 'clientSecret',
-				'authMethod' => 'authMethod',
+				'authMethod' => 'ResourceOwnerPassword',
 				'maxScanSize' => 209715200,
 				'timeout' => 900,
 				'cache' => true,
 				'hashlookup' => true
 			]],
-			// ['setadvancedconfig'],
+			['setAdvancedConfig', ['tokenEndpoint' => 'tokenEndpoint', 'vaasUrl' => 'vaasUrl']],
 		];
 	}
 

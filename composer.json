@@ -10,7 +10,8 @@
     ],
     "require": {
         "gdata/vaas": "11.0.1",
-        "coduo/php-humanizer": "5.0.0"
+        "coduo/php-humanizer": "5.0.0",
+        "vlucas/phpdotenv": "5.6"
     },
     "require-dev": {
         "nextcloud/ocp": "v32.0.0",
