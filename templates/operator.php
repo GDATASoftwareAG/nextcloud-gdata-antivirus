@@ -15,8 +15,8 @@ style('gdatavaas', 'style');
 		<table class="basic_settings_table">
 			<tr class="basic_settings">
 				<td>
-					<div title="<?php p($l->t('Files scanned as "Malicious" are moved to this folder. ' .
-								'They can still be downloaded etc. there, but this helps to prevent accidental use.'));?>" 
+					<div title="<?php p($l->t('Files scanned as "Malicious" are moved to this folder. '
+								. 'They can still be downloaded etc. there, but this helps to prevent accidental use.'));?>" 
 						 class="visible">
 						<label for="quarantine_folder"><?php p($l->t('Quarantine folder'));?></label>
 					</div>
@@ -28,8 +28,8 @@ style('gdatavaas', 'style');
 			</tr>
 			<tr class="basic_settings">
 				<td>
-					<div title="<?php p($l->t('Comma-separated allow list values. Can be paths, folders, ' .
-								'file names or file types. Wildcards are not supported.'));?>" 
+					<div title="<?php p($l->t('Comma-separated allow list values. Can be paths, folders, '
+								. 'file names or file types. Wildcards are not supported.'));?>" 
 						 class="visible">
 						<label for="scanOnlyThis"><?php p($l->t('Scan only this'));?></label>
 					</div>
@@ -41,8 +41,8 @@ style('gdatavaas', 'style');
 			</tr>
 			<tr class="basic_settings">
 				<td>
-					<div title="<?php p($l->t('Comma-separated block list values. Can be paths, folders, ' .
-								'file names or file types. Wildcards are not supported.'));?>" 
+					<div title="<?php p($l->t('Comma-separated block list values. Can be paths, folders, '
+								. 'file names or file types. Wildcards are not supported.'));?>" 
 						 class="visible">
 						<label for="doNotScanThis"><?php p($l->t('Do not scan this'));?></label>
 					</div>
@@ -54,8 +54,8 @@ style('gdatavaas', 'style');
 			</tr>
 			<tr class="notify_mails">
 				<td>
-					<div title="<?php p($l->t('Mail addresses for notifications when malicious files are found ' .
-								'or a user tries to upload them. Must be comma-separated.'));?>" 
+					<div title="<?php p($l->t('Mail addresses for notifications when malicious files are found '
+								. 'or a user tries to upload them. Must be comma-separated.'));?>" 
 						 class="visible">
 						<label for="notify_mails"><?php p($l->t('Notify Mails'));?></label>
 					</div>
@@ -92,8 +92,8 @@ style('gdatavaas', 'style');
 				<label for="prefixMalicious"></label>
 			</td>
 			<td>
-				<div title="<?php p($l->t('If the scan result is "Malicious", this is added to the front ' .
-							'of the file name. Increases the visibility of malicious content.'));?>" 
+				<div title="<?php p($l->t('If the scan result is "Malicious", this is added to the front '
+							. 'of the file name. Increases the visibility of malicious content.'));?>" 
 					 class="visible">
 					<label><?php p($l->t('Set prefix for malicious files'));?></label>
 				</div>
@@ -105,8 +105,8 @@ style('gdatavaas', 'style');
 				<label for="disable_tag_unscanned"></label>
 			</td>
 			<td>
-				<div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", ' .
-							'but they will still be scanned if "Automatic file scanning" is switched on.'));?>" 
+				<div title="<?php p($l->t('Files that have not yet been scanned will no longer be tagged "Unscanned", '
+							. 'but they will still be scanned if "Automatic file scanning" is switched on.'));?>" 
 					 class="visible">
 					<label><?php p($l->t('Disable Unscanned tag'));?></label>
 				</div>
@@ -118,8 +118,8 @@ style('gdatavaas', 'style');
 				<label for="send_mail_on_virus_upload"></label>
 			</td>
 			<td>
-				<div title="<?php p($l->t('If a user tries to upload an infected file an email is send ' .
-							'to all \'Notify Mails\' receiver'));?>" 
+				<div title="<?php p($l->t('If a user tries to upload an infected file an email is send '
+							. 'to all \'Notify Mails\' receiver'));?>" 
 					 class="visible">
 					<label><?php p($l->t('Send mails on infected file upload'));?></label>
 				</div>
