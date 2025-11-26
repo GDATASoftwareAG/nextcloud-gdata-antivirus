@@ -4,9 +4,36 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+use Dotenv\Dotenv;
+
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-define('PROJECT_ROOT', __DIR__ . '/../..');
+/**
+ * Search upward from the given directory for a .env file.
+ */
+function findEnvDirectory(string $startDir): ?string
+{
+	$dir = $startDir;
 
-$dotenv = Dotenv\Dotenv::createImmutable(PROJECT_ROOT);
-$dotenv->load();
+	while (true) {
+		if (file_exists($dir . '/.env')) {
+			return $dir;
+		}
+
+		$parent = dirname($dir);
+
+		// Stop if we've reached the root directory
+		if ($parent === $dir) {
+			return null;
+		}
+
+		$dir = $parent;
+	}
+}
+
+$envDir = findEnvDirectory(__DIR__);
+
+if ($envDir !== null) {
+	$dotenv = Dotenv::createImmutable($envDir);
+	$dotenv->safeLoad();
+}
