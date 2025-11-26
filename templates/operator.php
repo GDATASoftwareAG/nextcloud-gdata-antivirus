@@ -132,3 +132,4 @@ style('gdatavaas', 'style');
 		<label id="scan_counter"></label>
 	</h3>
 </div>
+
