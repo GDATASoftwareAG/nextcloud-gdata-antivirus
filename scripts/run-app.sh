@@ -124,7 +124,7 @@ docker exec --user www-data -i nextcloud-container php occ config:system:set mai
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
 docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
 
-if [ "$IS_CI" -ne 0 ]; then
+if [ "$IS_CI" -eq 0 ]; then
   setup_s3 &
   wait %1 || exit 1
 fi
