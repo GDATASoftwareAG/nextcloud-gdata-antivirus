@@ -20,6 +20,8 @@ source .env || echo "No .env file found."
 setup_nextcloud () {
   docker stop nextcloud-container || true
   docker container rm nextcloud-container || true
+  docker stop garaged || true
+  docker container rm garaged || true
   docker compose -f docker-compose.yaml kill
   docker compose -f docker-compose.yaml rm --force --stop --volumes
   docker compose -f docker-compose.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
@@ -47,6 +49,30 @@ setup_nextcloud () {
 
   echo "Setup Nextcloud finished."
 }
+
+setup_s3 () {
+  NODE_ID=$(docker exec garaged /garage -c /etc/garage.toml status | grep "ID" -A 1 | awk 'NR==2 {print $1}')
+  docker exec garaged /garage -c /etc/garage.toml layout assign -z dc1 -c 1G $NODE_ID
+  docker exec garaged /garage -c /etc/garage.toml layout apply --version 1
+  docker exec garaged /garage -c /etc/garage.toml bucket create nextcloud-bucket
+  SECRET_KEY=$(docker exec garaged /garage -c /etc/garage.toml key create nextcloud-key | grep "Secret key" | awk -F': ' '/Secret key/ {gsub(/^[ \t]+/, "", $2); print $2}')
+  ACCESS_KEY=$(docker exec garaged /garage -c /etc/garage.toml key info nextcloud-key | grep "Key ID" | awk -F': ' '/Key ID/ {gsub(/^[ \t]+/, "", $2); print $2}')
+  docker exec garaged /garage -c /etc/garage.toml bucket allow --read --write --owner nextcloud-bucket --key nextcloud-key
+  
+  echo "Created S3 bucket 'nextcloud-bucket' with access key $ACCESS_KEY and secret key $SECRET_KEY."
+
+  docker exec --user www-data nextcloud-container php occ app:enable files_external
+
+  docker exec --user www-data nextcloud-container php occ files_external:create garage-storage amazons3 amazons3::accesskey \
+    --config bucket=nextcloud-bucket \
+    --config hostname=garaged \
+    --config port=3900 \
+    --config region=garage \
+    --config use_ssl=false \
+    --config use_path_style=true \
+    --config key=$ACCESS_KEY \
+    --config secret=$SECRET_KEY
+  }
 
 build_app () {
   echo "Building G DATA Antivirus App for Nextcloud..."
@@ -97,6 +123,9 @@ docker exec --user www-data -i nextcloud-container php occ config:system:set mai
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_from_address --value="test@example.com"
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
 docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
+
+setup_s3 &
+wait %1 || exit 1
 
 composer install
 
