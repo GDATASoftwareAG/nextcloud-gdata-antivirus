@@ -6,7 +6,8 @@
 
 namespace OCA\GDataVaas\Service;
 
-use Exception;
+use Amp\File\Driver\BlockingFilesystemDriver;
+use Amp\File\FilesystemDriver;
 use OC\User\NoUserException;
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\Files\EntityTooLargeException;
@@ -19,6 +20,7 @@ use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 use VaasSdk\Exceptions\VaasAuthenticationException;
 use VaasSdk\Exceptions\VaasClientException;
 use VaasSdk\Exceptions\VaasServerException;
+use VaasSdk\Options\ForFileOptions;
 use VaasSdk\Options\VaasOptions;
 use VaasSdk\Vaas;
 use VaasSdk\VaasVerdict;
@@ -35,6 +37,7 @@ class VerdictService {
 	private FileService $fileService;
 	private TagService $tagService;
 	private ?Vaas $vaas = null;
+	private FilesystemDriver $filesystemDriver;
 	private LoggerInterface $logger;
 
 	public function __construct(
@@ -47,6 +50,7 @@ class VerdictService {
 		$this->appConfig = $appConfig;
 		$this->fileService = $fileService;
 		$this->tagService = $tagService;
+		$this->filesystemDriver = new BlockingFilesystemDriver();
 
 		$this->authMethod = $this->appConfig->getValueString(
 			Application::APP_ID, 'authMethod', 'ClientCredentials'
@@ -186,7 +190,8 @@ class VerdictService {
 			$this->vaas = $this->createAndConnectVaas();
 		}
 
-		return $this->vaas->forFileAsync($filePath)->await();
+		$options = new ForFileOptions(true, true, ForFileOptions::DEFAULT_TIMEOUT, $this->filesystemDriver);
+		return $this->vaas->forFileAsync($filePath, $options)->await();
 	}
 
 	/**
