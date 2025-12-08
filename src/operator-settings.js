@@ -49,12 +49,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const msgElement = document.querySelector('#operator_save_msg')
 
 		if (response.status === 'success') {
-			msgElement.textContent = 'Data saved successfully.'
+			msgElement.textContent = t('gdatavaas', 'Data saved successfully.')
 		} else {
 			if (response.message) {
 				msgElement.textContent = response.message
 			} else {
-				msgElement.textContent = 'An error occurred when saving the data.'
+				msgElement.textContent = t('gdatavaas', 'An error occurred when saving the data.')
 			}
 		}
 	})
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const response = await postData(OC.generateUrl('apps/gdatavaas/setAutoScan'), { autoScanFiles: enable })
 		if (response.status !== 'success') {
 			OC.Notification.showTemporary(
-				`An Error occurred when ${enable ? 'activating' : 'deactivating'} automatic file scanning.`
+				t('gdatavaas', `An Error occurred when ${enable ? 'activating' : 'deactivating'} automatic file scanning.`)
 			)
 		}
 	}

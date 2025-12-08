@@ -1,0 +1,17 @@
+{
+  "translations": {
+    "Data saved successfully.": "Data saved successfully.",
+    "An error occurred when saving the data.": "An error occurred when saving the data.",
+    "Authentication successful and VaaS backend reachable.": "Authentication successful and VaaS backend reachable.",
+    "An error occurred during the test.": "An error occurred during the test.",
+    "All tags have been reset successfully.": "All tags have been reset successfully.",
+    "An error occurred when resetting the tags.": "An error occurred when resetting the tags.",
+    "Antivirus scan": "Antivirus scan",
+    "User {owner} tried to upload an infected file to {path}:":
+      "User {owner} tried to upload an infected file to {path}:",
+    "Detection": "Detection",
+    "The file \"{filename}\" has been scanned with G DATA and the verdict is: Malicious":
+      "The file \"{filename}\" has been scanned with G DATA and the verdict is: Malicious",
+  },
+  "pluralForm": "nplurals=2; plural=(n != 1);"
+}
