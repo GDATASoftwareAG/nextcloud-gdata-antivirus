@@ -42,7 +42,7 @@ Please make sure the "Authentication Method" "Resource Owner Password Flow" is s
 ]]></description>
     <version>0.0.0</version>
     <licence>agpl</licence>
-    <author mail="vaas@gdata.de" homepage="https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus">Lennart Dohmann</author>
+    <author mail="vaas@gdata.de" homepage="https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus">G DATA CyberDefense AG</author>
     <namespace>GDataVaas</namespace>
     <category>security</category>
     <bugs>https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues</bugs>
