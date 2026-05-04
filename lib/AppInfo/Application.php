@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
 
-use OCA\Files\Event\LoadAdditionalScriptsEvent as FilesLoadAdditionalScriptsEvent;
 use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\EventListener\FileEventsListener;
 use OCA\GDataVaas\Service\TagService;
@@ -29,6 +28,7 @@ use Psr\Log\LoggerInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'gdatavaas';
+	private const FILES_LOAD_ADDITIONAL_SCRIPTS_EVENT = 'OCA\\Files\\Event\\LoadAdditionalScriptsEvent';
 
 	/**
 	 * @throws ContainerExceptionInterface
@@ -40,7 +40,7 @@ class Application extends App implements IBootstrap {
 		$container = $this->getContainer();
 		$eventDispatcher = $container->get(IEventDispatcher::class);
 		assert($eventDispatcher instanceof IEventDispatcher);
-		$eventDispatcher->addListener(FilesLoadAdditionalScriptsEvent::class, function () {
+		$eventDispatcher->addListener(self::FILES_LOAD_ADDITIONAL_SCRIPTS_EVENT, function () {
 			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
 		});
 		$eventDispatcher->addListener(ResourcesLoadAdditionalScriptsEvent::class, function () {

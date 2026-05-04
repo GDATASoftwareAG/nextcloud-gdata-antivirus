@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2025 G DATA CyberDefense AG
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 metadata_dir = "/tmp/meta"
 data_dir = "/tmp/data"
 db_engine = "sqlite"
