@@ -3,31 +3,44 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 import {showError, showSuccess, showWarning} from '@nextcloud/dialogs'
-import {FileAction, Permission, registerFileAction} from '@nextcloud/files'
+import {FileType, Permission, registerFileAction} from '@nextcloud/files'
+import {getRequestToken} from '@nextcloud/auth'
+import {t} from '@nextcloud/l10n'
+import {generateUrl} from '@nextcloud/router'
 import Magnifier from '@mdi/svg/svg/magnify.svg?raw'
 
-registerFileAction(new FileAction({
+registerFileAction({
 	id: "gdatavaas-filescan",
 	displayName: () => t('gdatavaas', 'Antivirus scan'),
-	enabled: (nodes) => {
-		const node = nodes[0];
-		return node.mime !== 'httpd/unix-directory' && (node.permissions & Permission.READ);
+	enabled: ({nodes}) => {
+		if (!Array.isArray(nodes) || nodes.length === 0) {
+			return false
+		}
+
+		return nodes.every((node) => {
+			if (!node) {
+				return false
+			}
+
+			return node.type !== FileType.Folder && Boolean(node.permissions & Permission.READ)
+		})
 	},
 	iconSvgInline: () => Magnifier,
-	async exec(file) {
+	async exec({nodes}) {
 		try {
-			const fileId = file.fileid;
-			let response = await fetch(OC.generateUrl('/apps/gdatavaas/scan'), {
+			const file = nodes[0]
+			const fileId = file.id
+			let response = await fetch(generateUrl('/apps/gdatavaas/scan'), {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'requesttoken': oc_requesttoken
+					'requesttoken': getRequestToken()
 				},
 				body: JSON.stringify({
 					fileId: fileId
 				})
-			});
-			let vaasVerdict = await response.json();
+			})
+			let vaasVerdict = await response.json()
 			if (response.status === 200) {
 				switch (vaasVerdict['verdict']) {
 					case 'Malicious':
@@ -53,4 +66,4 @@ registerFileAction(new FileAction({
 			showError(t('gdatavaas', 'An error occurred while trying to scan the file: ') + e);
 		}
 	},
-}))
+})

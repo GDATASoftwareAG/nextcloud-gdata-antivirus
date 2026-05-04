@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace OCA\GDataVaas\AppInfo;
 
+use OCA\Files\Event\LoadAdditionalScriptsEvent as FilesLoadAdditionalScriptsEvent;
 use OCA\GDataVaas\Db\DbFileMapper;
 use OCA\GDataVaas\EventListener\FileEventsListener;
 use OCA\GDataVaas\Service\TagService;
@@ -16,7 +17,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
+use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent as ResourcesLoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
@@ -39,8 +40,11 @@ class Application extends App implements IBootstrap {
 		$container = $this->getContainer();
 		$eventDispatcher = $container->get(IEventDispatcher::class);
 		assert($eventDispatcher instanceof IEventDispatcher);
-		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
-			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
+		$eventDispatcher->addListener(FilesLoadAdditionalScriptsEvent::class, function () {
+			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
+		});
+		$eventDispatcher->addListener(ResourcesLoadAdditionalScriptsEvent::class, function () {
+			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
 		});
 	}
 
