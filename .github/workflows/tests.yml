@@ -73,7 +73,9 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-        run: ./scripts/run-app.sh 31.0.8 1
+        run: |
+          source nextcloud.env
+          ./scripts/run-app.sh "$NEXTCLOUD_VERSION" 1
 
       - name: add builder into nextcloud network
         run: |

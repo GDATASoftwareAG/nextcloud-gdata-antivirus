@@ -6,7 +6,12 @@
 
 set -e
 
-export NEXTCLOUD_VERSION=${1:-33.0.0}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -z "${NEXTCLOUD_VERSION:-}" ]; then
+  source "$SCRIPT_DIR/../nextcloud.env"
+fi
+
+export NEXTCLOUD_VERSION=${1:-${NEXTCLOUD_VERSION}}
 export IS_CI=${2:-0}
 
 if [ "$IS_CI" -eq 0 ]; then
@@ -24,7 +29,7 @@ setup_nextcloud () {
   docker container rm garaged || true
   docker compose -f docker-compose.yaml kill || true
   docker compose -f docker-compose.yaml down --volumes || true
-  docker compose -f docker-compose.yaml up --build -d
+  NEXTCLOUD_VERSION="$NEXTCLOUD_VERSION" docker compose -f docker-compose.yaml up --build -d
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do

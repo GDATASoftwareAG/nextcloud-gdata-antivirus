@@ -4,7 +4,7 @@
 
 services:
   nextcloud-container:
-    image: nextcloud:33.0.0
+    image: nextcloud:${NEXTCLOUD_VERSION:?NEXTCLOUD_VERSION must be set}
     ports:
       - "8080:80"
     container_name: nextcloud-container
