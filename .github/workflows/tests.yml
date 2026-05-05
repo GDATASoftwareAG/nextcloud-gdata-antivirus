@@ -86,7 +86,7 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
-          NEXTCLOUD_HOSTNAME: nextcloud-container
+          NEXTCLOUD_HOSTNAME: 127.0.0.1:8080
         run: |
           bats --verbose-run --timing --trace ./tests/bats
           ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php tests/integration/
