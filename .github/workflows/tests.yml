@@ -60,9 +60,6 @@ jobs:
           sed -i "s/<version>0.0.0<\/version>/<version>$RELEASE_VERSION<\/version>/g" ./appinfo/info.xml
 
       - name: unittests
-        env:
-          CLIENT_ID: ${{ secrets.VAAS_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.VAAS_CLIENT_SECRET }}
         run: |
           composer install
           ./vendor/bin/phpunit --bootstrap tests/unittests/bootstrap.php tests/unittests/ --testdox
@@ -91,7 +88,10 @@ jobs:
           curl --fail --show-error --silent --connect-timeout 5 --max-time 10 "http://${NEXTCLOUD_HOSTNAME}/status.php" > /dev/null
           curl --fail --show-error --silent --connect-timeout 5 --max-time 10 "http://nextcloud-container/status.php" > /dev/null
           bats --verbose-run --timing --trace ./tests/bats
+          # Need to dump env into .env because phpunit does not pass them on to tests
+          printenv | sed "s/'/'\"'\"'/g; s/=/='/; s/$/'/" > .env
           ./vendor/bin/phpunit --bootstrap tests/integration/bootstrap.php tests/integration/
+          rm -f .env
 
       - uses: actions/upload-artifact@master
         with:
