@@ -6,25 +6,6 @@ set -euo pipefail
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-start_docker() {
-    if docker info >/dev/null 2>&1; then
-        return 0
-    fi
-
-    sudo mkdir -p /var/log
-    sudo nohup dockerd >/var/log/dockerd.log 2>&1 &
-
-    for _ in $(seq 1 30); do
-        if docker info >/dev/null 2>&1; then
-            return 0
-        fi
-        sleep 1
-    done
-
-    sudo tail -n 200 /var/log/dockerd.log >&2 || true
-    return 1
-}
-
 # for d in "/usr/local/etc/php/conf.d" "${PHP_INI_DIR}/conf.d"; do
 #     if [ -n "$d" ] && [ -d "$d" ]; then
 #         echo "Setting PHP CLI memory_limit=-1 in $d/99-memory-limit.ini"
@@ -55,7 +36,5 @@ sudo bash -c "npm completion > /usr/share/bash-completion/completions/npm"
 if ! grep -qxF ". /usr/share/bash-completion/bash_completion" "$HOME"/.bashrc; then
     echo ". /usr/share/bash-completion/bash_completion" >> "$HOME"/.bashrc
 fi
-
-start_docker
 
 ./scripts/run-app.sh

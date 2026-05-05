@@ -69,9 +69,4 @@ RUN echo "export HISTFILE=/home/vscode/commandhistory/.bash_history" >> "/home/v
     && touch /home/vscode/commandhistory/.bash_history \
     && chown -R vscode /home/vscode/commandhistory    
 
-COPY docker-init.sh /usr/local/bin/docker-init.sh
-
-RUN chmod +x /usr/local/bin/docker-init.sh
-
-ENTRYPOINT ["/usr/local/bin/docker-init.sh"]
 CMD ["sleep", "infinity"]

@@ -12,7 +12,7 @@
   "overrideCommand": false,
   "init": true,
 	"runArgs": [
-		"--userns=keep-id"
+		// "--userns=keep-id"
 	],
 	"remoteUser": "vscode",
   "containerUser": "vscode",
@@ -38,5 +38,10 @@
       ]
     }
   },
-  "postStartCommand": "bash .devcontainer/postCreateCommands.sh"
+  "postStartCommand": "bash .devcontainer/postCreateCommands.sh",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": "false"
+    }
+  }
 }
