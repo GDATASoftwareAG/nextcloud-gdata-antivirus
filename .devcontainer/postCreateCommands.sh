@@ -1,28 +1,49 @@
 #!/bin/bash
 
+set -euo pipefail
+
 # SPDX-FileCopyrightText: 2025 Lennart Dohmann <lennart.dohmann@gdata.de>
 #
 # SPDX-License-Identifier: AGPL-3.0-or-later
 
-for d in "/usr/local/etc/php/conf.d" "${PHP_INI_DIR}/conf.d"; do
-    if [ -n "$d" ] && [ -d "$d" ]; then
-        echo "Setting PHP CLI memory_limit=-1 in $d/99-memory-limit.ini"
-        echo "memory_limit = -1" | sudo tee "$d/99-memory-limit.ini" >/dev/null || true
+start_docker() {
+    if docker info >/dev/null 2>&1; then
+        return 0
     fi
-done
+
+    sudo mkdir -p /var/log
+    sudo nohup dockerd >/var/log/dockerd.log 2>&1 &
+
+    for _ in $(seq 1 30); do
+        if docker info >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 1
+    done
+
+    sudo tail -n 200 /var/log/dockerd.log >&2 || true
+    return 1
+}
+
+# for d in "/usr/local/etc/php/conf.d" "${PHP_INI_DIR}/conf.d"; do
+#     if [ -n "$d" ] && [ -d "$d" ]; then
+#         echo "Setting PHP CLI memory_limit=-1 in $d/99-memory-limit.ini"
+#         echo "memory_limit = -1" | sudo tee "$d/99-memory-limit.ini" >/dev/null || true
+#     fi
+# done
 
 export COMPOSER_MEMORY_LIMIT=-1
 
-bash -i -c 'nvm install 20'
-bash -i -c 'nvm use 20'
-
 echo "setup php-scoper"
-composer global require humbug/php-scoper
-echo "export PATH=$(composer config home)/vendor/bin/:\$PATH" >> "$HOME"/.bashrc
+composer global require --no-interaction humbug/php-scoper
+PATH_EXPORT="export PATH=$(composer config home)/vendor/bin/:\$PATH"
+if ! grep -qxF "$PATH_EXPORT" "$HOME"/.bashrc; then
+    echo "$PATH_EXPORT" >> "$HOME"/.bashrc
+fi
 COMPOSER_HOME=$(composer config home)
 export PATH=$COMPOSER_HOME/vendor/bin/:$PATH
 
-if [[ "$IS_CI" == 1 ]]; then
+if [[ "${IS_CI:-0}" == 1 ]]; then
     echo "Skipping bash completion setup in CI environment"
     exit 0
 fi
@@ -31,6 +52,10 @@ sudo bash -c "docker completion bash > /usr/share/bash-completion/completions/do
 sudo bash -c "composer completion bash > /usr/share/bash-completion/completions/composer"
 sudo bash -c "npm completion > /usr/share/bash-completion/completions/npm"
 
-echo ". /usr/share/bash-completion/bash_completion" >> /home/vscode/.bashrc
+if ! grep -qxF ". /usr/share/bash-completion/bash_completion" "$HOME"/.bashrc; then
+    echo ". /usr/share/bash-completion/bash_completion" >> "$HOME"/.bashrc
+fi
+
+start_docker
 
 ./scripts/run-app.sh

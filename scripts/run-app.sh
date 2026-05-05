@@ -22,9 +22,9 @@ setup_nextcloud () {
   docker container rm nextcloud-container || true
   docker stop garaged || true
   docker container rm garaged || true
-  docker compose -f docker-compose.yaml kill
-  docker compose -f docker-compose.yaml rm --force --stop --volumes
-  docker compose -f docker-compose.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
+  docker compose -f docker-compose.yaml kill || true
+  docker compose -f docker-compose.yaml down --volumes || true
+  docker compose -f docker-compose.yaml up --build -d
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do
