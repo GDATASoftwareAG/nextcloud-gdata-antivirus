@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 G DATA CyberDefense AG
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
 FROM mcr.microsoft.com/devcontainers/base:trixie
 
 ENV DEBIAN_FRONTEND=noninteractive

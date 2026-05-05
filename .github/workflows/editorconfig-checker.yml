@@ -12,4 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: editorconfig-checker/action-editorconfig-checker@main
-      - run: editorconfig-checker -exclude "\.sh|\.ya?ml|\.md|\.gitignore|\.json|admin\.php|Dockerfile\.Nextcloud|\.txt|Makefile|\.xml|\.bats|\.env-test|\.ini"
+      - run: editorconfig-checker -exclude "\.sh|\.ya?ml|\.md|\.gitignore|\.json|admin\.php|Dockerfile\.Nextcloud|Dockerfile|\.txt|Makefile|\.xml|\.bats|\.env-test|\.ini"
