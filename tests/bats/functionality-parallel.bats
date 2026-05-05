@@ -21,7 +21,7 @@ setup_file() {
 
 @test "test admin eicar Upload" {
     EICAR_LENGTH=$(echo $EICAR_STRING | wc -c)
-    RESULT=$(echo $EICAR_STRING | curl -v -X PUT -d"$EICAR_STRING" -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
+    RESULT=$(echo $EICAR_STRING | curl -v -X PUT -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
 
     echo "Actual: $RESULT"
     curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
