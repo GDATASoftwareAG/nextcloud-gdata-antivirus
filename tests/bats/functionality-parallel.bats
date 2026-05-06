@@ -21,47 +21,47 @@ setup_file() {
 
 @test "test admin eicar Upload" {
     EICAR_LENGTH=$(echo $EICAR_STRING | wc -c)
-    RESULT=$(echo $EICAR_STRING | curl -v -X PUT -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
+    RESULT=$(echo $EICAR_STRING | curl -v -X PUT -w "%{http_code}" -u admin:admin -T - http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "curl failed")
 
     echo "Actual: $RESULT"
-    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
+    curl --silent -q -u admin:admin -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.eicar.com.txt || echo "file not found"
     [[ "$RESULT" =~ "Virus found" ]]
 }
 
 @test "test admin clean upload" {
-    RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "curl failed")
+    RESULT=$(echo $CLEAN_STRING | curl -w "%{http_code}" -u admin:admin -T - http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "curl failed")
 
     echo "Actual: $RESULT"
-    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "file not found"
+    curl --silent -q -u admin:admin -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.clean.txt || echo "file not found"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]]
 }
 
 @test "test admin pup Upload" {
-    RESULT=$(curl --silent -w "%{http_code}" -u admin:admin -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe)
+    RESULT=$(curl --silent -w "%{http_code}" -u admin:admin -T $FOLDER_PREFIX/pup.exe http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe)
     echo "Actual: $RESULT"
-    curl --silent -q -u admin:admin -X DELETE http://$HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe || echo "file not found"
+    curl --silent -q -u admin:admin -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/admin/functionality-parallel.pup.exe || echo "file not found"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]]
 }
 
 @test "test testuser eicar Upload" {
-    RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.eicar.com.txt)
+    RESULT=$(echo $EICAR_STRING | curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.eicar.com.txt)
     echo "Actual: $RESULT"
     $DOCKER_EXEC_WITH_USER -i nextcloud-container php occ config:app:get gdatavaas clientSecret
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.eicar.com.txt || echo "file not found"
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.eicar.com.txt || echo "file not found"
     [[ "$RESULT" =~ "Virus found" ]]
 }
 
 @test "test testuser clean Upload" {
-    STATUS_CODE=$(echo $CLEAN_STRING | curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.clean.txt)
+    STATUS_CODE=$(echo $CLEAN_STRING | curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T - http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.clean.txt)
     echo "Actual: $RESULT"
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.clean.txt || echo "file not found"
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.clean.txt || echo "file not found"
     [[ $STATUS_CODE -ge 200 && $STATUS_CODE -lt 300 ]] || exit 1
 }
 
 @test "test testuser pup Upload" {
-    RESULT=$(curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe)
+    RESULT=$(curl --silent -w "%{http_code}" -u $TESTUSER:$TESTUSER_PASSWORD -T $FOLDER_PREFIX/pup.exe http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe)
     echo "Actual: $RESULT"
-    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe || echo "file not found"
+    curl --silent -q -u $TESTUSER:$TESTUSER_PASSWORD -X DELETE http://$NEXTCLOUD_HOSTNAME/remote.php/dav/files/$TESTUSER/functionality-parallel.pup.exe || echo "file not found"
     [[ $RESULT -ge 200 && $RESULT -lt 300 ]] || exit 1
 }
 
