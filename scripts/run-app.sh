@@ -11,8 +11,10 @@ if [ -z "${NEXTCLOUD_VERSION:-}" ]; then
   source "$SCRIPT_DIR/../nextcloud.env"
 fi
 
+IS_CI_FROM_ENV="${IS_CI-}"
+
 export NEXTCLOUD_VERSION=${1:-${NEXTCLOUD_VERSION}}
-export IS_CI=${2:-0}
+export IS_CI=${2:-${IS_CI_FROM_ENV:-0}}
 
 if [ "$IS_CI" -eq 0 ]; then
   make oc
@@ -129,7 +131,8 @@ docker exec --user www-data -i nextcloud-container php occ config:system:set mai
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
 docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
 
-if [ "$IS_CI" -ne 0  ]; then
+if [ "${IS_CI_FROM_ENV:-0}" != "1" ]; then
+  echo "Setting up S3 storage backend for Nextcloud..."
   setup_s3 &
   wait %1 || exit 1
 fi
