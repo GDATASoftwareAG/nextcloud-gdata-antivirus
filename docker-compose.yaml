@@ -27,7 +27,7 @@ services:
       - nextcloud-network
 
   garaged:
-    image: dxflrs/garage:v2.1.0
+    image: dxflrs/garage:v2.3.0
     container_name: garaged
     hostname: garaged
     restart: unless-stopped
