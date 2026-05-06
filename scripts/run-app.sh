@@ -22,7 +22,11 @@ if [ "$IS_CI" -eq 0 ]; then
   exit 0
 fi
 
-source .env || echo "No .env file found."
+if [ -f .env ]; then
+  source .env
+else
+  echo "No .env file found."
+fi
 
 setup_nextcloud () {
   docker stop nextcloud-container || true
