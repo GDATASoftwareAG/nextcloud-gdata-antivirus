@@ -39,7 +39,7 @@
   },
   "overrides": {
     "@nextcloud/axios": {
-      "axios": "1.12.2"
+      "axios": "1.13.5"
     }
   }
 }
