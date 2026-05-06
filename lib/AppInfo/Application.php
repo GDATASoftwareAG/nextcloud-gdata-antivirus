@@ -16,7 +16,7 @@ use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
 use OCP\AppFramework\Bootstrap\IRegistrationContext;
-use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent;
+use OCP\Collaboration\Resources\LoadAdditionalScriptsEvent as ResourcesLoadAdditionalScriptsEvent;
 use OCP\EventDispatcher\IEventDispatcher;
 use OCP\IDBConnection;
 use OCP\SystemTag\ISystemTagManager;
@@ -28,6 +28,7 @@ use Psr\Log\LoggerInterface;
 
 class Application extends App implements IBootstrap {
 	public const APP_ID = 'gdatavaas';
+	private const FILES_LOAD_ADDITIONAL_SCRIPTS_EVENT = 'OCA\\Files\\Event\\LoadAdditionalScriptsEvent';
 
 	/**
 	 * @throws ContainerExceptionInterface
@@ -39,8 +40,11 @@ class Application extends App implements IBootstrap {
 		$container = $this->getContainer();
 		$eventDispatcher = $container->get(IEventDispatcher::class);
 		assert($eventDispatcher instanceof IEventDispatcher);
-		$eventDispatcher->addListener(LoadAdditionalScriptsEvent::class, function () {
-			Util::addScript(self::APP_ID, 'gdatavaas-files-action');
+		$eventDispatcher->addListener(self::FILES_LOAD_ADDITIONAL_SCRIPTS_EVENT, function () {
+			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
+		});
+		$eventDispatcher->addListener(ResourcesLoadAdditionalScriptsEvent::class, function () {
+			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
 		});
 	}
 
