@@ -15,6 +15,13 @@ IS_CI_FROM_ENV="${IS_CI-}"
 
 export NEXTCLOUD_VERSION=${1:-${NEXTCLOUD_VERSION}}
 export IS_CI=${2:-${IS_CI_FROM_ENV:-0}}
+# Force local make prod runs to use workspace-identical code for debugging.
+# Only real CI environments (IS_CI env var set to 1) use the appstore/scoper package.
+if [ "${IS_CI_FROM_ENV:-0}" -eq 1 ]; then
+  export USE_APPSTORE_PACKAGE=${USE_APPSTORE_PACKAGE:-1}
+else
+  export USE_APPSTORE_PACKAGE=0
+fi
 
 if [ "$IS_CI" -eq 0 ]; then
   make oc
@@ -88,8 +95,26 @@ setup_s3 () {
 build_app () {
   echo "Building G DATA Antivirus App for Nextcloud..."
   make distclean
-  make appstore
-  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
+  if [ "$USE_APPSTORE_PACKAGE" -eq 1 ]; then
+    make appstore
+    tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
+  else
+    make build
+    rm -rf ./build/artifacts/gdatavaas
+    mkdir -p ./build/artifacts/gdatavaas
+    # Keep file contents/line numbers identical to workspace for VS Code breakpoints.
+    tar \
+      --exclude='./.git' \
+      --exclude='./.github' \
+      --exclude='./.devcontainer' \
+      --exclude='./build' \
+      --exclude='./nextcloud-server' \
+      --exclude='./tests' \
+      --exclude='./scripts' \
+      --exclude='./node_modules' \
+      --exclude='./src' \
+      -cf - . | tar -xf - -C ./build/artifacts/gdatavaas
+  fi
   echo "Building G DATA Antivirus App for Nextcloud finished."
 }
 
