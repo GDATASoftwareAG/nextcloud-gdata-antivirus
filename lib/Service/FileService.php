@@ -82,6 +82,12 @@ class FileService {
 				return $node;
 			}
 		}
+		// Fallback for group folders and other global mounts that are not tracked
+		// in the user mount cache.
+		$nodes = $this->rootFolder->getById($fileId);
+		if (!empty($nodes)) {
+			return $nodes[0];
+		}
 		throw new NotFoundException();
 	}
 
