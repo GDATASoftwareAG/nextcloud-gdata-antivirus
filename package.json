@@ -2,7 +2,7 @@
   "name": "gdatavaas",
   "description": "This app aims to provide an additional layer of security to your Nextcloud instance by enabling automatic and manual scanning of files for malicious content.",
   "version": "0.0.8",
-  "author": "Lennart Dohmann <lennart.dohmann@gdata.de>",
+  "author": "G DATA CyberDefense AG",
   "contributors": [],
   "bugs": {
     "url": "https://github.com/GDATASoftwareAG/nextcloud-gdata-antivirus/issues"
@@ -20,7 +20,7 @@
   "dependencies": {
     "@mdi/svg": "7.4.47",
     "@nextcloud/dialogs": "7.1.0",
-    "@nextcloud/files": "3.12.0",
+    "@nextcloud/files": "4.0.0",
     "@nextcloud/router": "3.1.0"
   },
   "browserslist": [
@@ -39,7 +39,7 @@
   },
   "overrides": {
     "@nextcloud/axios": {
-      "axios": "1.12.2"
+      "axios": "1.13.5"
     }
   }
 }

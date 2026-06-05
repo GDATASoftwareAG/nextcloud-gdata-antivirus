@@ -6,8 +6,15 @@
 
 set -e
 
-export NEXTCLOUD_VERSION=${1:-32.0.0}
-export IS_CI=${2:-0}
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -z "${NEXTCLOUD_VERSION:-}" ]; then
+  source "$SCRIPT_DIR/../nextcloud.env"
+fi
+
+IS_CI_FROM_ENV="${IS_CI-}"
+
+export NEXTCLOUD_VERSION=${1:-${NEXTCLOUD_VERSION}}
+export IS_CI=${2:-${IS_CI_FROM_ENV:-0}}
 
 if [ "$IS_CI" -eq 0 ]; then
   make oc
@@ -15,14 +22,20 @@ if [ "$IS_CI" -eq 0 ]; then
   exit 0
 fi
 
-source .env || echo "No .env file found."
+if [ -f .env ]; then
+  source .env
+else
+  echo "No .env file found."
+fi
 
 setup_nextcloud () {
   docker stop nextcloud-container || true
   docker container rm nextcloud-container || true
-  docker compose -f docker-compose.yaml kill
-  docker compose -f docker-compose.yaml rm --force --stop --volumes
-  docker compose -f docker-compose.yaml up --build --quiet-pull --wait -d --force-recreate --renew-anon-volumes --remove-orphans
+  docker stop garaged || true
+  docker container rm garaged || true
+  docker compose -f docker-compose.yaml kill || true
+  docker compose -f docker-compose.yaml down --volumes || true
+  NEXTCLOUD_VERSION="$NEXTCLOUD_VERSION" docker compose -f docker-compose.yaml up --build -d
 
   until docker exec --user www-data -i nextcloud-container php occ status | grep "installed: false"
   do
@@ -47,6 +60,30 @@ setup_nextcloud () {
 
   echo "Setup Nextcloud finished."
 }
+
+setup_s3 () {
+  NODE_ID=$(docker exec garaged /garage -c /etc/garage.toml status | grep "ID" -A 1 | awk 'NR==2 {print $1}')
+  docker exec garaged /garage -c /etc/garage.toml layout assign -z dc1 -c 1G $NODE_ID
+  docker exec garaged /garage -c /etc/garage.toml layout apply --version 1
+  docker exec garaged /garage -c /etc/garage.toml bucket create nextcloud-bucket
+  SECRET_KEY=$(docker exec garaged /garage -c /etc/garage.toml key create nextcloud-key | grep "Secret key" | awk -F': ' '/Secret key/ {gsub(/^[ \t]+/, "", $2); print $2}')
+  ACCESS_KEY=$(docker exec garaged /garage -c /etc/garage.toml key info nextcloud-key | grep "Key ID" | awk -F': ' '/Key ID/ {gsub(/^[ \t]+/, "", $2); print $2}')
+  docker exec garaged /garage -c /etc/garage.toml bucket allow --read --write --owner nextcloud-bucket --key nextcloud-key
+  
+  echo "Created S3 bucket 'nextcloud-bucket' with access key $ACCESS_KEY and secret key $SECRET_KEY."
+
+  docker exec --user www-data nextcloud-container php occ app:enable files_external
+
+  docker exec --user www-data nextcloud-container php occ files_external:create garage-storage amazons3 amazons3::accesskey \
+    --config bucket=nextcloud-bucket \
+    --config hostname=garaged \
+    --config port=3900 \
+    --config region=garage \
+    --config use_ssl=false \
+    --config use_path_style=true \
+    --config key=$ACCESS_KEY \
+    --config secret=$SECRET_KEY
+  }
 
 build_app () {
   echo "Building G DATA Antivirus App for Nextcloud..."
@@ -97,6 +134,13 @@ docker exec --user www-data -i nextcloud-container php occ config:system:set mai
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_from_address --value="test@example.com"
 docker exec --user www-data -i nextcloud-container php occ config:system:set mail_domain --value="example.com"
 docker exec --user www-data -i nextcloud-container php occ user:setting admin settings email test@example.com
+
+if [ "${IS_CI_FROM_ENV:-0}" != "1" ]; then
+  echo "Setting up S3 storage backend for Nextcloud..."
+  setup_s3 &
+  wait %1 || exit 1
+fi
+
 
 composer install
 

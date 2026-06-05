@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
     xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd"
-    phpVersion="8.1"
+    phpVersion="8.2"
 >
     <projectFiles>
         <directory name="lib" />

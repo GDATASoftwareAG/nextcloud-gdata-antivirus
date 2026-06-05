@@ -11,6 +11,8 @@ appstore_package_name=$(appstore_build_directory)/$(app_real_name)
 npm=$(shell which npm 2> /dev/null)
 composer=$(shell which composer 2> /dev/null)
 
+include nextcloud.env
+
 all: build
 
 # Fetches dependencies and builds it
@@ -30,7 +32,7 @@ endif
 .PHONY: oc
 oc:
 ifeq (,$(wildcard nextcloud-server))
-	./scripts/get-nc-server.sh
+	./scripts/get-nc-server.sh "$(NEXTCLOUD_VERSION)"
 endif
 
 # Installs and updates the composer dependencies. If composer is not installed
@@ -80,20 +82,20 @@ unittests:
 # Run integration tests
 .PHONY: integrationtests
 integrationtests:
-	./scripts/run-app.sh "32.0.0" 1
+	./scripts/run-app.sh "$(NEXTCLOUD_VERSION)" 1
 	composer install
 	./vendor/bin/phpunit -c tests/integration/phpunit.xml tests/integration/ --testdox
 
 # Run bats tests
 .PHONY: bats
 bats:
-	./scripts/run-app.sh "32.0.0" 1
+	./scripts/run-app.sh "$(NEXTCLOUD_VERSION)" 1
 	bats --verbose-run --timing --trace ./tests/bats
 
 # Complete production like but static Nextcloud and app setup
 .PHONY: prod
 prod: oc
-	./scripts/run-app.sh "32.0.0" 1
+	./scripts/run-app.sh "$(NEXTCLOUD_VERSION)" 1
 
 # Same as clean but also removes dependencies and build related folders
 .PHONY: distclean
@@ -111,7 +113,7 @@ local: build
 	docker compose kill || true
 	docker stop nextcloud-container || true
 	docker container rm nextcloud-container || true
-	docker run --rm -d -p 8080:80 --name nextcloud-container -e SERVER_BRANCH="v32.0.0" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php84:latest
+	docker run --rm -d -p 8080:80 --name nextcloud-container -e SERVER_BRANCH="v$(NEXTCLOUD_VERSION)" -v .:/var/www/html/apps-extra/gdatavaas ghcr.io/juliusknorr/nextcloud-dev-php84:latest
 	composer install
 
 # Builds the app for production and prepares it for the appstore under ./build/artifacts

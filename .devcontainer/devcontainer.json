@@ -1,6 +1,25 @@
 {
-  "name": "PHP",
-  "image": "mcr.microsoft.com/devcontainers/php:1-8.4-bullseye",
+  "name": "gdatavaas Local Dev",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".",
+    "args": {
+      "USERNAME": "vscode",
+      "USER_UID": "1000",
+      "USER_GID": "1000"
+    }
+  },
+  "overrideCommand": false,
+  "init": true,
+	"runArgs": [
+		// "--userns=keep-id"
+	],
+	"remoteUser": "vscode",
+  "containerUser": "vscode",
+	"updateRemoteUserUID": true,
+  "containerEnv": {
+    "COMPOSER_MEMORY_LIMIT": "-1"
+  },
   "forwardPorts": [
     8080,
     8081
@@ -19,14 +38,10 @@
       ]
     }
   },
-  "postStartCommand": ".devcontainer/postCreateCommands.sh",
+  "postStartCommand": "bash .devcontainer/postCreateCommands.sh",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/szkiba/devcontainer-features/bats:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/wxw-matt/devcontainer-features/apt:latest": {
-        "packages": "bash-completion vim iputils-ping telnet"
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "moby": "false"
     }
   }
 }

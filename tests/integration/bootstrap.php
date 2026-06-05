@@ -33,6 +33,6 @@ function findEnvDirectory(string $startDir): ?string {
 $envDir = findEnvDirectory(__DIR__);
 
 if ($envDir !== null) {
-	$dotenv = Dotenv::createImmutable($envDir);
+	$dotenv = Dotenv::createMutable($envDir);
 	$dotenv->safeLoad();
 }
