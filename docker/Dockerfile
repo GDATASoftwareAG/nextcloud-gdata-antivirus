@@ -13,4 +13,4 @@ RUN apt-get update \
     && apt-get purge -y --auto-remove $PHPIZE_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
-COPY xdebug.ini /usr/local/etc/php/conf.d/99-xdebug.ini
+COPY docker/xdebug.ini /usr/local/etc/php/conf.d/99-xdebug.ini
