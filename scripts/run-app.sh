@@ -54,11 +54,27 @@ setup_nextcloud () {
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
   docker exec -i nextcloud-container chown www-data:www-data /var/www/html/config/config.php
 
-  until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
-  do
-    echo "Waiting for installation to finish..."
-    sleep 2
-  done
+  if docker exec --user www-data -i nextcloud-container php occ status | grep -q "installed: true"; then
+    echo "Nextcloud already installed, skipping manual maintenance:install."
+  else
+    until docker exec --user www-data -i nextcloud-container php occ maintenance:install \
+      --database="mysql" \
+      --database-host="mariadb" \
+      --database-name="nextcloud" \
+      --database-user="nextcloud" \
+      --database-pass="nextcloud" \
+      --admin-user=admin \
+      --admin-pass=admin | grep "Nextcloud was successfully installed"
+    do
+      # The container may auto-install in parallel depending on entrypoint env vars.
+      if docker exec --user www-data -i nextcloud-container php occ status | grep -q "installed: true"; then
+        echo "Nextcloud became installed during setup, skipping manual maintenance:install."
+        break
+      fi
+      echo "Waiting for installation to finish..."
+      sleep 2
+    done
+  fi
 
   docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
   docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
