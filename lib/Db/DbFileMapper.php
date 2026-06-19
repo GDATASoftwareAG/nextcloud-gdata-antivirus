@@ -65,7 +65,7 @@ class DbFileMapper extends QBMapper {
 		$instanceId = $this->config->getSystemValue('instanceid', '');
 
 		$query = $this->db->getQueryBuilder();
-		$query->selectDistinct('fc.fileid')
+		$query->select('fc.fileid')
 			->from('filecache', 'fc')
 			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->leftJoin(
@@ -112,7 +112,12 @@ class DbFileMapper extends QBMapper {
 		$instanceId = $this->config->getSystemValue('instanceid', '');
 
 		$query = $this->db->getQueryBuilder();
-		$query->selectDistinct('fc.fileid')
+		if (count($includedTagIds) > 1) {
+			$query->selectDistinct('fc.fileid');
+		} else {
+			$query->select('fc.fileid');
+		}
+		$query
 			->from('filecache', 'fc')
 			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->innerJoin(
@@ -125,8 +130,7 @@ class DbFileMapper extends QBMapper {
 					$query->expr()->in('o.systemtagid', $query->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY))
 				)
 			)
-			->where($query->expr()->isNotNull('o.objectid'))
-			->andWhere($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
+			->where($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
 			->andWhere($query->expr()->orX(
 				$query->expr()->like('fc.path', $query->createNamedParameter('files/%')),
 				$query->expr()->notLike('s.id', $query->createNamedParameter('home::%'))
