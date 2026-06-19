@@ -65,15 +65,20 @@ class DbFileMapper extends QBMapper {
 		$instanceId = $this->config->getSystemValue('instanceid', '');
 
 		$query = $this->db->getQueryBuilder();
-		$query->select('fc.fileid')
+		$query->selectDistinct('fc.fileid')
 			->from('filecache', 'fc')
 			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
 			->leftJoin(
-				'fc', 'systemtag_object_mapping', 'o', $query->expr()->eq(
-					'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
-			->where($query->expr()->notIn(
-				'o.systemtagid', $query->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->orWhere($query->expr()->isNull('o.systemtagid'))
+				'fc',
+				'systemtag_object_mapping',
+				'o',
+				$query->expr()->andX(
+					$query->expr()->eq('o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))),
+					$query->expr()->eq('o.objecttype', $query->createNamedParameter('files')),
+					$query->expr()->in('o.systemtagid', $query->createNamedParameter($excludedTagIds, IQueryBuilder::PARAM_INT_ARRAY))
+				)
+			)
+			->where($query->expr()->isNull('o.objectid'))
 			->andWhere($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
 			->andWhere($query->expr()->orX(
 				$query->expr()->like('fc.path', $query->createNamedParameter('files/%')),
@@ -107,15 +112,20 @@ class DbFileMapper extends QBMapper {
 		$instanceId = $this->config->getSystemValue('instanceid', '');
 
 		$query = $this->db->getQueryBuilder();
-		$query->select('fc.fileid')
+		$query->selectDistinct('fc.fileid')
 			->from('filecache', 'fc')
 			->leftJoin('fc', 'storages', 's', $query->expr()->eq('fc.storage', 's.numeric_id'))
-			->leftJoin(
-				'fc', 'systemtag_object_mapping', 'o', $query->expr()->eq(
-					'o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))))
-			->where($query->expr()->in(
-				'o.systemtagid', $query->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY)))
-			->orWhere($query->expr()->isNull('o.systemtagid'))
+			->innerJoin(
+				'fc',
+				'systemtag_object_mapping',
+				'o',
+				$query->expr()->andX(
+					$query->expr()->eq('o.objectid', $query->createFunction(sprintf('CAST(fc.fileid AS %s)', $this->stringType))),
+					$query->expr()->eq('o.objecttype', $query->createNamedParameter('files')),
+					$query->expr()->in('o.systemtagid', $query->createNamedParameter($includedTagIds, IQueryBuilder::PARAM_INT_ARRAY))
+				)
+			)
+			->where($query->expr()->isNotNull('o.objectid'))
 			->andWhere($query->expr()->neq('fc.mimetype', $query->createNamedParameter($dirMimeTypeId)))
 			->andWhere($query->expr()->orX(
 				$query->expr()->like('fc.path', $query->createNamedParameter('files/%')),

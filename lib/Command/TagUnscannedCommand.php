@@ -7,6 +7,7 @@
 namespace OCA\GDataVaas\Command;
 
 use OCA\GDataVaas\Logging\ConsoleCommandLogger;
+use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\TagUnscannedService;
 use OCP\DB\Exception;
@@ -20,11 +21,16 @@ class TagUnscannedCommand extends Command {
 	private TagUnscannedService $tagUnscannedService;
 	private LoggerInterface $logger;
 
-	public function __construct(IAppConfig $appConfig, TagService $tagService, LoggerInterface $logger) {
+	public function __construct(
+		IAppConfig $appConfig,
+		TagService $tagService,
+		FileService $fileService,
+		LoggerInterface $logger,
+	) {
 		parent::__construct();
 		$this->logger = $logger;
 
-		$this->tagUnscannedService = new TagUnscannedService($logger, $tagService, $appConfig);
+		$this->tagUnscannedService = new TagUnscannedService($logger, $tagService, $fileService, $appConfig);
 	}
 
 	/**
