@@ -40,7 +40,12 @@ services:
     container_name: mariadb
     hostname: mariadb
     restart: unless-stopped
-    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    command: >-
+      --transaction-isolation=READ-COMMITTED
+      --binlog-format=ROW
+      --slow-query-log=1
+      --slow-query-log-file=/var/lib/mysql/slow.log
+      --long-query-time=0
     environment:
       MARIADB_DATABASE: nextcloud
       MARIADB_USER: nextcloud

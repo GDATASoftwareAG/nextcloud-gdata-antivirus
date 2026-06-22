@@ -15,6 +15,9 @@ NC_CONTAINER="nextcloud-container"
 DB_USER="nextcloud"
 DB_PASS="nextcloud"
 DB_NAME="nextcloud"
+DB_ROOT_PASS="rootpassword"
+SLOW_LOG=false
+SLOW_LOG_FILE=""
 
 usage() {
   cat <<'EOF'
@@ -29,12 +32,16 @@ Options:
   --offset <n>     Query OFFSET (default: 0)
   --mode <m>       both|with-tags|without-tags|single-tag (default: both)
                    single-tag simulates the real scan path: only the 'Unscanned' tag (1 tag-id)
+  --slow-log       Enable MariaDB slow query log integration: shows Rows_examined per variant.
+                   Requires root access to MariaDB (uses DB_ROOT_PASS=rootpassword).
+                   Also enabled persistently via docker-compose.yaml (needs container restart once).
   --help           Show this help
 
 Notes:
   - Requires running Docker containers: mariadb + nextcloud-container.
   - Compares old query shape (pre-fix) vs new query shape (current fix).
   - Prints avg/min/max runtime in milliseconds.
+  - With --slow-log: additionally prints avg/min/max Rows_examined (independent of cache/load).
 EOF
 }
 
@@ -55,6 +62,10 @@ while [[ $# -gt 0 ]]; do
     --mode)
       MODE="$2"
       shift 2
+      ;;
+    --slow-log)
+      SLOW_LOG=true
+      shift
       ;;
     --help|-h)
       usage
@@ -98,6 +109,41 @@ resolve_mysql_cli() {
 mysql_exec() {
   local sql="$1"
   docker exec -i "$DB_CONTAINER" "$MYSQL_CLI" -N -u"$DB_USER" -p"$DB_PASS" "$DB_NAME" -e "$sql"
+}
+
+mysql_root_exec() {
+  local sql="$1"
+  docker exec -i "$DB_CONTAINER" "$MYSQL_CLI" -N -uroot -p"$DB_ROOT_PASS" -e "$sql"
+}
+
+setup_slow_log() {
+  if ! mysql_root_exec "SET GLOBAL slow_query_log = ON; SET GLOBAL long_query_time = 0;" 2>/dev/null; then
+    echo "Warning: Could not enable slow query log (root access failed — check DB_ROOT_PASS)" >&2
+    SLOW_LOG=false
+    return
+  fi
+  SLOW_LOG_FILE=$(mysql_root_exec "SELECT @@slow_query_log_file;" 2>/dev/null | tr -d '\r')
+  # If the path is relative, resolve it against @@datadir (MariaDB default behaviour)
+  if [[ -n "$SLOW_LOG_FILE" && "$SLOW_LOG_FILE" != /* ]]; then
+    local datadir
+    datadir=$(mysql_root_exec "SELECT @@datadir;" 2>/dev/null | tr -d '\r')
+    SLOW_LOG_FILE="${datadir%/}/${SLOW_LOG_FILE}"
+  fi
+  if [[ -z "$SLOW_LOG_FILE" ]]; then
+    SLOW_LOG_FILE="/var/lib/mysql/slow.log"
+  fi
+  # Ensure the file exists and is writable
+  docker exec "$DB_CONTAINER" bash -c "touch \"$SLOW_LOG_FILE\" 2>/dev/null || true"
+  mysql_root_exec "FLUSH SLOW LOGS;" 2>/dev/null || true
+}
+
+flush_slow_log() {
+  docker exec "$DB_CONTAINER" bash -c "truncate -s 0 \"$SLOW_LOG_FILE\" 2>/dev/null || true"
+}
+
+read_rows_examined() {
+  docker exec "$DB_CONTAINER" bash -c \
+    "grep -oP 'Rows_examined: \K[0-9]+' \"$SLOW_LOG_FILE\" | tail -1" 2>/dev/null || true
 }
 
 echo "Resolving DB table prefix and runtime parameters..."
@@ -317,17 +363,29 @@ run_timed_query() {
   local sql="$1"
   local start_ns end_ns elapsed_ns elapsed_ms
 
+  if [[ "$SLOW_LOG" == "true" ]]; then
+    flush_slow_log
+  fi
+
   start_ns=$(date +%s%N)
   mysql_exec "$sql" > /dev/null
   end_ns=$(date +%s%N)
 
   elapsed_ns=$((end_ns - start_ns))
   elapsed_ms=$(awk -v ns="$elapsed_ns" 'BEGIN { printf "%.3f", ns/1000000 }')
-  echo "$elapsed_ms"
+
+  if [[ "$SLOW_LOG" == "true" ]]; then
+    local rows_examined
+    rows_examined=$(read_rows_examined)
+    echo "${elapsed_ms} ${rows_examined:-0}"
+  else
+    echo "$elapsed_ms"
+  fi
 }
 
 summarize_series() {
   local series="$1"
+  # Uses only $1 (ms) — works with both "123.456" and "123.456 78900" (slow-log mode)
   echo "$series" | awk '
     BEGIN { min=1e99; max=0; sum=0; n=0 }
     {
@@ -343,6 +401,22 @@ summarize_series() {
       } else {
         printf "avg=%.3f ms, min=%.3f ms, max=%.3f ms", sum/n, min, max;
       }
+    }
+  '
+}
+
+summarize_rows_examined_series() {
+  local series="$1"
+  echo "$series" | awk '
+    NF >= 2 {
+      v=$2+0;
+      if (n==0 || v < min) min=v;
+      if (n==0 || v > max) max=v;
+      sum += v; n += 1;
+    }
+    END {
+      if (n == 0) { print "n/a"; }
+      else { printf "avg=%d, min=%d, max=%d rows", sum/n, min, max; }
     }
   '
 }
@@ -386,6 +460,14 @@ echo "  Instance ID  : ${INSTANCE_ID}"
 echo "  Runs         : ${RUNS}"
 echo "  Limit/Offset : ${LIMIT}/${OFFSET}"
 echo "  Mode         : ${MODE}"
+echo "  Slow log     : ${SLOW_LOG}"
+
+if [[ "$SLOW_LOG" == "true" ]]; then
+  setup_slow_log
+  if [[ "$SLOW_LOG" == "true" ]]; then
+    echo "  Slow log file: ${SLOW_LOG_FILE} (in container)"
+  fi
+fi
 echo
 
 benchmark_triple() {
@@ -427,6 +509,29 @@ benchmark_triple() {
       }
     }
   '
+
+  if [[ "$SLOW_LOG" == "true" ]]; then
+    echo
+    echo "Rows examined (old)        : $(summarize_rows_examined_series "$old_runs")"
+    echo "Rows examined (JOIN/curr)  : $(summarize_rows_examined_series "$join_runs")"
+    echo "Rows examined (EXISTS)     : $(summarize_rows_examined_series "$exists_runs")"
+
+    local old_rows_avg join_rows_avg exists_rows_avg
+    old_rows_avg=$(echo "$old_runs"    | awk 'NF>=2{sum+=$2;n+=1} END{if(n==0) print 0; else print sum/n}')
+    join_rows_avg=$(echo "$join_runs"  | awk 'NF>=2{sum+=$2;n+=1} END{if(n==0) print 0; else print sum/n}')
+    exists_rows_avg=$(echo "$exists_runs" | awk 'NF>=2{sum+=$2;n+=1} END{if(n==0) print 0; else print sum/n}')
+
+    awk -v o="$old_rows_avg" -v j="$join_rows_avg" -v e="$exists_rows_avg" '
+      BEGIN {
+        if (o <= 0) {
+          print "Rows delta             : n/a"
+        } else {
+          printf "Rows delta JOIN (curr) : %+.2f%% vs old\n", ((j-o)/o)*100
+          printf "Rows delta EXISTS      : %+.2f%% vs old\n", ((e-o)/o)*100
+        }
+      }
+    '
+  fi
 }
 
 if [[ "$MODE" == "both" || "$MODE" == "without-tags" ]]; then
