@@ -197,6 +197,26 @@ class TagService {
 	}
 
 	/**
+	 * Removes all VaaS tags from a file id if they are present.
+	 * Useful to clean up stale tag mappings that point to missing files.
+	 * @param int $fileId
+	 * @return void
+	 */
+	public function removeVaasTagsFromFile(int $fileId): void {
+		$vaasTagIds = $this->getVaasTagIds();
+		if (empty($vaasTagIds)) {
+			return;
+		}
+
+		try {
+			$this->silentTagMapper->unassignTags((string)$fileId, 'files', $vaasTagIds);
+			$this->logger->debug('Removed stale VaaS tags for missing file ' . $fileId);
+		} catch (\Throwable $e) {
+			$this->logger->debug('Failed to remove stale VaaS tags for file ' . $fileId . ': ' . $e->getMessage());
+		}
+	}
+
+	/**
 	 * @return array
 	 * @throws Exception
 	 */
