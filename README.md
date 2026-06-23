@@ -192,6 +192,29 @@ make npm
 - make appstore
   - Builds a distributable tarball at build/artifacts/gdatavaas.tar.gz. Intended for releases; requires php-scoper available in PATH.
 
+### Debugging PHP with VS Code (make prod)
+
+`make prod` now starts Nextcloud with Xdebug enabled in the `nextcloud-container` service.
+For local runs, it also deploys workspace-identical app sources so breakpoints in your normal source tree bind directly.
+
+To debug app code:
+
+1. Start the stack:
+
+```bash
+make prod
+```
+
+2. In VS Code, start the launch configuration `Listen for Xdebug (Nextcloud prod)`.
+3. Trigger a request in Nextcloud (UI action, API call, or OCC command) that hits your breakpoint.
+
+Notes:
+- The Xdebug client host is configured as `host.docker.internal` (mapped to the Docker host gateway on Linux).
+- The debug listener port is `9003`.
+- For VS Code, install the PHP Debug extension (`xdebug.php-debug`) if it is not installed yet.
+- Local `make prod` keeps line numbers/content aligned with workspace files for source-level debugging.
+- Local `make prod` debugging is intentionally bound to the local build package (not the appstore/scoper package).
+
 ### Stopping and restarting
 
 - Stop/remove the dev container manually if needed:

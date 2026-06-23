@@ -8,17 +8,25 @@ namespace OCA\GDataVaas\Service;
 
 use OCA\GDataVaas\AppInfo\Application;
 use OCP\DB\Exception;
+use OCP\Files\NotFoundException;
 use OCP\IAppConfig;
 use Psr\Log\LoggerInterface;
 
 class TagUnscannedService {
 	private TagService $tagService;
+	private FileService $fileService;
 	private IAppConfig $appConfig;
 	private LoggerInterface $logger;
 
-	public function __construct(LoggerInterface $logger, TagService $tagService, IAppConfig $appConfig) {
+	public function __construct(
+		LoggerInterface $logger,
+		TagService $tagService,
+		FileService $fileService,
+		IAppConfig $appConfig,
+	) {
 		$this->logger = $logger;
 		$this->tagService = $tagService;
+		$this->fileService = $fileService;
 		$this->appConfig = $appConfig;
 	}
 
@@ -61,6 +69,13 @@ class TagUnscannedService {
 		$fileIds = $this->tagService->getFileIdsWithoutTags($excludedTagIds, 10000);
 
 		foreach ($fileIds as $fileId) {
+			try {
+				$this->fileService->getNodeFromFileId($fileId);
+			} catch (NotFoundException) {
+				$this->logger->debug("Skipping stale file ID $fileId while tagging unscanned files");
+				continue;
+			}
+
 			if ($this->tagService->hasAnyButUnscannedTag($fileId)) {
 				continue;
 			}

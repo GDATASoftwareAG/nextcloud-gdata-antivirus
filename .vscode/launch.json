@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Listen for Xdebug (Nextcloud prod)",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "log": true,
+      "pathMappings": {
+        "/var/www/html/apps/gdatavaas": "${workspaceFolder}",
+        "/var/www/html/apps-extra/gdatavaas": "${workspaceFolder}"
+      },
+      "xdebugSettings": {
+        "max_children": 128,
+        "max_data": 1024,
+        "max_depth": 5
+      }
+    }
+  ]
+}

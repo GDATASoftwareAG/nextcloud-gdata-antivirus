@@ -15,6 +15,13 @@ IS_CI_FROM_ENV="${IS_CI-}"
 
 export NEXTCLOUD_VERSION=${1:-${NEXTCLOUD_VERSION}}
 export IS_CI=${2:-${IS_CI_FROM_ENV:-0}}
+# Force local make prod runs to use workspace-identical code for debugging.
+# Only real CI environments (IS_CI env var set to 1) use the appstore/scoper package.
+if [ "${IS_CI_FROM_ENV:-0}" -eq 1 ]; then
+  export USE_APPSTORE_PACKAGE=${USE_APPSTORE_PACKAGE:-1}
+else
+  export USE_APPSTORE_PACKAGE=0
+fi
 
 if [ "$IS_CI" -eq 0 ]; then
   make oc
@@ -47,11 +54,27 @@ setup_nextcloud () {
   docker cp ./empty-skeleton.config.php nextcloud-container:/var/www/html/config/config.php
   docker exec -i nextcloud-container chown www-data:www-data /var/www/html/config/config.php
 
-  until docker exec --user www-data -i nextcloud-container php occ maintenance:install --admin-user=admin --admin-pass=admin | grep "Nextcloud was successfully installed"
-  do
-    echo "Waiting for installation to finish..."
-    sleep 2
-  done
+  if docker exec --user www-data -i nextcloud-container php occ status | grep -q "installed: true"; then
+    echo "Nextcloud already installed, skipping manual maintenance:install."
+  else
+    until docker exec --user www-data -i nextcloud-container php occ maintenance:install \
+      --database="mysql" \
+      --database-host="mariadb" \
+      --database-name="nextcloud" \
+      --database-user="nextcloud" \
+      --database-pass="nextcloud" \
+      --admin-user=admin \
+      --admin-pass=admin | grep "Nextcloud was successfully installed"
+    do
+      # The container may auto-install in parallel depending on entrypoint env vars.
+      if docker exec --user www-data -i nextcloud-container php occ status | grep -q "installed: true"; then
+        echo "Nextcloud became installed during setup, skipping manual maintenance:install."
+        break
+      fi
+      echo "Waiting for installation to finish..."
+      sleep 2
+    done
+  fi
 
   docker exec --user www-data -i nextcloud-container php occ log:manage --level DEBUG
   docker exec --user www-data -i nextcloud-container php occ app:disable firstrunwizard
@@ -85,12 +108,93 @@ setup_s3 () {
     --config secret=$SECRET_KEY
   }
 
+setup_groupfolders () {
+  local groupfolders_access_group="groupfolders-admin"
+  local groupfolders_name="admin-team-folder"
+  local groupfolder_id
+
+  echo "Setting up Groupfolders app with admin-only access..."
+
+  if ! docker exec --user www-data -i nextcloud-container php occ group:list | grep -q "${groupfolders_access_group}"; then
+    docker exec --user www-data -i nextcloud-container php occ group:add "${groupfolders_access_group}"
+  fi
+
+  if ! docker exec --user www-data -i nextcloud-container php occ user:info admin | grep -q "${groupfolders_access_group}"; then
+    docker exec --user www-data -i nextcloud-container php occ group:adduser "${groupfolders_access_group}" admin
+  fi
+
+  if ! docker exec --user www-data -i nextcloud-container php occ app:list | grep -q "groupfolders"; then
+    docker exec --user www-data -i nextcloud-container php occ app:install groupfolders
+  fi
+
+  docker exec --user www-data -i nextcloud-container php occ app:enable groupfolders
+
+  groupfolder_id=$(docker exec --user www-data -i nextcloud-container php occ groupfolders:list | awk -F'|' -v folder_name="${groupfolders_name}" '
+    {
+      name = $3
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", name)
+      if (name == folder_name) {
+        id = $2
+        gsub(/^[[:space:]]+|[[:space:]]+$/, "", id)
+        print id
+        exit
+      }
+    }
+  ')
+
+  if [ -z "${groupfolder_id}" ]; then
+    groupfolder_id=$(docker exec --user www-data -i nextcloud-container php occ groupfolders:create "${groupfolders_name}" --output=json)
+  fi
+
+  docker exec --user www-data -i nextcloud-container php occ groupfolders:group "${groupfolder_id}" "${groupfolders_access_group}" read write share delete
+
+  echo "Groupfolders app configured with admin-only Team folder access."
+}
+
 build_app () {
   echo "Building G DATA Antivirus App for Nextcloud..."
   make distclean
-  make appstore
-  tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
+  if [ "$USE_APPSTORE_PACKAGE" -eq 1 ]; then
+    make appstore
+    tar -xf ./build/artifacts/gdatavaas.tar.gz -C ./build/artifacts
+  else
+    make build
+    rm -rf ./build/artifacts/gdatavaas
+    mkdir -p ./build/artifacts/gdatavaas
+    # Keep file contents/line numbers identical to workspace for VS Code breakpoints.
+    tar \
+      --exclude='./.git' \
+      --exclude='./.github' \
+      --exclude='./.devcontainer' \
+      --exclude='./build' \
+      --exclude='./nextcloud-server' \
+      --exclude='./tests' \
+      --exclude='./scripts' \
+      --exclude='./node_modules' \
+      --exclude='./src' \
+      -cf - . | tar -xf - -C ./build/artifacts/gdatavaas
+  fi
   echo "Building G DATA Antivirus App for Nextcloud finished."
+}
+
+wait_for_http_ready () {
+  local max_attempts=60
+  local attempt=1
+
+  until [ "$attempt" -gt "$max_attempts" ]
+  do
+    if docker exec -i nextcloud-container sh -lc "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1/" | grep -Eq '^(200|302)$'; then
+      echo "Nextcloud HTTP endpoint is ready."
+      return 0
+    fi
+
+    echo "Waiting for Nextcloud HTTP endpoint to become ready..."
+    sleep 2
+    attempt=$((attempt + 1))
+  done
+
+  echo "Nextcloud HTTP endpoint did not become ready in time."
+  return 1
 }
 
 if [  -z "$CLIENT_ID" ] || [ -z "$CLIENT_SECRET" ]; then
@@ -112,6 +216,12 @@ do
   sleep 2
 done
 echo "G DATA Antivirus App for Nextcloud enabled."
+
+if [ "${IS_CI_FROM_ENV:-0}" != "1" ]; then
+  setup_groupfolders
+else
+  echo "Skipping Groupfolders setup in CI."
+fi
 
 # Configure the app for scanning
 docker exec --user www-data -i nextcloud-container php occ config:app:set gdatavaas clientId --value="$CLIENT_ID"
@@ -143,6 +253,8 @@ fi
 
 
 composer install
+
+wait_for_http_ready
 
 echo
 echo "Nextcloud setup and G DATA Antivirus App installation completed successfully."
