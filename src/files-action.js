@@ -9,8 +9,47 @@ import {t} from '@nextcloud/l10n'
 import {generateUrl} from '@nextcloud/router'
 import Magnifier from '@mdi/svg/svg/magnify.svg?raw'
 
+const API_ENDPOINT = generateUrl('/apps/gdatavaas/scan')
+
+const scanFile = async (fileId, fileName) => {
+	try {
+		const response = await fetch(API_ENDPOINT, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'requesttoken': getRequestToken()
+			},
+			body: JSON.stringify({ fileId })
+		})
+
+		const result = await response.json()
+
+		if (response.status === 200) {
+			switch (result.verdict) {
+				case 'Malicious':
+					showError(t('gdatavaas', `The file "${fileName}" has been scanned with G DATA as verdict Malicious`))
+					break
+				case 'Clean':
+					showSuccess(t('gdatavaas', `The file "${fileName}" has been scanned with G DATA as verdict Clean`))
+					break
+				case 'Pup':
+					showWarning(t('gdatavaas', `The file "${fileName}" has been scanned with G DATA as verdict PUP (Potentially unwanted program)`))
+					break
+				default:
+					showWarning(t('gdatavaas', `The file "${fileName}" has been scanned with G DATA as verdict ${result.verdict}`))
+			}
+		} else {
+			const errorMessage = result.error || 'An unknown error occurred while scanning the file'
+			showError(t('gdatavaas', errorMessage))
+		}
+	} catch (error) {
+		console.error('Scan error:', error)
+		showError(t('gdatavaas', `An error occurred while trying to scan the file: ${error.message}`))
+	}
+}
+
 registerFileAction({
-	id: "gdatavaas-filescan",
+	id: 'gdatavaas-filescan',
 	displayName: () => t('gdatavaas', 'Antivirus scan'),
 	enabled: ({nodes}) => {
 		if (!Array.isArray(nodes) || nodes.length === 0) {
@@ -22,48 +61,17 @@ registerFileAction({
 				return false
 			}
 
-			return node.type !== FileType.Folder && Boolean(node.permissions & Permission.READ)
+		return node.type !== FileType.Folder && Boolean(node.permissions & Permission.READ)
 		})
 	},
 	iconSvgInline: () => Magnifier,
 	async exec({nodes}) {
-		try {
-			const file = nodes[0]
-			const fileId = file.id
-			let response = await fetch(generateUrl('/apps/gdatavaas/scan'), {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'requesttoken': getRequestToken()
-				},
-				body: JSON.stringify({
-					fileId: fileId
-				})
-			})
-			let vaasVerdict = await response.json()
-			if (response.status === 200) {
-				switch (vaasVerdict['verdict']) {
-					case 'Malicious':
-						showError(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Malicious'));
-						break;
-					case 'Clean':
-						showSuccess(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as verdict Clean'));
-						break;
-					case 'Pup':
-						showWarning(t('gdatavaas', 'The file "' + file.basename + '" has been scanned with G DATA as ' +
-							'verdict PUP (Potentially unwanted program)'));
-						break;
-				}
-			} else {
-				try {
-					showError(t('gdatavaas', vaasVerdict.error));
-				} catch (e) {
-					showError(t('gdatavaas', 'An unknown error occurred while scanning the file'));
-				}
-			}
+		if (!nodes || nodes.length === 0) {
+			showError(t('gdatavaas', 'No file selected'))
+			return
 		}
-		catch (e) {
-			showError(t('gdatavaas', 'An error occurred while trying to scan the file: ') + e);
-		}
-	},
+
+		const file = nodes[0]
+		await scanFile(file.id, file.basename)
+	}
 })

@@ -70,7 +70,6 @@ return [
 	'finders' => [
 		Finder::create()
 			->files()
-			->notName('babel.config.js')
 			->notName('docker-compose.yaml')
 			->notName('Dockerfile.Nextcloud')
 			->notName('empty-skeleton.config.php')
@@ -82,7 +81,7 @@ return [
 			->notName('scoper.inc.php')
 			->notName('stylelint.config.js')
 			->notName('use-*-vaas.sh')
-			->notName('webpack.config.js')
+			->notName('vite.config.mjs')
 			->ignoreVCS(true)
 			->ignoreDotFiles(true)
 			->exclude([

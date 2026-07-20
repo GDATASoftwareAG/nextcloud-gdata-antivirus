@@ -42,9 +42,11 @@ class Application extends App implements IBootstrap {
 		assert($eventDispatcher instanceof IEventDispatcher);
 		$eventDispatcher->addListener(self::FILES_LOAD_ADDITIONAL_SCRIPTS_EVENT, function () {
 			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
+			Util::addStyle(self::APP_ID, 'gdatavaas-files-action');
 		});
 		$eventDispatcher->addListener(ResourcesLoadAdditionalScriptsEvent::class, function () {
 			Util::addInitScript(self::APP_ID, 'gdatavaas-files-action');
+			Util::addStyle(self::APP_ID, 'gdatavaas-files-action');
 		});
 	}
 

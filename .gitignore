@@ -9,6 +9,7 @@
 node_modules/
 /.php_cs.cache
 js/*hot-update.*
+css/
 # CakePHP 3
 
 /config/app.php

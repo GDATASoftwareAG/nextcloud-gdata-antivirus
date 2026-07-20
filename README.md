@@ -137,6 +137,7 @@ Install these locally (or ensure your devcontainer provides them):
 - PHP CLI (8.1+)
 - Optional for tests and packaging:
   - Bats (for make bats)
+  - Playwright (for `npm run test:e2e`)
   - php-scoper (only for make appstore - if you want to execute bats tests or want the production app, not development version)
 
 Note: The Makefile will download composer.phar if Composer isn’t available, but it still requires a local PHP CLI to run it.
@@ -166,6 +167,12 @@ After the container is up, open Nextcloud at http://localhost:8080 and enable th
 make npm
 ```
 
+For faster iteration during frontend development, use Vite in watch mode:
+
+```bash
+npm run watch
+```
+
 ### Available Make targets
 
 - make prod
@@ -189,6 +196,8 @@ make npm
 - make bats
   - Spins up a complete environment using Docker Compose and runs end-to-end Bats tests from tests/bats with the production build of the app.
   - Requirements: Bats installed locally and two environment variables set: CLIENT_ID and CLIENT_SECRET (valid VaaS credentials).
+- npm run test:e2e
+  - Runs Playwright end-to-end tests against the settings pages. Expects a running Nextcloud instance at `NEXTCLOUD_BASE_URL` (defaults to `http://127.0.0.1:8080`).
 - make appstore
   - Builds a distributable tarball at build/artifacts/gdatavaas.tar.gz. Intended for releases; requires php-scoper available in PATH.
 
@@ -279,8 +288,8 @@ php occ config:app:set gdatavaas disableUnscannedTag <true|false>
 php occ config:app:set gdatavaas scanOnlyThis <string>
 # Comma-separated list of files/folders that should **not** be scanned. Default: Empty string (no files excluded)
 php occ config:app:set gdatavaas doNotScanThis <string>
-# Email address to send notifications to, when infected files are uploaded. Default: None
-php occ config:app:set gdatavaas notifyMail <email>
+# Comma-separated email addresses to send notifications to when infected files are uploaded. Default: Empty string
+php occ config:app:set gdatavaas notifyMails <emails>
 # Whether to send email notifications on upload, when files are infected. Default: false
 php occ config:app:set gdatavaas sendMailOnVirusUpload <true|false>
 # Maximum file size (in MB) to scan. Default: 256

@@ -29,7 +29,7 @@ class VaasOperator implements IDelegatedSettings {
 				=> $this->config->getValueString(Application::APP_ID, 'quarantineFolder', 'Quarantine'),
 			'autoScanFiles' => $this->config->getValueBool(Application::APP_ID, 'autoScanFiles'),
 			'prefixMalicious'
-				=> $this->config->getValueBool(Application::APP_ID, 'prefixMalicious', true),
+				=> $this->config->getValueBool(Application::APP_ID, 'prefixMalicious'),
 			'disableUnscannedTag' => $this->config->getValueBool(Application::APP_ID, 'disableUnscannedTag'),
 			'scanOnlyThis' => $this->config->getValueString(Application::APP_ID, 'scanOnlyThis'),
 			'doNotScanThis' => $this->config->getValueString(Application::APP_ID, 'doNotScanThis'),

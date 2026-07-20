@@ -131,7 +131,7 @@ appstore: build
 	--exclude="$(source_build_directory)/nextcloud-server" \
 	--exclude="$(source_build_directory)/composer.json" \
 	--exclude="$(source_build_directory)/composer.json.license" \
-	--exclude="$(source_build_directory)/babel.config.js" \
+	--exclude="$(source_build_directory)/vite.config.mjs" \
 	--exclude="$(source_build_directory)/.editorconfig" \
 	--exclude="$(source_build_directory)/.gitignore" \
 	--exclude="$(source_build_directory)/.php-cs-fixer.dist.php" \
@@ -142,7 +142,6 @@ appstore: build
 	--exclude="$(source_build_directory)/package-lock.json.license" \
 	--exclude="$(source_build_directory)/package.json.license" \
 	--exclude="$(source_build_directory)/psalm.xml" \
-	--exclude="$(source_build_directory)/webpack.config.json" \
 	--exclude="$(source_build_directory)/stylelint.config.json" \
 	--exclude="$(source_build_directory)/empty-skeleton.config.php" \
 	--exclude="$(source_build_directory)/scoper.inc.php" \
