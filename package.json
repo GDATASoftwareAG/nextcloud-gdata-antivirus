@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@mdi/svg": "7.4.47",
+    "@nextcloud/auth": "2.6.0",
     "@nextcloud/dialogs": "8.0.0",
     "@nextcloud/files": "4.1.1",
     "@nextcloud/router": "3.2.0"

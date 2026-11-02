@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
+import {getRequestToken} from '@nextcloud/auth'
+
 document.addEventListener('DOMContentLoaded', async () => {
 
 	async function postData(url = '', data = {}) {
@@ -9,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'requesttoken': oc_requesttoken
+				'requesttoken': getRequestToken()
 			},
 			body: JSON.stringify(data)
 		});
@@ -21,7 +23,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			method: 'GET',
 			headers: {
 				'Content-Type': 'application/json',
-				'requesttoken': oc_requesttoken
+				'requesttoken': getRequestToken()
 			}
 		});
 		return response.json();
