@@ -69,7 +69,6 @@ class VerdictService {
 		$this->password = $this->appConfig->getValueString(Application::APP_ID, 'password');
 	}
 
-
 	/** Scans a file for malicious content with G DATA Verdict-as-a-Service and handles the result.
 	 * @param int $fileId
 	 * @return VaasVerdict

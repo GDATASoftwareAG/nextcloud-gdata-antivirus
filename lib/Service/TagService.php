@@ -50,17 +50,17 @@ class TagService {
 	public function setTag(int $fileId, string $tagName, bool $silent): void {
 		$mapper = $silent ? $this->silentTagMapper : $this->standardTagMapper;
 		$tag = $this->getTag($tagName);
-		$filesTagIds = $mapper->getTagIdsForObjects([$fileId], 'files');
+		$filesTagIds = $mapper->getTagIdsForObjects([strval($fileId)], 'files');
 		$vaasTagIds = $this->getVaasTagIds();
 
-		if (isset($filesTagIds[$fileId])) {
-			foreach ($filesTagIds[$fileId] as $tagId) {
+		if (isset($filesTagIds[strval($fileId)])) {
+			foreach ($filesTagIds[strval($fileId)] as $tagId) {
 				if ($tagId != $tag->getId() && in_array($tagId, $vaasTagIds)) {
 					// Removal of outdated tags should always be silent
 					$this->silentTagMapper->unassignTags(strval($fileId), 'files', [$tagId]);
 				}
 			}
-			if (in_array($tag->getId(), $filesTagIds[$fileId])) {
+			if (in_array($tag->getId(), $filesTagIds[strval($fileId)])) {
 				return;
 			}
 		}
@@ -119,7 +119,7 @@ class TagService {
 		$anyButUnscannedTagIds = $this->addTagToArray(self::PUP, $anyButUnscannedTagIds);
 		$anyButUnscannedTagIds = $this->addTagToArray(self::WONT_SCAN, $anyButUnscannedTagIds);
 		foreach ($anyButUnscannedTagIds as $tagId) {
-			if ($this->standardTagMapper->haveTag([$fileId], 'files', $tagId)) {
+			if ($this->standardTagMapper->haveTag([strval($fileId)], 'files', $tagId)) {
 				return true;
 			}
 		}
@@ -134,7 +134,7 @@ class TagService {
 	public function hasUnscannedTag(int $fileId): bool {
 		try {
 			return $this->standardTagMapper->haveTag(
-				[$fileId], 'files', $this->getTag(self::UNSCANNED, false)->getId()
+				[strval($fileId)], 'files', $this->getTag(self::UNSCANNED, false)->getId()
 			);
 		} catch (TagNotFoundException) {
 			return false;

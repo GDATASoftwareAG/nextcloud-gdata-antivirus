@@ -71,7 +71,6 @@ class ScanServiceTest extends TestCase {
 					default:
 						$this->fail('Unexpected number of calls to unassignTags');
 				}
-
 			});
 		$createTagMatcher = $this->exactly(4);
 		$tagManager
@@ -163,7 +162,6 @@ class ScanServiceTest extends TestCase {
 					default:
 						$this->fail('Unexpected number of calls to unassignTags');
 				}
-
 			});
 		$createTagMatcher = $this->exactly(4);
 		$tagManager

@@ -50,7 +50,9 @@ class GetTagsForFileCommand extends Command {
 		$this->setDescription('get tags for file');
 
 		$this->addArgument(
-			self::FILE_PATH, InputArgument::REQUIRED, 'path to file (username/files/filename)'
+			self::FILE_PATH,
+			InputArgument::REQUIRED,
+			'path to file (username/files/filename)'
 		);
 	}
 
@@ -69,8 +71,9 @@ class GetTagsForFileCommand extends Command {
 		$filePath = $input->getArgument('file-path');
 
 		$node = $this->rootFolder->get($filePath);
-		$tagIds = $this->systemTagObjectMapper->getTagIdsForObjects([$node->getId()], 'files');
-		foreach ($tagIds[$node->getId()] as $tagId) {
+		$fileId = strval($node->getId());
+		$tagIds = $this->systemTagObjectMapper->getTagIdsForObjects([$fileId], 'files');
+		foreach ($tagIds[$fileId] as $tagId) {
 			$tags = $this->tagManager->getTagsByIds([$tagId]);
 			foreach ($tags as $tag) {
 				$logger->info('tag: ' . $tag->getName());
