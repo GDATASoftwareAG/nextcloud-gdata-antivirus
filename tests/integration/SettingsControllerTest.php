@@ -66,7 +66,6 @@ class SettingsControllerTest extends IntegrationTestBase {
 		$this->testGetEndpoint($route, "Admin access to {$route}", 200);
 	}
 
-
 	#[DataProvider('adminPostRouteProvider')]
 	public function testAdminCanAccessAdminPostRoutes(string $route, array $data): void {
 		$this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
@@ -82,7 +81,6 @@ class SettingsControllerTest extends IntegrationTestBase {
 		$this->testPostEndpoint($route, $data, "Admin access to {$route}", 200);
 	}
 
-
 	#[DataProvider('adminGetRouteProvider')]
 	public function testOperatorCannotAccessAdminGetRoutes(string $route): void {
 		$this->testGetEndpoint(
@@ -93,7 +91,6 @@ class SettingsControllerTest extends IntegrationTestBase {
 			password: 'gdatavaas-operator'
 		);
 	}
-
 
 	#[DataProvider('adminPostRouteProvider')]
 	public function testOperatorCannotAccessAdminPostRoutes(string $route, array $data): void {
@@ -130,12 +127,10 @@ class SettingsControllerTest extends IntegrationTestBase {
 		);
 	}
 
-
 	#[DataProvider('adminGetRouteProvider')]
 	public function testUserCannotAccessAdminGetRoutes(string $route): void {
 		$this->testGetEndpoint($route, "User access to {$route}", 403, username: 'user', password: 'gdatavaas-user');
 	}
-
 
 	#[DataProvider('adminPostRouteProvider')]
 	public function testUserCannotAccessAdminPostRoutes(string $route, array $data): void {
