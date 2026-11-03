@@ -12,10 +12,12 @@ use OCA\GDataVaas\Service\FileService;
 use OCA\GDataVaas\Service\TagService;
 use OCA\GDataVaas\Service\VerdictService;
 use OCP\IAppConfig;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use VaasSdk\Authentication\ResourceOwnerPasswordGrantAuthenticator;
 
+#[AllowMockObjectsWithoutExpectations]
 class VerdictServiceTest extends TestCase {
 	private LoggerInterface $logger;
 

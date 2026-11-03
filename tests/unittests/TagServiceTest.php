@@ -12,8 +12,10 @@ use OCA\GDataVaas\Service\TagService;
 use OCP\SystemTag\ISystemTag;
 use OCP\SystemTag\ISystemTagManager;
 use OCP\SystemTag\ISystemTagObjectMapper;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class TagServiceTest extends TestCase {
 	public static int $OBJECT_ID_1 = 1;
 
