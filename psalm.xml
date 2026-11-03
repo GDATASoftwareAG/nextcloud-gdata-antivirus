@@ -46,6 +46,19 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <file name="lib/**/*.php" />
             </errorLevel>
         </UnusedClass>
+        <UnusedMethod>
+            <errorLevel type="suppress">
+                <!-- false positive: the method is called from the constructor -->
+                <file name="lib/Db/DbFileMapper.php" />
+            </errorLevel>
+        </UnusedMethod>
+        <InvalidArrayOffset>
+            <errorLevel type="suppress">
+                <!-- OCP documents tag id maps as array<string, ...>, but PHP casts numeric string keys to int -->
+                <file name="lib/Command/GetTagsForFileCommand.php" />
+                <file name="lib/Service/TagService.php" />
+            </errorLevel>
+        </InvalidArrayOffset>
         <MissingTemplateParam>
             <errorLevel type="suppress">
                 <file name="lib/Db/DbFileMapper.php" />
